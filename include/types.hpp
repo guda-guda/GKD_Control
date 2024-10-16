@@ -111,6 +111,7 @@ namespace Types
     enum ROBOT_MODE
     {
         ROBOT_NO_FORCE,
+        ROBOT_FINISH_INIT,
         ROBOT_FOLLOW_GIMBAL,
         ROBOT_NOT_FOLLOW
     };

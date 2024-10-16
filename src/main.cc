@@ -12,13 +12,11 @@ int main(int argc, char **argv) {
     robot.load_hardware();
     robot.start_init();
     robot.init_join();
-    LOG_INFO("finish init\n");
 
-    robot.robot_set->mode = Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL;
-    robot.robot_set->yaw_set = robot.robot_set->ins_roll;
+    robot.robot_set->mode = Types::ROBOT_MODE::ROBOT_FINISH_INIT;
 
-    robot.start();
-    robot.join();
+		 robot.start();
+		 robot.join();
 
     return 0;
 }
