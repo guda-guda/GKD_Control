@@ -11,7 +11,9 @@ namespace Device
         explicit IMU() = default;
 
         void init(const std::shared_ptr<Robot::Robot_set> &robot);
-        void unpack(const Types::ReceivePacket &pkg);
+        void unpack1(const Types::ReceivePacket &pkg);
+        void unpack2(const Types::ReceivePacket &pkg);
+        void unpack3(const Types::ReceivePacket &pkg);
 
        private:
         std::shared_ptr<Robot::Robot_set> robot_set;

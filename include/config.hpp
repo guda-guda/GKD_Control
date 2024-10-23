@@ -33,7 +33,15 @@ namespace Config
         0.3f,   // KD
         10.0f,  // MAX_OUT
         0.0f,   // MAX_IOUT
-    };          // MAX_IOUT
+    };
+
+    const typename Pid::Pid_config GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG{
+        12.0f,
+        0.0f,
+        10.0f,
+        15.0f,
+        5.0f,
+    };
 
     const typename Pid::Pid_config GIMBAL_PITCH_ABSOLUTE_PID_CONFIG{
         15.0f,  // KP
@@ -51,6 +59,14 @@ namespace Config
         0.0f,
     };
 
+    const typename Pid::Pid_config GIMBAL_9025_YAW_RELATIVE_PID_CONFIG{
+        8.0f,
+        0.0f,
+        10.0f,
+        15.0f,
+        5.0f,
+    };
+
     const typename Pid::Pid_config GIMBAL_PITCH_RELATIVE_PID_CONFIG{
         12.0f,
         0.0f,
@@ -61,10 +77,18 @@ namespace Config
 
     const typename Pid::Pid_config YAW_SPEED_PID_CONFIG{
         4000.f,
-        200.0f,
-        10.f,
+        0.0f,
+        100.f,
         30000.0f,
         5000.0f,
+    };
+
+    const typename Pid::Pid_config YAW_9025_SPEED_PID_CONFIG{
+        450.f,
+        0.0f,
+        50.f,
+        850.0f,
+        0.0f,
     };
 
     const typename Pid::Pid_config PITCH_SPEED_PID_CONFIG{
@@ -104,18 +128,25 @@ namespace Config
     constexpr fp32 CHASSIS_MOTOR_RPM_TO_VECTOR_SEN = 0.000415809748903494517209f;
     constexpr fp32 SHOOT_MOTOR_RPM_TO_SPEED = 0.00290888208665721596153948461415f;
     constexpr fp32 M6020_ECD_TO_RAD = 2.f * M_PIf / 8192.f;
+    constexpr fp32 M9025_ECD_TO_RAD = 2.f * M_PIf / 32767.f;
     constexpr fp32 RPM_TO_RAD_S = 2.f * M_PIf / 60.f;
     constexpr fp32 CHASSIS_CONTROL_FREQUENCE = 500.0f;
 #define STAND
 #ifdef STAND
-    constexpr fp32 GIMBAL_YAW_OFFSET_ECD = 3417;
-    constexpr fp32 GIMBAL_PITCH_OFFSET_ECD = 2194;
+    constexpr fp32 GIMBAL1_YAW_OFFSET_ECD = 3459;
+    constexpr fp32 GIMBAL1_PITCH_OFFSET_ECD = 2194;
+
+    constexpr fp32 GIMBAL2_YAW_OFFSET_ECD = 3366;
+    constexpr fp32 GIMBAL2_PITCH_OFFSET_ECD = 3985;
+
+    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 12432;
+    constexpr fp32 GIMBAL3_PITCH_OFFSET_ECD = 3985;
 #else
     constexpr fp32 GIMBAL_YAW_OFFSET_ECD = 5424;
     constexpr fp32 GIMBAL_PITCH_OFFSET_ECD = 618;
 #endif
 
-    constexpr uint32_t GIMBAL_INIT_STOP_TIME = 1000;
+    constexpr uint32_t GIMBAL_INIT_STOP_TIME = 2000;
     constexpr fp32 GIMBAL_INIT_EXP = 0.1f;
 
     constexpr fp32 FRICTION_MAX_SPEED = 4850.f;

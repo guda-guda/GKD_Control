@@ -25,7 +25,10 @@ typedef enum
 {
     CAN0 = 0,
     CAN1,
+    CAN2,
     SER1,
+    SER2,
+    SER3,
     SOCKET,
 } HardwareId;
 

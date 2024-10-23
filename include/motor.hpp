@@ -1,11 +1,12 @@
 #ifndef __MOTOR__
 #define __MOTOR__
 
-#include "pid_controller.hpp"
-#include "types.hpp"
+#include <linux/can.h>
+
 #include "can.hpp"
 #include "device/deviece_base.hpp"
-#include <linux/can.h>
+#include "pid_controller.hpp"
+#include "types.hpp"
 
 namespace Hardware
 {
@@ -41,15 +42,39 @@ namespace Hardware
        private:
     };
 
-    can_frame get_frame(canid_t can_id, const std::vector<Motor> & mots);
+    class Motor_9025 : public Device::DeviceBase
+    {
+       public:
+        explicit Motor_9025(const Pid::Pid_config &config) : pid_ctrler(config) {};
+        ~Motor_9025() = default;
+        void unpack(const can_frame &frame);
 
-    template<typename ...Args>
+       private:
+       public:
+        Pid::Pid_position pid_ctrler;
+        // TODO: can bus api related
+        motor_can_message motor_measure;
+
+        fp32 accel = 0.f;
+        fp32 speed = 0.f;
+        fp32 speed_set = 0.f;
+
+        int16_t give_current = 0;
+
+       private:
+    };
+
+    can_frame get_frame(canid_t can_id, const std::vector<Motor> &mots);
+
+    can_frame get_frame(canid_t can_id, const Motor_9025 &mots);
+
+    template<typename... Args>
     can_frame get_frame(canid_t can_id, const Motor &head, Args &&...args) {
         can_frame frame{};
         frame.can_id = can_id;
         frame.can_dlc = 8;
-        std::vector<const Motor*> mot_list = {&head, &args...};
-        for(int i = 0; i < mot_list.size() && i < 4; i++) {
+        std::vector<const Motor *> mot_list = { &head, &args... };
+        for (int i = 0; i < mot_list.size() && i < 4; i++) {
             frame.data[i << 1] = (mot_list[i]->give_current >> 8);
             frame.data[i << 1 | 1] = (mot_list[i]->give_current & 0xFF);
         }

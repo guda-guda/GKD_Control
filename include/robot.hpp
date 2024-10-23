@@ -24,29 +24,56 @@ namespace Robot
         fp32 wz_set = 0.f;
 
         /** gimbal_control **/
-        fp32 yaw_set = 0.f;
-        fp32 pitch_set = 0.f;
+        fp32 gimbal1_yaw_set = 0.f;
+        fp32 gimbal1_pitch_set = 0.f;
+
+        fp32 gimbal2_yaw_set = 0.f;
+        fp32 gimbal2_pitch_set = 0.f;
+
+        fp32 gimbal3_yaw_set = 0.f;
+        fp32 gimbal3_pitch_set = 0.f;
 
         /** shoot_control **/
         bool friction_open = false;
         bool shoot_open = false;
 
         /** IMU **/
-        fp32 ins_yaw = 0.f;
-        fp32 ins_pitch = 0.f;
-        fp32 ins_roll = 0.f;
-        fp32 ins_yaw_v = 0.f;
-        fp32 ins_pitch_v = 0.f;
-        fp32 ins_roll_v = 0.f;
+        fp32 gyro1_ins_yaw = 0.f;
+        fp32 gyro1_ins_pitch = 0.f;
+        fp32 gyro1_ins_roll = 0.f;
+        fp32 gyro1_ins_yaw_v = 0.f;
+        fp32 gyro1_ins_pitch_v = 0.f;
+        fp32 gyro1_ins_roll_v = 0.f;
+
+        fp32 gyro2_ins_yaw = 0.f;
+        fp32 gyro2_ins_pitch = 0.f;
+        fp32 gyro2_ins_roll = 0.f;
+        fp32 gyro2_ins_yaw_v = 0.f;
+        fp32 gyro2_ins_pitch_v = 0.f;
+        fp32 gyro2_ins_roll_v = 0.f;
+
+        fp32 gyro3_ins_yaw = 0.f;
+        fp32 gyro3_ins_pitch = 0.f;
+        fp32 gyro3_ins_roll = 0.f;
+        fp32 gyro3_ins_yaw_v = 0.f;
+        fp32 gyro3_ins_pitch_v = 0.f;
+        fp32 gyro3_ins_roll_v = 0.f;
 
         /** other **/
-        fp32 yaw_relative = 0.f;
-        fp32 pitch_relative = 0.f;
-		fp32 aimx;
-		fp32 aimy;
-		fp32 aimz;
+        fp32 gimbal1_yaw_relative = 0.f;
+        fp32 gimbal1_pitch_relative = 0.f;
 
-		bool is_aiming = false;
+        fp32 gimbal2_yaw_relative = 0.f;
+        fp32 gimbal2_pitch_relative = 0.f;
+
+        fp32 gimbal3_yaw_relative = 0.f;
+        fp32 gimbal3_pitch_relative = 0.f;
+
+        fp32 aimx;
+        fp32 aimy;
+        fp32 aimz;
+
+        bool is_aiming = false;
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
     } __attribute__((packed));
 
@@ -59,6 +86,8 @@ namespace Robot
         uint8_t id : 3;
         uint8_t armors_num : 3;
         uint8_t reserved : 1;
+				int16_t sd_yaw;
+				int16_t sd_pitch;
         float x;
         float y;
         float z;
@@ -113,7 +142,6 @@ namespace Robot
         float pitch;
         float yaw;
     } __attribute__((packed));
-
 
 }  // namespace Robot
 

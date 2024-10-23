@@ -43,7 +43,7 @@ namespace Io
         }
     }
 
-    Server_socket_interface::Server_socket_interface() : port_num(51718) {
+    Server_socket_interface::Server_socket_interface() : port_num(11451) {
         // NOTE: read this https://www.linuxhowtos.org/C_C++/socket.htm
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0) {

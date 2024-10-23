@@ -56,8 +56,8 @@ clean-build: clean
 
 mini-pc:
 	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL fc54835e2a55 make clean-build
-	@sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
-	@sshpass -p 1 ssh gkd@192.168.0.114 "/home/gkd/dev/rx78-2"
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
+	sshpass -p 1 ssh gkd@192.168.0.114 "/home/gkd/dev/rx78-2"
 
 serial: $(SERIAL_DIR)
 	@$(MAKE) -C $< -j8

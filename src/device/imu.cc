@@ -5,35 +5,50 @@
 
 namespace Device
 {
-    void IMU::unpack(const Types::ReceivePacket &pkg) {
-        robot_set->ins_yaw = UserLib::rad_format(pkg.yaw * (M_PIf / 180));
-        robot_set->ins_pitch = UserLib::rad_format(pkg.pitch * (M_PIf / 180));
-        robot_set->ins_roll = UserLib::rad_format(pkg.roll * (M_PIf / 180));
-        robot_set->ins_yaw_v = (pkg.yaw_v * (M_PIf / 180)) / 1000;
-        robot_set->ins_pitch_v = (pkg.pitch_v * (M_PIf / 180)) / 1000;
-        robot_set->ins_roll_v = (pkg.roll_v * (M_PIf / 180)) / 1000;
+    void IMU::unpack1(const Types::ReceivePacket &pkg) {
+        robot_set->gyro1_ins_yaw = UserLib::rad_format(pkg.yaw * (M_PIf / 180));
+        robot_set->gyro1_ins_pitch = UserLib::rad_format(pkg.pitch * (M_PIf / 180));
+        robot_set->gyro1_ins_roll = UserLib::rad_format(pkg.roll * (M_PIf / 180));
+        robot_set->gyro1_ins_yaw_v = (pkg.yaw_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro1_ins_pitch_v = (pkg.pitch_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro1_ins_roll_v = (pkg.roll_v * (M_PIf / 180)) / 1000;
+        update_time();
+    }
+    void IMU::unpack2(const Types::ReceivePacket &pkg) {
+        robot_set->gyro2_ins_yaw = UserLib::rad_format(pkg.yaw * (M_PIf / 180));
+        robot_set->gyro2_ins_pitch = UserLib::rad_format(pkg.pitch * (M_PIf / 180));
+        robot_set->gyro2_ins_roll = UserLib::rad_format(pkg.roll * (M_PIf / 180));
+        robot_set->gyro2_ins_yaw_v = (pkg.yaw_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro2_ins_pitch_v = (pkg.pitch_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro2_ins_roll_v = (pkg.roll_v * (M_PIf / 180)) / 1000;
+        update_time();
+    }
+
+    void IMU::unpack3(const Types::ReceivePacket &pkg) {
+        robot_set->gyro3_ins_yaw = UserLib::rad_format(pkg.yaw * (M_PIf / 180));
+        robot_set->gyro3_ins_pitch = UserLib::rad_format(pkg.pitch * (M_PIf / 180));
+        robot_set->gyro3_ins_roll = UserLib::rad_format(pkg.roll * (M_PIf / 180));
+        robot_set->gyro3_ins_yaw_v = (pkg.yaw_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro3_ins_pitch_v = (pkg.pitch_v * (M_PIf / 180)) / 1000;
+        robot_set->gyro3_ins_roll_v = (pkg.roll_v * (M_PIf / 180)) / 1000;
         update_time();
     }
 
     void IMU::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
         Robot::hardware->register_callback<SER1>([&](const Types::ReceivePacket &rp) {
-            // LOG_INFO(
-            //     "%f, %f, %f %f %f %f\n",
-            //     rp.yaw,
-            //     rp.pitch,
-            //     rp.roll,
-            //     (rp.yaw_v * (M_PIf / 180)) / 1000,
-            //     (rp.pitch_v * (M_PIf / 180)) / 1000,
-            //     (rp.roll_v * (M_PIf / 180)) / 1000);
-            unpack(rp);
+            // LOG_INFO("gyro 1 %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
+            unpack1(rp);
+        });
 
-            Robot::SendVisionControl svp;
-            svp.header = 0xA6;
-            svp.yaw = robot_set->ins_yaw;
-            svp.pitch = robot_set->ins_pitch;
-            svp.roll = robot_set->ins_roll;
-            Robot::hardware->send<SOCKET>(svp);
+        Robot::hardware->register_callback<SER2>([&](const Types::ReceivePacket &rp) {
+            // LOG_INFO("gyro 2 %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
+            unpack2(rp);
+        });
+
+        Robot::hardware->register_callback<SER3>([&](const Types::ReceivePacket &rp) {
+            // LOG_INFO("gyro 3 %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
+            unpack3(rp);
         });
     }
 }  // namespace Device
