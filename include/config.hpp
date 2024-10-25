@@ -18,7 +18,7 @@ namespace Config
     };
 
     const typename Pid::Pid_config CHASSIS_FOLLOW_GIMBAL_PID_CONFIG{
-        .4f,   // KP
+        2.0f,   // KP
         0.0f,    // KI
         110.0f,  // KD
         6.0f,    // MAX_OUT
@@ -36,7 +36,7 @@ namespace Config
     };
 
     const typename Pid::Pid_config GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG{
-        12.0f,
+        8.0f,
         0.0f,
         10.0f,
         15.0f,
@@ -139,7 +139,7 @@ namespace Config
     constexpr fp32 GIMBAL2_YAW_OFFSET_ECD = 3366;
     constexpr fp32 GIMBAL2_PITCH_OFFSET_ECD = 3985;
 
-    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 12432;
+    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 45199;
     constexpr fp32 GIMBAL3_PITCH_OFFSET_ECD = 3985;
 #else
     constexpr fp32 GIMBAL_YAW_OFFSET_ECD = 5424;

@@ -32,8 +32,9 @@ typedef enum
     SOCKET,
 } HardwareId;
 
-//之后移动到support
-struct Vec3d {
+// 之后移动到support
+struct Vec3d
+{
     double x, y, z;
 };
 
@@ -116,6 +117,8 @@ namespace Types
         ROBOT_NO_FORCE,
         ROBOT_FINISH_INIT,
         ROBOT_FOLLOW_GIMBAL,
+        ROBOT_SEARCH,
+        ROBOT_IDLE,
         ROBOT_NOT_FOLLOW
     };
 

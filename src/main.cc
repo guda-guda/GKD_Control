@@ -3,6 +3,7 @@
 
 using namespace std::chrono;
 
+
 int main(int argc, char **argv) {
     Robot::Robot_ctrl robot;
 
@@ -11,7 +12,7 @@ int main(int argc, char **argv) {
     robot.init_join();
     LOG_INFO("init finished!\n");
 
-    robot.robot_set->mode = Types::ROBOT_MODE::ROBOT_FINISH_INIT;
+    robot.robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FINISH_INIT);
 
     robot.start();
     robot.join();

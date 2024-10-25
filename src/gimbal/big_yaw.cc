@@ -26,12 +26,12 @@ namespace Gimbal
             yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
             yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 
-            //LOG_INFO(
-            //    "big yaw %d %f %f %f\n",
-            //    yaw_motor.motor_measure.ecd,
-            //    robot_set->gimbal3_yaw_relative,
-            //    yaw_gyro,
-            //    yaw_motor.speed_set);
+            LOG_INFO(
+                "big yaw %d %f %f %f\n",
+                yaw_motor.motor_measure.ecd,
+                robot_set->gimbal3_yaw_relative,
+                yaw_gyro,
+                yaw_motor.speed_set);
 
             robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
             if (fabs(robot_set->gimbal3_yaw_relative) < Config::GIMBAL_INIT_EXP) {
@@ -49,21 +49,22 @@ namespace Gimbal
             update_data();
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
                 yaw_motor.give_current = 0.f;
-            } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_FINISH_INIT) {
+            } else if (
+                robot_set->mode == Types::ROBOT_MODE::ROBOT_FINISH_INIT ||
+                robot_set->mode == Types::ROBOT_MODE::ROBOT_IDLE ||
+                robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
+                if (robot_set->mode_changed()) {
+                    robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
+                }
                 yaw_absolute_pid.calc(robot_set->gyro3_ins_yaw, robot_set->gimbal3_yaw_set);
                 yaw_motor.speed_set = yaw_absolute_pid.out;
                 yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
                 yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
             } else {
-                // LOG_INFO(
-                //     "big yaw %f %f %f %f\n",
-                //     robot_set->gyro3_ins_yaw,
-                //     robot_set->gimbal3_yaw_set,
-                //     yaw_gyro,
-                //     yaw_motor.speed_set);
-
-                yaw_absolute_pid.calc(robot_set->gyro3_ins_yaw, robot_set->gimbal3_yaw_set);
-                yaw_motor.speed_set = yaw_absolute_pid.out;
+                yaw_relative_pid.calc(robot_set->gimbal1_yaw_relative, 0);
+                yaw_motor.speed_set = yaw_relative_pid.out;
+                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, 0);
+                yaw_motor.speed_set += yaw_relative_pid.out;
                 yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
                 yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
             }

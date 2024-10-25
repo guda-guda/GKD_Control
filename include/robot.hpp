@@ -25,12 +25,15 @@ namespace Robot
 
         /** gimbal_control **/
         fp32 gimbal1_yaw_set = 0.f;
+        fp32 gimbal1_yaw_offset = 0.f;
         fp32 gimbal1_pitch_set = 0.f;
 
         fp32 gimbal2_yaw_set = 0.f;
+        fp32 gimbal2_yaw_offset = 0.f;
         fp32 gimbal2_pitch_set = 0.f;
 
         fp32 gimbal3_yaw_set = 0.f;
+        fp32 gimbal3_yaw_offset = 0.f;
         fp32 gimbal3_pitch_set = 0.f;
 
         /** shoot_control **/
@@ -72,9 +75,25 @@ namespace Robot
         fp32 aimx;
         fp32 aimy;
         fp32 aimz;
-
         bool is_aiming = false;
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
+        Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
+
+        void set_mode(Types::ROBOT_MODE set_mode) {
+            this->last_mode = this->mode;
+            this->mode = set_mode;
+        }
+
+        bool mode_changed() {
+            if (this->last_mode != this->mode) {
+                this->last_mode = this->mode;
+                return true;
+            }
+            return false;
+        }
+
+        void sync_head() {
+        }
     } __attribute__((packed));
 
     // send gimbal package header = 0x5A;
@@ -86,8 +105,16 @@ namespace Robot
         uint8_t id : 3;
         uint8_t armors_num : 3;
         uint8_t reserved : 1;
-				int16_t sd_yaw;
-				int16_t sd_pitch;
+        int16_t sd_yaw;
+        int16_t sd_pitch;
+        int16_t sd_vx;
+        int16_t sd_vy;
+        uint8_t sd_a;
+        uint8_t sd_b;
+        int8_t sd_mx;
+        int8_t sd_my;
+        uint8_t sd_x;
+        uint8_t sd_y;
         float x;
         float y;
         float z;

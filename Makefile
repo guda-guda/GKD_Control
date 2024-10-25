@@ -57,7 +57,14 @@ clean-build: clean
 mini-pc:
 	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL fc54835e2a55 make clean-build
 	sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
-	sshpass -p 1 ssh gkd@192.168.0.114 "/home/gkd/dev/rx78-2"
+
+mini-pc-os-deps:
+	sshpass -p 1 ssh root@192.168.0.114 "ip link set CAN_LEFT_HEAD up type can bitrate 1000000"
+	sshpass -p 1 ssh root@192.168.0.114 "ip link set CAN_RIGHT_HEAD up type can bitrate 1000000"
+	sshpass -p 1 ssh root@192.168.0.114 "ip link set CAN_CHASSIS up type can bitrate 1000000"
+	sshpass -p 1 ssh root@192.168.0.114 "chmod 666 /dev/IMU_LEFT"
+	sshpass -p 1 ssh root@192.168.0.114 "chmod 666 /dev/IMU_RIGHT"
+	sshpass -p 1 ssh root@192.168.0.114 "chmod 666 /dev/IMU_BIG_YAW"
 
 serial: $(SERIAL_DIR)
 	@$(MAKE) -C $< -j8

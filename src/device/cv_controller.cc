@@ -30,16 +30,33 @@ namespace Device
     }
 
     void Cv_controller::unpack(const Robot::ReceiveGimbalPacket& pkg) {
-        LOG_INFO("cv unpacking %d %d\n", pkg.sd_yaw, pkg.sd_pitch);
+        // LOG_INFO("cv unpacking %d %d\n", pkg.sd_mx, pkg.sd_my);
         float y = -(float)pkg.sd_yaw / 32767, p = -(float)pkg.sd_pitch / 62767;
-        if (y < 1.5 && y > -1.5) {
-            robot_set->gimbal1_yaw_set = y;
-            robot_set->gimbal2_yaw_set = y;
+        if (robot_set->mode == Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL) {
+            robot_set->gimbal1_yaw_offset += ((float)pkg.sd_mx / 18) * 0.02;
+            robot_set->gimbal2_yaw_offset += ((float)pkg.sd_mx / 18) * 0.02;
+            if (y < 1.5 && y > -1.5) {
+                robot_set->gimbal1_yaw_set = y + robot_set->gimbal1_yaw_offset;
+                robot_set->gimbal2_yaw_set = y + robot_set->gimbal2_yaw_offset;
+            }
+            if (p < 0.15 && p > -0.47) {
+                robot_set->gimbal1_pitch_set = p;
+                robot_set->gimbal2_pitch_set = p;
+            }
+        } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
+            robot_set->gimbal3_yaw_set += ((float)pkg.sd_mx / 18) * 0.02;
         }
-        if (p < 0.15 && p > -0.47) {
-            robot_set->gimbal1_pitch_set = p;
-            robot_set->gimbal2_pitch_set = p;
+
+        if (pkg.sd_a == 1) {
+            robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL);
+        } else if (pkg.sd_b == 1) {
+            robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH);
+        } else if (pkg.sd_x == 1) {
+            exit(0);
         }
+
+        robot_set->vx_set = (float)pkg.sd_vx / 32767;
+        robot_set->vy_set = (float)pkg.sd_vy / 32767;
         // if (pkg.x != 0) {
         //     auto solver_successful = bullet_solver_.solve(
         //         { pkg.x, pkg.y, pkg.z },

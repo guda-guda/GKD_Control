@@ -35,9 +35,10 @@ namespace Gimbal
             pitch_motor.pid_ctrler.calc(-pitch_gyro, pitch_motor.speed_set);
             pitch_motor.give_current = (int16_t)pitch_motor.pid_ctrler.out;
 
-            //LOG_INFO("ecd2 %d\n", yaw_motor.motor_measure.ecd);
+            // LOG_INFO("ecd2 %d\n", yaw_motor.motor_measure.ecd);
 
             robot_set->gimbal2_yaw_set = robot_set->gyro2_ins_yaw;
+            robot_set->gimbal2_yaw_offset = robot_set->gyro2_ins_yaw;
             if (fabs(robot_set->gimbal2_yaw_relative) < Config::GIMBAL_INIT_EXP &&
                 fabs(robot_set->gyro2_ins_pitch - init_pitch_set) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
@@ -50,7 +51,7 @@ namespace Gimbal
             Robot::hardware->send<CAN0>(Hardware::get_frame(0x1FF, yaw_motor, pitch_motor));
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
         }
-						 LOG_INFO("gimba2 init finished\n");
+        LOG_INFO("gimba2 init finished\n");
     }
 
     [[noreturn]] void Gimbal_L::task() {
@@ -60,23 +61,18 @@ namespace Gimbal
                 yaw_motor.give_current = 0.f;
                 pitch_motor.give_current = 0.f;
             } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_FINISH_INIT) {
-                static float delta = 0, delta1 = M_PIf / 4;
-                float y = .0, p = .0;
-                y = robot_set->gimbal2_yaw_set - delta;
+                static float delta1 = M_PIf / 4;
+                float p = .0;
                 // 仰角9.57 俯角27.42
                 p = robot_set->gimbal2_pitch_set +
                     (std::sin(delta1) * 0.10550000000000002 - 0.07233333333333336) * M_PIf;
-                delta += 0.002;
                 delta1 += 0.008;
 
-                // LOG_INFO("gimbal2 %f %f\n", robot_set->gyro2_ins_yaw, robot_set->gimbal2_yaw_set);
-                if (robot_set->gyro2_ins_yaw < robot_set->gimbal2_yaw_set - (M_PIf * 7 / 8)) {
-                    robot_set->mode = Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL;
+                if (robot_set->gimbal2_yaw_relative > (M_PIf * 7 / 8)) {
+                    robot_set->set_mode(Types::ROBOT_MODE::ROBOT_IDLE);
+                    continue;
                 }
-
-                yaw_absolute_pid.calc(robot_set->gyro2_ins_yaw, y);
-                yaw_motor.speed_set = yaw_absolute_pid.out;
-                yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
+                yaw_motor.pid_ctrler.calc(yaw_gyro, -2);
                 yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
 
                 pitch_absolute_pid.calc(robot_set->gyro2_ins_pitch, p);
@@ -84,7 +80,45 @@ namespace Gimbal
                 pitch_motor.pid_ctrler.calc(-pitch_gyro, pitch_motor.speed_set);
                 pitch_motor.give_current = (int16_t)pitch_motor.pid_ctrler.out;
 
-            } else {
+            } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_IDLE) {
+                yaw_absolute_pid.calc(robot_set->gyro2_ins_yaw, robot_set->gimbal2_yaw_set);
+                yaw_motor.speed_set = yaw_absolute_pid.out;
+                yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
+                yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
+
+                pitch_absolute_pid.calc(robot_set->gyro2_ins_pitch, robot_set->gimbal2_pitch_set);
+                pitch_motor.speed_set = pitch_absolute_pid.out;
+                pitch_motor.pid_ctrler.calc(-pitch_gyro, pitch_motor.speed_set);
+                pitch_motor.give_current = (int16_t)pitch_motor.pid_ctrler.out;
+            } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
+                static float delta1 = M_PIf / 4;
+                static int8_t dir = 2;
+                float p = .0;
+                // 仰角9.57 俯角27.42
+                p = robot_set->gimbal2_pitch_set +
+                    (std::sin(delta1) * 0.10550000000000002 - 0.07233333333333336) * M_PIf;
+                delta1 += 0.008;
+
+                if (robot_set->gimbal2_yaw_relative > (M_PIf * 8 / 9) ||
+                    robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 2)) {
+                    dir = -2;
+                } else if (
+                    robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 8) &&
+                    robot_set->gimbal2_yaw_relative > -(M_PIf * 1 / 2)) {
+                    dir = 2;
+                }
+
+                yaw_motor.pid_ctrler.calc(-(yaw_gyro + robot_set->gyro3_ins_yaw_v), dir);
+                yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
+
+                pitch_absolute_pid.calc(robot_set->gyro2_ins_pitch, p);
+                pitch_motor.speed_set = pitch_absolute_pid.out;
+                pitch_motor.pid_ctrler.calc(-pitch_gyro, pitch_motor.speed_set);
+                pitch_motor.give_current = (int16_t)pitch_motor.pid_ctrler.out;
+            } else {  // ROBOT_FOLLOW_GIMBAL
+                if (robot_set->mode_changed()) {
+                    robot_set->sync_head();
+                }
                 yaw_absolute_pid.calc(robot_set->gyro2_ins_yaw, robot_set->gimbal2_yaw_set);
                 yaw_motor.speed_set = yaw_absolute_pid.out;
                 yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
