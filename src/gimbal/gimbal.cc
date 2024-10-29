@@ -8,8 +8,7 @@ namespace Gimbal
           pitch_motor(Config::PITCH_SPEED_PID_CONFIG),
           yaw_absolute_pid(Config::GIMBAL_YAW_ABSOLUTE_PID_CONFIG),
           pitch_absolute_pid(Config::GIMBAL_PITCH_ABSOLUTE_PID_CONFIG),
-          yaw_relative_pid(Config::GIMBAL_YAW_RELATIVE_PID_CONFIG),
-          pitch_relative_pid(Config::GIMBAL_PITCH_RELATIVE_PID_CONFIG) {
+          yaw_relative_pid(Config::GIMBAL_YAW_RELATIVE_PID_CONFIG) {
     }
 
     void Gimbal::init(const std::shared_ptr<Robot::Robot_set> &robot) {

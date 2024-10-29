@@ -8,6 +8,9 @@ namespace Robot
 
     Robot_ctrl::~Robot_ctrl() {
         delete ser1;
+        delete ser2;
+        delete ser3;
+        delete socket_intrf;
     }
 
     void Robot_ctrl::start_init() {
