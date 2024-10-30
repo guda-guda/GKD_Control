@@ -79,7 +79,7 @@ namespace Config
         4000.f,
         0.0f,
         100.f,
-        30000.0f,
+        20000.0f,
         5000.0f,
     };
 
@@ -128,7 +128,7 @@ namespace Config
     constexpr fp32 CHASSIS_MOTOR_RPM_TO_VECTOR_SEN = 0.000415809748903494517209f;
     constexpr fp32 SHOOT_MOTOR_RPM_TO_SPEED = 0.00290888208665721596153948461415f;
     constexpr fp32 M6020_ECD_TO_RAD = 2.f * M_PIf / 8192.f;
-    constexpr fp32 M9025_ECD_TO_RAD = 2.f * M_PIf / 32767.f;
+    constexpr fp32 M9025_ECD_TO_RAD = 2.f * M_PIf / 65535.f;
     constexpr fp32 RPM_TO_RAD_S = 2.f * M_PIf / 60.f;
     constexpr fp32 CHASSIS_CONTROL_FREQUENCE = 500.0f;
 #define STAND
@@ -139,7 +139,7 @@ namespace Config
     constexpr fp32 GIMBAL2_YAW_OFFSET_ECD = 3366;
     constexpr fp32 GIMBAL2_PITCH_OFFSET_ECD = 3985;
 
-    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 45199;
+    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 12289;
     constexpr fp32 GIMBAL3_PITCH_OFFSET_ECD = 3985;
 #else
     constexpr fp32 GIMBAL_YAW_OFFSET_ECD = 5424;

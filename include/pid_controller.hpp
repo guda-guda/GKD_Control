@@ -1,10 +1,11 @@
 #ifndef __PID_CONTROLLER__
 #define __PID_CONTROLLER__
 
+#include <algorithm>
 #include <climits>
 #include <cmath>
-#include <algorithm>
 
+#include "ramp.hpp"
 #include "types.hpp"
 #include "user_lib.hpp"
 
@@ -44,7 +45,7 @@ namespace Pid
         fp32 Pout = 0.f;
         fp32 Iout = 0.f;
         fp32 Dout = 0.f;
-        fp32 Dbuf = 0.f;   // 微分项 0最新 1上一次 2上上次
+        fp32 Dbuf = 0.f;     // 微分项 0最新 1上一次 2上上次
         fp32 error[2] = {};  // 误差项 0最新 1上一次 2上上次
     };
 
@@ -53,17 +54,17 @@ namespace Pid
        public:
         explicit Pid_rad(const Pid_config &config);
         ~Pid_rad() = default;
-//        void calc(fp32 get, fp32 set, fp32 error_delta);
+        //        void calc(fp32 get, fp32 set, fp32 error_delta);
         void calc(fp32 get, fp32 set);
 
        public:
+        UserLib::Ramp ramp;
         fp32 out = 0.f;
         fp32 Pout = 0.f;
         fp32 Iout = 0.f;
         fp32 Dout = 0.f;
         fp32 err = 0.f;
         fp32 last_err = 0.f;
-
     };
 }  // namespace Pid
 

@@ -1,5 +1,4 @@
 #include "device/cv_controller.hpp"
-
 #include "hardware.hpp"
 #include "utils.hpp"
 
@@ -32,6 +31,11 @@ namespace Device
     void Cv_controller::unpack(const Robot::ReceiveGimbalPacket& pkg) {
         // LOG_INFO("cv unpacking %d %d\n", pkg.sd_mx, pkg.sd_my);
         float y = -(float)pkg.sd_yaw / 32767, p = -(float)pkg.sd_pitch / 62767;
+        if (pkg.sd_ltb == 1) {
+            robot_set->wz_set = 1.5;
+        } else {
+            robot_set->wz_set = 0.f;
+        }
         if (robot_set->mode == Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL) {
             robot_set->gimbal1_yaw_offset += ((float)pkg.sd_mx / 18) * 0.02;
             robot_set->gimbal2_yaw_offset += ((float)pkg.sd_mx / 18) * 0.02;

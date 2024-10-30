@@ -24,12 +24,12 @@ namespace Gimbal
             yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
             yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 
-            // LOG_INFO(
-            //     "big yaw %d %f %f %f\n",
-            //     yaw_motor.motor_measure.ecd,
-            //     robot_set->gimbal3_yaw_relative,
-            //     yaw_gyro,
-            //     yaw_motor.speed_set);
+            LOG_INFO(
+                "big yaw %d %f %f %f\n",
+                yaw_motor.motor_measure.ecd,
+                robot_set->gimbal3_yaw_relative,
+                yaw_gyro,
+                yaw_motor.speed_set);
 
             robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
             if (fabs(robot_set->gimbal3_yaw_relative) < Config::GIMBAL_INIT_EXP) {

@@ -105,6 +105,8 @@ namespace Robot
         int8_t sd_my;
         uint8_t sd_x;
         uint8_t sd_y;
+        uint8_t sd_ltb;
+        uint8_t sd_rtb;
         float x;
         float y;
         float z;

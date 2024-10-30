@@ -66,8 +66,11 @@ namespace Gimbal
                     robot_set->set_mode(Types::ROBOT_MODE::ROBOT_IDLE);
                     continue;
                 }
-                yaw_motor.pid_ctrler.calc(yaw_gyro, -2);
-                yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
+
+                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, robot_set->gimbal2_yaw_relative + 0.1);
+                yaw_motor.speed_set = yaw_relative_pid.out;
+                yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
+                yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 
                 pitch_absolute_pid.calc(robot_set->gyro2_ins_pitch, p);
                 pitch_motor.speed_set = pitch_absolute_pid.out;
@@ -102,14 +105,16 @@ namespace Gimbal
                     dir = 2;
                 }
 
-                yaw_motor.pid_ctrler.calc(-(yaw_gyro + robot_set->gyro3_ins_yaw_v), dir);
+                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, robot_set->gimbal2_yaw_relative + 0.1 * dir);
+                yaw_motor.speed_set = yaw_relative_pid.out;
+                yaw_motor.pid_ctrler.calc(-yaw_gyro - robot_set->gyro3_ins_yaw_v, yaw_motor.speed_set);
                 yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 
                 pitch_absolute_pid.calc(robot_set->gyro2_ins_pitch, p);
                 pitch_motor.speed_set = pitch_absolute_pid.out;
                 pitch_motor.pid_ctrler.calc(-pitch_gyro, pitch_motor.speed_set);
                 pitch_motor.give_current = (int16_t)pitch_motor.pid_ctrler.out;
-            } else {  // ROBOT_FOLLOW_GIMBAL
+            } else {  // ROBOT_FOLLOW_GIMBAL ROBOT_SPIN
                 if (robot_set->mode_changed()) {
                     robot_set->sync_head();
                 }

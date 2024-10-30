@@ -54,9 +54,7 @@ namespace Chassis
             vx_set = cos_yaw * robot_set->vx_set - sin_yaw * robot_set->vy_set;
             vy_set = sin_yaw * robot_set->vx_set + cos_yaw * robot_set->vy_set;
 
-            if (robot_set->mode == Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL ||
-                robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH ||
-                robot_set->mode == Types::ROBOT_MODE::ROBOT_IDLE) {
+            if (robot_set->wz_set == 0.f) {
                 chassis_angle_pid.calc(robot_set->gimbal3_yaw_relative, 0.f);
                 wz_set = chassis_angle_pid.out;
             } else {
