@@ -30,7 +30,7 @@ namespace Device
 
     void Cv_controller::unpack(const Robot::ReceiveGimbalPacket& pkg) {
         // LOG_INFO("cv unpacking %d %d\n", pkg.sd_mx, pkg.sd_my);
-        float y = -(float)pkg.sd_yaw / 32767, p = -(float)pkg.sd_pitch / 62767;
+        float y = (float)pkg.sd_yaw / 32767, p = -(float)pkg.sd_pitch / 62767;
         if (pkg.sd_ltb == 1) {
             robot_set->wz_set = 1.5;
         } else {

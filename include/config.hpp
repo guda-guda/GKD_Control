@@ -18,9 +18,9 @@ namespace Config
     };
 
     const typename Pid::Pid_config CHASSIS_FOLLOW_GIMBAL_PID_CONFIG{
-        2.0f,   // KP
+        4.0f,   // KP
         0.0f,    // KI
-        110.0f,  // KD
+        10.0f,  // KD
         6.0f,    // MAX_OUT
         0.2f,    // MAX_IOUT
     };
@@ -54,17 +54,17 @@ namespace Config
     const typename Pid::Pid_config GIMBAL_YAW_RELATIVE_PID_CONFIG{
         15.0f,
         0.0f,
-        10.0f,
+        0.3f,
         10.0f,
         0.0f,
     };
 
     const typename Pid::Pid_config GIMBAL_9025_YAW_RELATIVE_PID_CONFIG{
-        8.0f,
+        3.6f,
         0.0f,
-        10.0f,
+        8.0f,
         15.0f,
-        5.0f,
+        0.0f,
     };
 
     const typename Pid::Pid_config GIMBAL_PITCH_RELATIVE_PID_CONFIG{
@@ -78,7 +78,7 @@ namespace Config
     const typename Pid::Pid_config YAW_SPEED_PID_CONFIG{
         4000.f,
         0.0f,
-        100.f,
+        0.f,
         20000.0f,
         5000.0f,
     };

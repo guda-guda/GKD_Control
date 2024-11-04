@@ -67,7 +67,7 @@ namespace Gimbal
                     continue;
                 }
 
-                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, robot_set->gimbal2_yaw_relative + 0.1);
+                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, -robot_set->gimbal1_yaw_relative + 0.2);
                 yaw_motor.speed_set = yaw_relative_pid.out;
                 yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
                 yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
@@ -105,7 +105,7 @@ namespace Gimbal
                     dir = 2;
                 }
 
-                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, robot_set->gimbal2_yaw_relative + 0.1 * dir);
+                yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, -robot_set->gimbal1_yaw_relative + 0.1 * dir);
                 yaw_motor.speed_set = yaw_relative_pid.out;
                 yaw_motor.pid_ctrler.calc(-yaw_gyro - robot_set->gyro3_ins_yaw_v, yaw_motor.speed_set);
                 yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;

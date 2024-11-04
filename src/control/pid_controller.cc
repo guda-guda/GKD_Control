@@ -54,9 +54,9 @@ namespace Pid
 
     void Pid_rad::calc(fp32 get, fp32 set) {
         last_err = err;
-        ramp.update(set);
+        ramp.update(UserLib::rad_format(set - get));
 
-        err = UserLib::rad_format(ramp.out - get);
+        err = ramp.out;
         Pout = kp * err;
         Iout += ki * err;
         Dout = kd * (err - last_err);
