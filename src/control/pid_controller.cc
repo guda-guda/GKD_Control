@@ -1,36 +1,12 @@
 #include "pid_controller.hpp"
 
-namespace Pid
-{
-    /**
-     * @brief          pid config data init
-     * @param[out]     pid: PID结构数据指针
-     * @param[in]      mode: PID_POSITION:普通PID
-     *                 PID_DELTA: 差分PID
-     * @param[in]      PID: 0: kp, 1: ki, 2:kd
-     * @param[in]      max_out: pid最大输出
-     * @param[in]      max_iout: pid最大积分输出
-     * @retval         none
-     */
-
-    Pid_config::Pid_config(fp32 kp, fp32 ki, fp32 kd, fp32 max_out, fp32 max_iout)
-        : kp(kp),
-          ki(ki),
-          kd(kd),
-          max_out(max_out),
-          max_iout(max_iout) {
-    }
-}  // namespace Pid
+#include "user_lib.hpp"
 
 namespace Pid
 {
-
-    Pid_position::Pid_position(const Pid_config &config) : Pid_config(config) {
-    }
-
-    void Pid_position::calc(fp32 ref, fp32 set) {
+    void PidPosition::set(const fp32 set_v) {
         error[1] = error[0];
-        error[0] = (set - ref);
+        error[0] = (set_v - ref);
 
         Pout = kp * error[0];
         Iout += ki * error[0];
@@ -42,21 +18,17 @@ namespace Pid
         out = std::clamp(out, -max_out, max_out);
     }
 
-    void Pid_position::clean() {
+    void PidPosition::clean() {
         error[0] = error[1] = 0;
         Dbuf = 0.f;
         Pout = Iout = Dout = 0;
         out = 0;
     }
 
-    Pid_rad::Pid_rad(const Pid_config &config) : Pid_config(config), ramp(10, 1.f / 1000) {
-    }
-
-    void Pid_rad::calc(fp32 get, fp32 set) {
+    void PidRad::set(const fp32 set) {
         last_err = err;
-        ramp.update(UserLib::rad_format(set - get));
 
-        err = ramp.out;
+        err = UserLib::rad_format(set - ref);
         Pout = kp * err;
         Iout += ki * err;
         Dout = kd * (err - last_err);
@@ -65,5 +37,4 @@ namespace Pid
         out = Pout + Iout + Dout;
         out = std::clamp(out, -max_out, max_out);
     }
-
 }  // namespace Pid

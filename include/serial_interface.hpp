@@ -4,9 +4,10 @@
 
 #include "hardware_callback.hpp"
 #include "serial/serial.h"
+#include "types.hpp"
 #include "utils.hpp"
 
-namespace Hardware
+namespace IO
 {
 
     template<class T>
@@ -25,6 +26,7 @@ namespace Hardware
 
        public:
         T rp;
+        std::string name;
 
        private:
         uint8_t buffer[256];
@@ -33,7 +35,8 @@ namespace Hardware
 
     template<class T>
     Serial_interface<T>::Serial_interface(std::string port_name, int baudrate, int simple_timeout)
-        : serial::Serial(port_name, baudrate, serial::Timeout::simpleTimeout(simple_timeout)) {
+        : serial::Serial(port_name, baudrate, serial::Timeout::simpleTimeout(simple_timeout)),
+          name(port_name) {
     }
 
     template<class T>
@@ -61,7 +64,7 @@ namespace Hardware
     inline int Serial_interface<T>::unpack() {
         memcpy(buffer, read(sizeof(T)).c_str(), sizeof(T));
         fromVector(buffer, &rp);
-				//LOG_INFO("serial data : (angle y/p/r) %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
+        // LOG_INFO("serial data : (angle y/p/r) %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
         this->callback(rp);
         return 0;
     }
@@ -79,5 +82,7 @@ namespace Hardware
             }
         }
     }
-}  // namespace Hardware
+}  // namespace IO
 #endif
+
+using SERIAL = IO::Serial_interface<Types::ReceivePacket>;

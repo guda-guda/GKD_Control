@@ -21,18 +21,6 @@ namespace Status
     const bool ERROR = false;
 }  // namespace Status
 
-typedef enum
-{
-    CAN0 = 0,
-    CAN1,
-    CAN2,
-    SER1,
-    SER2,
-    SER3,
-    SOCKET,
-} HardwareId;
-
-// 之后移动到support
 struct Vec3d
 {
     double x, y, z;

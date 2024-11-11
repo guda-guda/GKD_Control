@@ -84,7 +84,7 @@ namespace Robot
 
         void sync_head() {
         }
-    } __attribute__((packed));
+    };
 
     // send gimbal package header = 0x5A;
     struct ReceiveGimbalPacket

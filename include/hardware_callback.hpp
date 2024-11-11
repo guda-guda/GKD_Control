@@ -6,7 +6,7 @@
 #include "functional"
 #include "map"
 
-namespace Hardware {
+namespace IO {
 
     /** callback base define **/
     /**

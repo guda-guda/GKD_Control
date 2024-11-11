@@ -3,10 +3,8 @@
 
 #include <memory>
 
-#include "can.hpp"
-#include "config.hpp"
-#include "hardware.hpp"
-#include "motor.hpp"
+#include "dji_motor.hpp"
+#include "pid_controller.hpp"
 #include "robot.hpp"
 
 namespace Gimbal
@@ -44,12 +42,8 @@ namespace Gimbal
         void update_data();
 
        public:
-        Hardware::Motor yaw_motor;
-        Hardware::Motor pitch_motor;
-
-        Pid::Pid_rad pitch_absolute_pid;
-        Pid::Pid_rad yaw_absolute_pid;
-        Pid::Pid_rad yaw_relative_pid;
+        Hardware::M6020 yaw_motor;
+        Hardware::M6020 pitch_motor;
     };
 
     class Gimbal_L : public Gimbal
@@ -76,9 +70,9 @@ namespace Gimbal
         void update_data();
 
         bool inited = false;
-        Hardware::Motor_9025 yaw_motor;
-        Pid::Pid_rad yaw_absolute_pid;
-        Pid::Pid_rad yaw_relative_pid;
+        // Hardware::Motor_9025 yaw_motor;
+        //Pid::PidRad yaw_absolute_pid;
+        //Pid::PidRad yaw_relative_pid;
     };
 
 }  // namespace Gimbal

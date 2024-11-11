@@ -1,11 +1,9 @@
 #include "socket_interface.hpp"
 
-#include <chrono>
-#include <thread>
-
+#include "robot.hpp"
 #include "user_lib.hpp"
 
-namespace Io
+namespace IO
 {
     void Server_socket_interface::task() {
         while (true) {
@@ -43,7 +41,7 @@ namespace Io
         }
     }
 
-    Server_socket_interface::Server_socket_interface() : port_num(11451) {
+    Server_socket_interface::Server_socket_interface(std::string name) : port_num(11451), name(name) {
         // NOTE: read this https://www.linuxhowtos.org/C_C++/socket.htm
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0) {
@@ -65,4 +63,4 @@ namespace Io
     Server_socket_interface::~Server_socket_interface() {
         close(sockfd);
     }
-}  // namespace Io
+}  // namespace IO

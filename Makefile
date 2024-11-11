@@ -12,7 +12,7 @@ SERIAL_DIR= $(shell find ./3rdparty -name "src-serial")
 THIRD_PARTY_LIB_DIR= $(shell find ./3rdparty -name "lib")
 
 CC = g++
-CPPFLAGS = -std=c++17 -O0 -g
+CPPFLAGS = -std=c++20 -O0 -g
 #CPPFLAGS += -Wall
 CPPFLAGS += -I$(WORK_DIR)/include
 
@@ -57,6 +57,7 @@ clean-build: clean
 mini-pc:
 	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL fc54835e2a55 make clean-build
 	sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
+	sshpass -p 1 ssh gkd@192.168.0.114 "/home/gkd/dev/rx78-2"
 
 mini-pc-os-deps:
 	sshpass -p 1 ssh root@192.168.0.114 "ip link set CAN_LEFT_HEAD up type can bitrate 1000000"

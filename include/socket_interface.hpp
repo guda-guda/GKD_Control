@@ -8,21 +8,18 @@
 #include <cstdio>
 #include <cstring>
 #include <map>
-#include <memory>
 
-#include "arpa/inet.h"
 #include "hardware_callback.hpp"
 #include "robot.hpp"
 #include "utils.hpp"
-#include "iostream"
 
-namespace Io
+namespace IO
 {
-    class Server_socket_interface : public Hardware::Callback<Robot::Vison_control, Robot::ReceiveGimbalPacket>
+    class Server_socket_interface : public IO::Callback<Robot::Vison_control, Robot::ReceiveGimbalPacket>
 
     {
        public:
-        Server_socket_interface();
+        Server_socket_interface(std::string name);
         ~Server_socket_interface();
         void task();
 
@@ -42,18 +39,6 @@ namespace Io
             }
         }
 
-        // void send(const std::string &str) {
-        //     auto n =
-        //         sendto(sockfd, str.c_str(), str.size(), MSG_CONFIRM, (const struct sockaddr *)&cli_addr,
-        //         cli_addr_len);
-        //     //            LOG_OK("%lu bytes send to client\n", n);
-        // }
-
-        // void send(const char *str) {
-        //     auto n = sendto(sockfd, str, strlen(str), MSG_CONFIRM, (const struct sockaddr *)&cli_addr, cli_addr_len);
-        //     //            LOG_OK("%lu bytes send to client\n", n);
-        // }
-
        private:
         int64_t port_num;
         int sockfd;
@@ -65,8 +50,11 @@ namespace Io
         char buffer[256];
 
        public:
+        std::string name;
+
        private:
     };
-}  // namespace Io
-
+}  // namespace IO
 #endif
+
+using SOCKET = IO::Server_socket_interface;

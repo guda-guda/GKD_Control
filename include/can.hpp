@@ -11,19 +11,16 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <functional>
 
-#include "config.hpp"
-#include "string"
-#include "utils.hpp"
 #include "hardware_callback.hpp"
+#include "types.hpp"
 
-namespace Hardware
+namespace IO
 {
-    class Can_interface : public Callback_key<uint32_t , can_frame>
+    class Can_interface : public Callback_key<uint32_t, can_frame>
     {
        public:
-        Can_interface();
+        Can_interface(const std::string &name);
         ~Can_interface();
         bool send(const can_frame &frame);
         bool task();
@@ -38,8 +35,9 @@ namespace Hardware
         bool init_flag;
 
        public:
+        std::string name;
     };
 
-}  // namespace Hardware
+}  // namespace IO
 
 #endif

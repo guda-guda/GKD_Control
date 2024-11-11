@@ -1,13 +1,13 @@
 #include "device/cv_controller.hpp"
-#include "hardware.hpp"
-#include "utils.hpp"
+#include "types.hpp"
 
 namespace Device
 {
     void Cv_controller::init(const std::shared_ptr<Robot::Robot_set>& robot) {
         robot_set = robot;
-        Robot::hardware->register_callback<SOCKET, Robot::ReceiveGimbalPacket>(
-            [&](const Robot::ReceiveGimbalPacket& pkg) { unpack(pkg); });
+        // FIXME:
+        // Robot::hardware->register_callback<SOCKET, Robot::ReceiveGimbalPacket>(
+        //     [&](const Robot::ReceiveGimbalPacket& pkg) { unpack(pkg); });
     }
 
     [[noreturn]] void Cv_controller::task() {
@@ -23,8 +23,9 @@ namespace Device
             sgp.aim_x = robot_set->aimx;
             sgp.aim_y = robot_set->aimy;
             sgp.aim_z = robot_set->aimz;
-            Robot::hardware->send<SOCKET>(sgp);
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // FIXME:
+            // Robot::hardware->send<SOCKET>(sgp);
+            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 

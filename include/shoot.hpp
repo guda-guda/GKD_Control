@@ -1,9 +1,7 @@
-#include "config.hpp"
-#include "hardware.hpp"
-#include "motor.hpp"
-#include "pid_controller.hpp"
-#include "robot.hpp"
+#include "dji_motor.hpp"
 #include "ramp.hpp"
+#include "robot.hpp"
+#include <memory>
 
 namespace Shoot
 {
@@ -24,8 +22,8 @@ namespace Shoot
         int jam_time = 0;
         int back_time = 0;
 
-        std::vector<Hardware::Motor> friction;
-        std::vector<Hardware::Motor> trigger;
+        //std::vector<Hardware::Motor> friction;
+        //std::vector<Hardware::Motor> trigger;
 
         std::shared_ptr<Robot::Robot_set> robot_set;
        private:

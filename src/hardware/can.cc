@@ -1,38 +1,25 @@
 #include "can.hpp"
+
 #include <cstring>
 
-namespace Hardware
+#include "utils.hpp"
+
+namespace IO
 {
-    Can_interface::Can_interface() {
+    Can_interface::Can_interface(const std::string &name) : name(name) {
         addr = new sockaddr_can;
         ifr = new ifreq;
         soket_id = -1;
         init_flag = false;
+        init(name.c_str());
     }
 
-    void Can_interface::init(const char* can_channel) {
+    void Can_interface::init(const char *can_channel) {
         // create CAN socket
         if ((soket_id = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
             LOG_ERR("Error while creating socket");
             exit(-1);
         }
-
-        struct can_filter rfilter[7];
-        rfilter[0].can_id = 0x201;
-        rfilter[0].can_mask = 0x3ff;
-        rfilter[1].can_id = 0x202;
-        rfilter[1].can_mask = 0x3ff;
-        rfilter[2].can_id = 0x203;
-        rfilter[2].can_mask = 0x3ff;
-        rfilter[3].can_id = 0x204;
-        rfilter[3].can_mask = 0x3ff;
-        rfilter[4].can_id = 0x205;
-        rfilter[4].can_mask = 0x3ff;
-        rfilter[5].can_id = 0x206;
-        rfilter[5].can_mask = 0x3ff;
-        rfilter[6].can_id = 0x141;
-        rfilter[6].can_mask = 0x3ff;
-        setsockopt(soket_id, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
         std::strcpy(ifr->ifr_name, can_channel);
         ioctl(soket_id, SIOCGIFINDEX, ifr);
@@ -74,4 +61,4 @@ namespace Hardware
         return true;
     }
 
-}  // namespace Hardware
+}  // namespace IO

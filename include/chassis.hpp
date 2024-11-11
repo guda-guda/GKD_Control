@@ -2,14 +2,12 @@
 #define __CHASSIS_H__
 
 #include <memory>
-#include <vector>
 
+#include "pid_controller.hpp"
 #include "robot.hpp"
-#include "hardware.hpp"
-#include "can.hpp"
-#include "motor.hpp"
+#include "dji_motor.hpp"
 #include "types.hpp"
-#include "utils.hpp"
+#include <stdint.h>
 
 namespace Chassis
 {
@@ -45,9 +43,9 @@ namespace Chassis
         fp32 wheel_speed[4] = {};
 
         fp32 max_wheel_speed = 2.5f;
-        Pid::Pid_rad chassis_angle_pid;
+        Pid::PidRad* chassis_angle_pid;
 
-        std::vector<Hardware::Motor> motors;
+				std::vector<Hardware::M3508> motors;
         std::shared_ptr<Robot::Robot_set> robot_set;
     };
 }  // namespace Chassis

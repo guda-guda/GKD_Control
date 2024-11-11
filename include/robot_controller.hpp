@@ -4,12 +4,9 @@
 
 #include "can.hpp"
 #include "chassis.hpp"
-#include "config.hpp"
 #include "device/cv_controller.hpp"
 #include "device/imu.hpp"
 #include "gimbal.hpp"
-#include "hardware.hpp"
-#include "rc_ctrl.hpp"
 #include "robot.hpp"
 #include "serial_interface.hpp"
 #include "shoot.hpp"
@@ -51,14 +48,13 @@ namespace Robot
         Gimbal::Gimbal_big_yaw gimbal_big_yaw;
         Shoot::Shoot shoot;
 
-        Hardware::Can_interface can0;
-        Hardware::Can_interface can1;
-        Hardware::Can_interface can2;
-        Hardware::Serial_interface<Types::ReceivePacket> *ser1;
-        Hardware::Serial_interface<Types::ReceivePacket> *ser2;
-        Hardware::Serial_interface<Types::ReceivePacket> *ser3;
-        Io::Server_socket_interface *socket_intrf;
-        Io::Rc_ctrl rc_ctrl;
+        IO::Can_interface *can0;
+        IO::Can_interface *can1;
+        IO::Can_interface *can2;
+        IO::Serial_interface<Types::ReceivePacket> *ser1;
+        IO::Serial_interface<Types::ReceivePacket> *ser2;
+        IO::Serial_interface<Types::ReceivePacket> *ser3;
+        IO::Server_socket_interface *socket_intrf;
 
        private:
     };

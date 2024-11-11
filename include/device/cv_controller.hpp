@@ -1,7 +1,6 @@
 #pragma once
 
 #include "device/deviece_base.hpp"
-#include "types.hpp"
 #include "bullet_solver.hpp"
 #include "robot.hpp"
 #include "memory"

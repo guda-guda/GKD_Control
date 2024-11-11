@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "pid_controller.hpp"
 #include "types.hpp"
 
@@ -9,7 +10,7 @@ namespace Config
     // NOTE: PID CONFIG
 
     /** CHASSIS **/
-    const typename Pid::Pid_config M3508_SPEED_PID_CONFIG{
+    const typename Pid::PidConfig M3508_SPEED_PID_CONFIG{
         15000.0f,  // KP
         10.0f,     // KI
         0.0f,      // KD
@@ -17,17 +18,17 @@ namespace Config
         2000.0f,   // MAX_IOUT
     };
 
-    const typename Pid::Pid_config CHASSIS_FOLLOW_GIMBAL_PID_CONFIG{
+    const typename Pid::PidConfig CHASSIS_FOLLOW_GIMBAL_PID_CONFIG{
         4.0f,   // KP
-        0.0f,    // KI
+        0.0f,   // KI
         10.0f,  // KD
-        6.0f,    // MAX_OUT
-        0.2f,    // MAX_IOUT
+        6.0f,   // MAX_OUT
+        0.2f,   // MAX_IOUT
     };
 
-    //TODO Adjust PID parameters
+    // TODO Adjust PID parameters
     /** GIMBAL **/
-    const typename Pid::Pid_config GIMBAL_YAW_ABSOLUTE_PID_CONFIG{
+    const typename Pid::PidConfig GIMBAL_YAW_ABSOLUTE_PID_CONFIG{
         12.0f,  // KP
         0.0f,   // KI
         0.3f,   // KD
@@ -35,82 +36,54 @@ namespace Config
         0.0f,   // MAX_IOUT
     };
 
-    const typename Pid::Pid_config GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG{
-        8.0f,
-        0.0f,
-        10.0f,
-        15.0f,
-        5.0f,
+    const typename Pid::PidConfig GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG{
+        8.0f, 0.0f, 10.0f, 15.0f, 5.0f,
     };
 
-    const typename Pid::Pid_config GIMBAL_PITCH_ABSOLUTE_PID_CONFIG{
+    const typename Pid::PidConfig GIMBAL_PITCH_ABSOLUTE_PID_CONFIG{
         15.0f,  // KP
         0.0f,   // KI
-        10.0f,   // KD
+        10.0f,  // KD
         10.0f,  // MAX_OUT
         0.0f,   // MAX_IOUT
     };
 
-    const typename Pid::Pid_config GIMBAL_YAW_RELATIVE_PID_CONFIG{
-        15.0f,
-        0.0f,
-        0.3f,
-        10.0f,
-        0.0f,
+    const typename Pid::PidConfig GIMBAL_YAW_RELATIVE_PID_CONFIG{
+        8.0f, 0.0f, 0.3f, 10.0f, 0.0f,
     };
 
-    const typename Pid::Pid_config GIMBAL_9025_YAW_RELATIVE_PID_CONFIG{
-        3.6f,
-        0.0f,
-        8.0f,
-        15.0f,
-        0.0f,
+    const typename Pid::PidConfig GIMBAL_9025_YAW_RELATIVE_PID_CONFIG{
+        3.6f, 0.0f, 8.0f, 15.0f, 0.0f,
     };
 
-    const typename Pid::Pid_config GIMBAL_PITCH_RELATIVE_PID_CONFIG{
-        12.0f,
-        0.0f,
-        0.0f,
-        10.0f,
-        0.0f,
+    const typename Pid::PidConfig GIMBAL_PITCH_RELATIVE_PID_CONFIG{
+        12.0f, 0.0f, 0.0f, 10.0f, 0.0f,
     };
 
-    const typename Pid::Pid_config YAW_SPEED_PID_CONFIG{
-        4000.f,
-        0.0f,
-        0.f,
-        20000.0f,
-        5000.0f,
+    const typename Pid::PidConfig YAW_SPEED_PID_CONFIG{
+        5000.f, 0.0f, 0.f, 20000.0f, 5000.0f,
     };
 
-    const typename Pid::Pid_config YAW_9025_SPEED_PID_CONFIG{
-        450.f,
-        0.0f,
-        50.f,
-        850.0f,
-        0.0f,
+    const typename Pid::PidConfig YAW_9025_SPEED_PID_CONFIG{
+        450.f, 0.0f, 50.f, 850.0f, 0.0f,
     };
 
-    const typename Pid::Pid_config PITCH_SPEED_PID_CONFIG{
-        4500.0f,
-        100.0f,
-        0.0f,
-        30000.0f,
-        5000.0f,
+    const typename Pid::PidConfig PITCH_SPEED_PID_CONFIG{
+        5500.0f, 100.0f, 0.0f, 30000.0f, 5000.0f,
     };
 
     /** SHOOT **/
-    const typename Pid::Pid_config FRIC_SPEED_PID_CONFIG{
-        5.f,  // KP
+    const typename Pid::PidConfig FRIC_SPEED_PID_CONFIG{
+        5.f,       // KP
         0.05f,     // KI
-        10.0f,      // KD
+        10.0f,     // KD
         16000.0f,  // MAX_OUT
         2000.0f,   // MAX_IOUT
     };
 
-    const typename Pid::Pid_config TRIGGER_SPEED_PID_CONFIG{
-        800.0f,  // KP
-        0.5f,     // KI
+    const typename Pid::PidConfig TRIGGER_SPEED_PID_CONFIG{
+        800.0f,    // KP
+        0.5f,      // KI
         0.0f,      // KD
         10000.0f,  // MAX_OUT
         9000.0f,   // MAX_IOUT
@@ -159,4 +132,4 @@ namespace Config
 
     constexpr uint32_t DEFAULT_OFFLINE_TIME = 100;
 
-}  // namespace BulletSolverConfig
+}  // namespace Config
