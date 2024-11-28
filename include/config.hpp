@@ -1,11 +1,24 @@
 #pragma once
 #include <cmath>
+#include <vector>
 #include "pid_controller.hpp"
 #include "types.hpp"
 
 namespace Config
 {
-    const char CAN_CHANNEL[] = "can1";
+    const std::vector<std::string> CanInitList = {
+        "CAN_CHASSIS", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD"
+    };
+
+    const std::vector<std::string> SocketInitList = {
+        "CONTROLLER_SOCKET"
+    };
+
+    const std::vector<std::tuple<std::string, int, int>> SerialInitList = {
+        {"/dev/IMU_RIGHT", 115200, 2000},
+        {"/dev/IMU_LEFT", 115200, 2000},
+        {"/dev/IMU_BIG_YAW", 115200, 2000}
+    };
 
     // NOTE: PID CONFIG
 

@@ -47,16 +47,6 @@ namespace Robot
         Gimbal::Gimbal_L gimbal_l;
         Gimbal::Gimbal_big_yaw gimbal_big_yaw;
         Shoot::Shoot shoot;
-
-        IO::Can_interface *can0;
-        IO::Can_interface *can1;
-        IO::Can_interface *can2;
-        IO::Serial_interface<Types::ReceivePacket> *ser1;
-        IO::Serial_interface<Types::ReceivePacket> *ser2;
-        IO::Serial_interface<Types::ReceivePacket> *ser3;
-        IO::Server_socket_interface *socket_intrf;
-
-       private:
     };
 
 }  // namespace Robot
