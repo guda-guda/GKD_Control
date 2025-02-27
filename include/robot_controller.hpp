@@ -2,11 +2,8 @@
 #include <memory>
 #include <thread>
 
-#include "can.hpp"
 #include "chassis/chassis.hpp"
 #include "device/cv_controller.hpp"
-#include "device/imu.hpp"
-#include "gimbal/gimbal.hpp"
 #include "gimbal/gimbal_sentry.hpp"
 #include "gimbal/gimbal_temp.hpp"
 #include "robot.hpp"
@@ -45,6 +42,7 @@ namespace Robot
         Device::Cv_controller cv_controller_;
         Chassis::Chassis chassis;
         Gimbal::GimbalT gimbal;
+        Gimbal::GimbalT gimbal_l;
         Gimbal::GimbalSentry gimbal_big_yaw;
         Shoot::Shoot shoot;
     };

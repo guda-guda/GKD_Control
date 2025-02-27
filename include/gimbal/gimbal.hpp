@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "dji_motor.hpp"
-#include "pid_controller.hpp"
+#include "imu.hpp"
 #include "robot.hpp"
 
 namespace Gimbal
@@ -40,6 +40,7 @@ namespace Gimbal
         void init_task();
         [[noreturn]] void task();
         void update_data();
+        Device::IMU imu;
 
        public:
         Hardware::DJIMotor yaw_motor;
@@ -70,6 +71,7 @@ namespace Gimbal
         void update_data();
 
         bool inited = false;
+        //Device::IMU imu;
         // Hardware::Motor_9025 yaw_motor;
         //Pid::PidRad yaw_absolute_pid;
         //Pid::PidRad yaw_relative_pid;

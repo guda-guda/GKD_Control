@@ -23,27 +23,20 @@ int main(int argc, char **argv) {
     signal(SIGSEGV, test);
     signal(SIGABRT, test);
     signal(SIGHUP, test);
+
     Robot::Robot_ctrl robot;
 
     robot.load_hardware();
-    std::cout << std::boolalpha;
-    std::thread out_thread([&]() {
-        while (true) {
-            motor.set(0);
-            std::cout << robot.gimbal_big_yaw.yaw_motor_speed << ' ' << motor.offline() << std::endl;
-            UserLib::sleep_ms(1);
-        }
-    });
-    // robot.start_init();
-    // robot.init_join();
-    // std::cout << "finish" << std::endl;
-    // LOG_INFO("init finished!\n");
+
+		robot.start_init();
+		robot.init_join();
+		LOG_INFO("init finished!\n");
 
     // robot.robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FINISH_INIT);
     // robot.robot_set->vx_set = 0.1;
     //
     // robot.start();
     // robot.join();
-    out_thread.join();
+
     return 0;
 }

@@ -23,7 +23,7 @@ namespace Gimbal
         while (!inited) {
             update_data();
             // yaw_relative_pid.calc(robot_set->gimbal3_yaw_relative, 0);
-            // yaw_motor.speed_set = yaw_relative_pid.out;
+   	       // yaw_motor.speed_set = yaw_relative_pid.out;
             // yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
             // yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 

@@ -15,6 +15,9 @@ CC = g++
 CPPFLAGS = -std=c++20 -O0 -g
 #CPPFLAGS += -Wall
 CPPFLAGS += -I$(WORK_DIR)/include
+CPPFLAGS += -I$(WORK_DIR)/include/gimbal
+CPPFLAGS += -I$(WORK_DIR)/include/chassis
+CPPFLAGS += -I$(WORK_DIR)/include/device
 
 # NOTE: turn on debug here
 CPPFLAGS += -D__DEBUG__
@@ -55,9 +58,9 @@ clean-build: clean
 	@make all -j8
 
 mini-pc:
-	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL fc54835e2a55 make clean-build
-	sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
-	sshpass -p 1 ssh gkd@192.168.0.114 "/home/gkd/dev/rx78-2"
+	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL a30b5228ace8 make clean-build
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.4:/home/gkd/dev
+	#sshpass -p 1 ssh gkd@192.168.1.4 "/home/gkd/dev/rx78-2"
 
 mini-pc-os-deps:
 	sshpass -p 1 ssh root@192.168.0.114 "ip link set CAN_LEFT_HEAD up type can bitrate 1000000"

@@ -9,7 +9,7 @@
 namespace Config
 {
     const std::vector<std::string> CanInitList = {
-        "CAN_CHASSIS", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD"
+        "CAN_CHASSIS", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD", "CAN_BULLET"
     };
 
     const std::vector<std::string> SocketInitList = {
@@ -47,7 +47,7 @@ namespace Config
     };
 
     const Gimbal::GimbalConfig gimbal_left_config {
-        .imu_serial_port = "/dev/IMU_LEFT",
+        .imu_serial_port = "/dev/IMU_RIGHT",
         .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_LEFT_HEAD", 1),
         .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_LEFT_HEAD", 2),
         .yaw_rate_pid_config = {
@@ -85,12 +85,13 @@ namespace Config
             .max_out =      10.0f,
             .max_iout =     0.0f,
         },
+				.gimbal_motor_dir = -1.0,
         .ControlTime = 1,
-        .YawOffSet = 3366
+        .YawOffSet = 6033
     };
 
     const Gimbal::GimbalConfig gimbal_right_config {
-        .imu_serial_port = "/dev/IMU_RIGHT",
+        .imu_serial_port = "/dev/IMU_LEFT",
         .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 2),
         .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 1),
         .yaw_rate_pid_config = {
@@ -128,8 +129,9 @@ namespace Config
             .max_out =      10.0f,
             .max_iout =     0.0f,
         },
+				.gimbal_motor_dir = 1.0,
         .ControlTime = 1,
-        .YawOffSet = 3459
+        .YawOffSet = 6094
     };
 
     // NOTE: PID CONFIG

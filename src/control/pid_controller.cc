@@ -37,4 +37,8 @@ namespace Pid
         out = Pout + Iout + Dout;
         out = std::clamp(out, -max_out, max_out);
     }
+
+    void Invert::set(const fp32 set) {
+        out = set * dir;
+    }
 }  // namespace Pid

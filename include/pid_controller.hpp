@@ -60,4 +60,13 @@ namespace Pid
         fp32 err = 0.f;
         fp32 last_err = 0.f;
     };
+
+    class Invert final : public PidConfig, public Controller
+    {
+    public:
+        explicit Invert(const fp32 dir) : dir(dir) {};
+        ~Invert() override = default;
+        void set(fp32 set) override;
+				fp32 dir;
+    };
 }  // namespace Pid

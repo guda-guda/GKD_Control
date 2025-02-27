@@ -15,6 +15,7 @@ namespace Gimbal
         Pid::PidConfig yaw_relative_pid_config{};
         Pid::PidConfig yaw_absolute_pid_config{};
         Pid::PidConfig pitch_absolute_pid_config{};
+				float gimbal_motor_dir;
         const int ControlTime{};
         const fp32 YawOffSet{};
     };

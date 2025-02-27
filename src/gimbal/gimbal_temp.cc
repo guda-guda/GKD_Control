@@ -12,15 +12,10 @@ namespace Gimbal
             yaw_motor(config.yaw_motor_config), pitch_motor(config.pitch_motor_config) {
     }
 
-    /**
-     *
-    * yaw_motor(6020, "CAN_RIGHT_HEAD", 2), pitch_motor(6020, "CAN_RIGHT_HEAD", 1),
-            imu("/dev/IMU_RIGHT")
-     */
     void GimbalT::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
         yaw_motor.setCtrl(Pid::PidPosition(config.yaw_rate_pid_config, yaw_gyro));
-        pitch_motor.setCtrl(Pid::PidPosition(config.pitch_rate_pid_config, pitch_gyro));
+        pitch_motor.setCtrl(Pid::PidPosition(config.pitch_rate_pid_config, pitch_gyro) >> Pid::Invert(config.gimbal_motor_dir));
 
         yaw_relative_pid = Pid::PidRad(config.yaw_relative_pid_config, yaw_relative);
         yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, imu.yaw);
@@ -37,8 +32,9 @@ namespace Gimbal
         }
         while (!inited) {
             update_data();
-            0.f >> yaw_relative_pid >> yaw_motor;
-            ((0.f >> pitch_absolute_pid)) >> pitch_motor;
+						0.f >> yaw_relative_pid >> yaw_motor;
+						0.f >> pitch_absolute_pid >> pitch_motor;
+						LOG_INFO("yaw offset %d\n",yaw_motor.motor_measure_.ecd);
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP &&
                 fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
@@ -46,7 +42,7 @@ namespace Gimbal
                 robot_set->gimbal1_yaw_set = robot_set->gimbal1_yaw_relative;
                 init_stop_times = 0;
             }
-            inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+            //inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(config.ControlTime);
         }
         robot_set->gimbal1_yaw_set = imu.yaw;

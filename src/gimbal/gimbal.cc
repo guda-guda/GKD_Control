@@ -7,20 +7,23 @@
 namespace Gimbal
 {
 
-    Gimbal::Gimbal() : yaw_motor(6020, "CAN_RIGHT_HEAD", 2), pitch_motor(6020, "CAN_RIGHT_HEAD", 1) {}
+    Gimbal::Gimbal() : yaw_motor(Config::gimbal_right_config.yaw_motor_config), pitch_motor(Config::gimbal_right_config.yaw_motor_config),
+		imu(Config::gimbal_right_config.imu_serial_port)
+	{}
 
     void Gimbal::init(const std::shared_ptr<Robot::Robot_set> &robot) {
+				imu.enable();
         robot_set = robot;
-        yaw_motor.setCtrl(
-            Pid::PidRad(Config::GIMBAL_YAW_RELATIVE_PID_CONFIG, robot_set->gimbal1_yaw_relative) >>
-            Pid::PidPosition(Config::YAW_SPEED_PID_CONFIG, yaw_gyro));
+        //yaw_motor.setCtrl(
+				//    Pid::PidRad(Config::GIMBAL_YAW_RELATIVE_PID_CONFIG, robot_set->gimbal1_yaw_relative) >>
+        //    Pid::PidPosition(Config::YAW_SPEED_PID_CONFIG, yaw_gyro));
 
-        pitch_motor.setCtrl(
-            Pid::PidRad(Config::GIMBAL_PITCH_ABSOLUTE_PID_CONFIG, robot_set->gyro1_ins_pitch) >>
-            Pid::PidPosition(Config::PITCH_SPEED_PID_CONFIG, pitch_gyro));
+        //pitch_motor.setCtrl(
+        //    Pid::PidRad(Config::GIMBAL_PITCH_ABSOLUTE_PID_CONFIG, robot_set->gyro1_ins_pitch) >>
+        //    Pid::PidPosition(Config::PITCH_SPEED_PID_CONFIG, pitch_gyro));
 
-        yaw_motor.enable();
-        pitch_motor.enable();
+        //yaw_motor.enable();
+        //pitch_motor.enable();
     }
 
     void Gimbal::init_task() {
@@ -29,8 +32,8 @@ namespace Gimbal
             init_yaw_set = 0;
             init_pitch_set = 0;
 
-            yaw_motor.set(init_yaw_set);
-            pitch_motor.set(init_pitch_set);
+            //yaw_motor.set(init_yaw_set);
+            //pitch_motor.set(init_pitch_set);
             LOG_INFO("pitch %f %f\n", robot_set->gyro1_ins_pitch, robot_set->gyro1_ins_pitch_v);
 
             robot_set->gimbal1_yaw_set = robot_set->gyro1_ins_yaw;
