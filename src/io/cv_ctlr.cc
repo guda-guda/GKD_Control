@@ -17,9 +17,9 @@ namespace Device
             sgp.reserved = 0;
             sgp.reset_tracker = false;
             sgp.header = 0x5A;
-            sgp.yaw = 0.f;
-            sgp.pitch = robot_set->gyro1_ins_pitch;
-            sgp.roll = robot_set->gyro1_ins_roll;
+            // sgp.yaw = 0.f;
+            // sgp.pitch = robot_set->gyro1_ins_pitch;
+            // sgp.roll = robot_set->gyro1_ins_roll;
             sgp.aim_x = robot_set->aimx;
             sgp.aim_y = robot_set->aimy;
             sgp.aim_z = robot_set->aimz;

@@ -1,26 +1,21 @@
 #pragma once
 #include <cmath>
 #include <vector>
-#include "pid_controller.hpp"
-#include "types.hpp"
+
 #include "chassis/chassis_config.hpp"
 #include "gimbal/gimbal_config.hpp"
+#include "pid_controller.hpp"
+#include "types.hpp"
 
 namespace Config
 {
-    const std::vector<std::string> CanInitList = {
-        "CAN_CHASSIS", "CAN_BULLET", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD"
-    };
+    const std::vector<std::string> CanInitList = { "CAN_CHASSIS", "CAN_BULLET", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD" };
 
-    const std::vector<std::string> SocketInitList = {
-        "CONTROLLER_SOCKET"
-    };
+    const std::vector<std::string> SocketInitList = { "CONTROLLER_SOCKET" };
 
-    const std::vector<std::tuple<std::string, int, int>> SerialInitList = {
-        {"/dev/IMU_RIGHT", 115200, 2000},
-        {"/dev/IMU_LEFT", 115200, 2000},
-        {"/dev/IMU_BIG_YAW", 115200, 2000}
-    };
+    const std::vector<std::tuple<std::string, int, int>> SerialInitList = { { "/dev/IMU_RIGHT", 115200, 2000 },
+                                                                            { "/dev/IMU_LEFT", 115200, 2000 },
+                                                                            { "/dev/IMU_BIG_YAW", 115200, 2000 } };
 
     const Chassis::ChassisConfig chassis_config {
         .wheels_config = {
@@ -86,6 +81,7 @@ namespace Config
             .max_iout =     0.0f,
         },
 				.gimbal_motor_dir = -1.0,
+				.gimbal_id = 2,
         .ControlTime = 1,
         .YawOffSet = 6033
     };
@@ -130,6 +126,7 @@ namespace Config
             .max_iout =     0.0f,
         },
 				.gimbal_motor_dir = 1.0,
+				.gimbal_id = 1,
         .ControlTime = 1,
         .YawOffSet = 6094
     };

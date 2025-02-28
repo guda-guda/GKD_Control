@@ -23,7 +23,7 @@ namespace Gimbal
         while (!inited) {
             update_data();
             // yaw_relative_pid.calc(robot_set->gimbal3_yaw_relative, 0);
-   	       // yaw_motor.speed_set = yaw_relative_pid.out;
+            // yaw_motor.speed_set = yaw_relative_pid.out;
             // yaw_motor.pid_ctrler.calc(yaw_gyro, yaw_motor.speed_set);
             // yaw_motor.give_current = (int16_t)yaw_motor.pid_ctrler.out;
 
@@ -34,10 +34,10 @@ namespace Gimbal
             //     yaw_gyro,
             //     yaw_motor.speed_set);
 
-            robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
-            if (fabs(robot_set->gimbal3_yaw_relative) < Config::GIMBAL_INIT_EXP) {
-                init_stop_times += 1;
-            }
+            // robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
+            // if (fabs(robot_set->gimbal3_yaw_relative) < Config::GIMBAL_INIT_EXP) {
+            //     init_stop_times += 1;
+            // }
 
             inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             // Robot::hardware->send<CAN2>(Hardware::get_frame(0x141, yaw_motor));
@@ -54,13 +54,13 @@ namespace Gimbal
                 robot_set->mode == Types::ROBOT_MODE::ROBOT_FINISH_INIT ||
                 robot_set->mode == Types::ROBOT_MODE::ROBOT_IDLE ||
                 robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
-                if (robot_set->mode_changed()) {
-                    robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
-                }
-                // yaw_absolute_pid.calc(robot_set->gyro3_ins_yaw, robot_set->gimbal3_yaw_set);
-                // yaw_motor.speed_set = yaw_absolute_pid.out;
-                // yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
-                // yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
+                // if (robot_set->mode_changed()) {
+                //     robot_set->gimbal3_yaw_set = robot_set->gyro3_ins_yaw;
+                // }
+                //  yaw_absolute_pid.calc(robot_set->gyro3_ins_yaw, robot_set->gimbal3_yaw_set);
+                //  yaw_motor.speed_set = yaw_absolute_pid.out;
+                //  yaw_motor.pid_ctrler.calc(-yaw_gyro, yaw_motor.speed_set);
+                //  yaw_motor.give_current = -(int16_t)yaw_motor.pid_ctrler.out;
             } else {
                 // yaw_relative_pid.calc(robot_set->gimbal1_yaw_relative, 0);
                 // yaw_motor.speed_set = yaw_relative_pid.out;
@@ -80,6 +80,6 @@ namespace Gimbal
         // robot_set->gimbal3_yaw_relative = UserLib::rad_format(
         //     Config::M9025_ECD_TO_RAD * ((fp32)yaw_motor.motor_measure.ecd - Config::GIMBAL3_YAW_OFFSET_ECD));
 
-        yaw_gyro = robot_set->gyro3_ins_yaw_v;
+        // yaw_gyro = robot_set->gyro3_ins_yaw_v;
     }
 }  // namespace Gimbal

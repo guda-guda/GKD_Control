@@ -34,15 +34,15 @@ namespace Gimbal
 
             // LOG_INFO("ecd2 %d\n", yaw_motor.motor_measure.ecd);
 
-            robot_set->gimbal2_yaw_set = robot_set->gyro2_ins_yaw;
-            robot_set->gimbal2_yaw_offset = robot_set->gyro2_ins_yaw;
-            // if (fabs(robot_set->gimbal2_yaw_relative) < Config::GIMBAL_INIT_EXP &&
-            //     fabs(robot_set->gyro2_ins_pitch - init_pitch_set) < Config::GIMBAL_INIT_EXP) {
-            //     init_stop_times += 1;
-            // } else if (init_stop_times > Config::GIMBAL_INIT_STOP_TIME) {
-            //     robot_set->gimbal2_pitch_set = 0;
-            //     init_stop_times = 0;
-            // }
+            // robot_set->gimbal2_yaw_set = robot_set->gyro2_ins_yaw;
+            // robot_set->gimbal2_yaw_offset = robot_set->gyro2_ins_yaw;
+            //  if (fabs(robot_set->gimbal2_yaw_relative) < Config::GIMBAL_INIT_EXP &&
+            //      fabs(robot_set->gyro2_ins_pitch - init_pitch_set) < Config::GIMBAL_INIT_EXP) {
+            //      init_stop_times += 1;
+            //  } else if (init_stop_times > Config::GIMBAL_INIT_STOP_TIME) {
+            //      robot_set->gimbal2_pitch_set = 0;
+            //      init_stop_times = 0;
+            //  }
 
             // inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             // Robot::hardware->send<CAN0>(Hardware::get_frame(0x1FF, yaw_motor, pitch_motor));
@@ -65,10 +65,10 @@ namespace Gimbal
                     (std::sin(delta1) * 0.10550000000000002 - 0.07233333333333336) * M_PIf;
                 delta1 += 0.008;
 
-                if (robot_set->gimbal2_yaw_relative > (M_PIf * 7 / 8)) {
-                    robot_set->set_mode(Types::ROBOT_MODE::ROBOT_IDLE);
-                    continue;
-                }
+                // if (robot_set->gimbal2_yaw_relative > (M_PIf * 7 / 8)) {
+                //     robot_set->set_mode(Types::ROBOT_MODE::ROBOT_IDLE);
+                //     continue;
+                // }
 
                 // yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, -robot_set->gimbal1_yaw_relative + 0.2);
                 // yaw_motor.speed_set = yaw_relative_pid.out;
@@ -99,14 +99,14 @@ namespace Gimbal
                     (std::sin(delta1) * 0.10550000000000002 - 0.07233333333333336) * M_PIf;
                 delta1 += 0.008;
 
-                if (robot_set->gimbal2_yaw_relative > (M_PIf * 8 / 9) ||
-                    robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 2)) {
-                    dir = -2;
-                } else if (
-                    robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 8) &&
-                    robot_set->gimbal2_yaw_relative > -(M_PIf * 1 / 2)) {
-                    dir = 2;
-                }
+                // if (robot_set->gimbal2_yaw_relative > (M_PIf * 8 / 9) ||
+                //     robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 2)) {
+                //     dir = -2;
+                // } else if (
+                //     robot_set->gimbal2_yaw_relative < -(M_PIf * 1 / 8) &&
+                //     robot_set->gimbal2_yaw_relative > -(M_PIf * 1 / 2)) {
+                //     dir = 2;
+                // }
 
                 // yaw_relative_pid.calc(robot_set->gimbal2_yaw_relative, -robot_set->gimbal1_yaw_relative + 0.1 * dir);
                 // yaw_motor.speed_set = yaw_relative_pid.out;
@@ -145,9 +145,9 @@ namespace Gimbal
         // robot_set->gimbal2_pitch_relative = UserLib::rad_format(
         //     Config::M6020_ECD_TO_RAD * -((fp32)pitch_motor.motor_measure.ecd - Config::GIMBAL2_PITCH_OFFSET_ECD));
 
-        yaw_gyro = std::sin(robot_set->gimbal2_pitch_relative) * robot_set->gyro2_ins_roll_v -
-                   std::cos(robot_set->gimbal2_pitch_relative) * robot_set->gyro2_ins_yaw_v;
-        pitch_gyro = robot_set->gyro2_ins_pitch_v;
+        // yaw_gyro = std::sin(robot_set->gimbal2_pitch_relative) * robot_set->gyro2_ins_roll_v -
+        //            std::cos(robot_set->gimbal2_pitch_relative) * robot_set->gyro2_ins_yaw_v;
+        // pitch_gyro = robot_set->gyro2_ins_pitch_v;
     }
 
 }  // namespace Gimbal

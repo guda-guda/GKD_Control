@@ -1,14 +1,14 @@
 #pragma once
 
-#include "gimbal/gimbal_temp.hpp"
-#include "gimbal/gimbal_config.hpp"
 #include "device/M9025.hpp"
+#include "gimbal/gimbal_config.hpp"
+#include "gimbal/gimbal_temp.hpp"
 
 namespace Gimbal
 {
     class GimbalSentry
     {
-    public:
+       public:
         GimbalSentry();
         ~GimbalSentry() = default;
         void init(const std::shared_ptr<Robot::Robot_set> &robot);
@@ -16,7 +16,7 @@ namespace Gimbal
         [[noreturn]] void task();
         void update_data();
 
-    public:
+       public:
         std::shared_ptr<Robot::Robot_set> robot_set;
 
         bool inited = false;
@@ -27,11 +27,13 @@ namespace Gimbal
         ControllerList yaw_rate_pid;
         ControllerList yaw_absolute_pid;
         ControllerList yaw_relative_pid;
+        ControllerList yaw_relative_with_two_head_pid;
 
         fp32 yaw_relative = 0.f;
+        fp32 yaw_relative_with_two_head = 0.f;
         fp32 yaw_gyro = 0.f;
         fp32 yaw_motor_speed = 0.f;
 
         int init_stop_times = 0;
     };
-}
+}  // namespace Gimbal

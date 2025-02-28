@@ -30,37 +30,18 @@ namespace Robot
         bool friction_open = false;
         bool shoot_open = false;
 
-        /** IMU **/
-        fp32 gyro1_ins_yaw = 0.f;
-        fp32 gyro1_ins_pitch = 0.f;
-        fp32 gyro1_ins_roll = 0.f;
-        fp32 gyro1_ins_yaw_v = 0.f;
-        fp32 gyro1_ins_pitch_v = 0.f;
-        fp32 gyro1_ins_roll_v = 0.f;
-
-        fp32 gyro2_ins_yaw = 0.f;
-        fp32 gyro2_ins_pitch = 0.f;
-        fp32 gyro2_ins_roll = 0.f;
-        fp32 gyro2_ins_yaw_v = 0.f;
-        fp32 gyro2_ins_pitch_v = 0.f;
-        fp32 gyro2_ins_roll_v = 0.f;
-
-        fp32 gyro3_ins_yaw = 0.f;
-        fp32 gyro3_ins_pitch = 0.f;
-        fp32 gyro3_ins_roll = 0.f;
-        fp32 gyro3_ins_yaw_v = 0.f;
-        fp32 gyro3_ins_pitch_v = 0.f;
-        fp32 gyro3_ins_roll_v = 0.f;
-
         /** other **/
-        fp32 gimbal1_yaw_relative = 0.f;
-        fp32 gimbal1_pitch_relative = 0.f;
+        fp32 gimbalT_1_yaw_set = 0.f;
+        fp32 gimbalT_1_pitch_set = 0.f;
+        fp32 gimbalT_1_yaw_reletive = 0.f;
 
-        fp32 gimbal2_yaw_relative = 0.f;
-        fp32 gimbal2_pitch_relative = 0.f;
+        // only sentry needs gimbalT_2
+        fp32 gimbalT_2_yaw_set = 0.f;
+        fp32 gimbalT_2_pitch_set = 0.f;
+        fp32 gimbalT_2_yaw_reletive = 0.f;
 
-        fp32 gimbal3_yaw_relative = 0.f;
-        fp32 gimbal3_pitch_relative = 0.f;
+        fp32 gimbal_sentry_yaw_set = 0.f;
+        fp32 gimbal_sentry_yaw_reletive = 0.f;
 
         fp32 aimx;
         fp32 aimy;
