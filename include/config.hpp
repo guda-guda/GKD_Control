@@ -9,7 +9,7 @@
 namespace Config
 {
     const std::vector<std::string> CanInitList = {
-        "CAN_CHASSIS", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD", "CAN_BULLET"
+        "CAN_CHASSIS", "CAN_BULLET", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD"
     };
 
     const std::vector<std::string> SocketInitList = {
@@ -192,7 +192,7 @@ namespace Config
     };
 
     const typename Pid::PidConfig YAW_9025_SPEED_PID_CONFIG{
-        450.f, 0.0f, 50.f, 850.0f, 0.0f,
+        450.f, 5.0f, 50.f, 850.0f, 250.0f,
     };
 
     const typename Pid::PidConfig PITCH_SPEED_PID_CONFIG{
@@ -240,7 +240,7 @@ namespace Config
     constexpr fp32 GIMBAL2_YAW_OFFSET_ECD = 3366;
     constexpr fp32 GIMBAL2_PITCH_OFFSET_ECD = 3985;
 
-    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 12289;
+    constexpr fp32 GIMBAL3_YAW_OFFSET_ECD = 48041;
     constexpr fp32 GIMBAL3_PITCH_OFFSET_ECD = 3985;
 #else
     constexpr fp32 GIMBAL_YAW_OFFSET_ECD = 5424;

@@ -4,26 +4,30 @@
 
 namespace Gimbal
 {
-    GimbalSentry::GimbalSentry() : imu("/dev/IMU_BIG_YAW"), yaw_motor("CAN_CHASSIS", 1) {}
+    GimbalSentry::GimbalSentry() : imu("/dev/IMU_BIG_YAW"), yaw_motor("CAN_BULLET", 1) {}
 
     void GimbalSentry::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
-        yaw_rate_pid = Pid::PidRad(Config::YAW_9025_SPEED_PID_CONFIG, yaw_motor_speed);
+
         yaw_absolute_pid = Pid::PidRad(Config::GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG, imu.yaw);
         yaw_relative_pid = Pid::PidRad(Config::GIMBAL_9025_YAW_RELATIVE_PID_CONFIG, yaw_relative);
 
+        yaw_motor.setCtrl(Pid::PidPosition(Config::YAW_9025_SPEED_PID_CONFIG, imu.yaw_rate));
+
+
+				imu.enable();
         yaw_motor.enable();
     }
 
     void GimbalSentry::init_task() {
         while (!inited) {
             update_data();
-            0.f >> yaw_motor;
-            // 0.f >> yaw_relative_pid >> yaw_motor;
+						0.f >>  yaw_relative_pid >> yaw_motor;
+						//LOG_INFO("big yaw %f %f\n", yaw_motor_speed,yaw_relative);
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
             }
-            inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+						inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
         }
     }
@@ -60,7 +64,7 @@ namespace Gimbal
     void GimbalSentry::update_data() {
         yaw_motor_speed = Config::RPM_TO_RAD_S * (fp32)yaw_motor.motor_measure.speed_rpm;
 
-        robot_set->gimbal3_yaw_relative = UserLib::rad_format(
+        yaw_relative = UserLib::rad_format(
             Config::M9025_ECD_TO_RAD * ((fp32)yaw_motor.motor_measure.ecd - Config::GIMBAL3_YAW_OFFSET_ECD));
 
         yaw_gyro = robot_set->gyro3_ins_yaw_v;

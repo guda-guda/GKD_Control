@@ -7,6 +7,8 @@ namespace Device
     M9025::M9025(const std::string &can_name, const int id) : id(id), can_name(can_name) {}
 
     void M9025::set(float x) {
+				LOG_INFO("give current %f %f\n",x, x >> controller);
+				x = x >> controller;
         give_current = static_cast<int16_t>(x);
         can_frame frame{};
         frame.can_id = 0x140 + id;

@@ -71,8 +71,7 @@ namespace Gimbal
         void update_data();
 
         bool inited = false;
-        //Device::IMU imu;
-        // Hardware::Motor_9025 yaw_motor;
+        //Hardware::Motor_9025 yaw_motor;
         //Pid::PidRad yaw_absolute_pid;
         //Pid::PidRad yaw_relative_pid;
     };

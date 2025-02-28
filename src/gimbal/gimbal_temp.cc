@@ -34,7 +34,7 @@ namespace Gimbal
             update_data();
 						0.f >> yaw_relative_pid >> yaw_motor;
 						0.f >> pitch_absolute_pid >> pitch_motor;
-						LOG_INFO("yaw offset %d\n",yaw_motor.motor_measure_.ecd);
+						//LOG_INFO("yaw offset %d\n",yaw_motor.motor_measure_.ecd);
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP &&
                 fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
@@ -42,7 +42,7 @@ namespace Gimbal
                 robot_set->gimbal1_yaw_set = robot_set->gimbal1_yaw_relative;
                 init_stop_times = 0;
             }
-            //inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+						inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(config.ControlTime);
         }
         robot_set->gimbal1_yaw_set = imu.yaw;
@@ -55,8 +55,8 @@ namespace Gimbal
                 yaw_motor.give_current = 0;
                 pitch_motor.give_current = 0;
             } else {
-                ((robot_set->gimbal1_yaw_set >> yaw_absolute_pid) * -1) >> yaw_motor;
-                // robot_set->gimbal1_pitch_set >> pitch_absolute_pid >> pitch_motor;
+								0.f >> yaw_relative_pid >> yaw_motor;
+								0.f >> pitch_absolute_pid >> pitch_motor;
             }
             UserLib::sleep_ms(config.ControlTime);
         }

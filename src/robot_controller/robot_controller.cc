@@ -12,19 +12,20 @@ namespace Robot
     Robot_ctrl::~Robot_ctrl() = default;
 
     void Robot_ctrl::start_init() {
-        // NOTE: register motors here
-        // cv_controller_.init(robot_set);
-        //chassis.init(robot_set);
-        gimbal.init(robot_set);
-        gimbal_l.init(robot_set);
-				gimbal_big_yaw.init(robot_set);
-        //  shoot.init(robot_set);
+			// NOTE: register motors here
 
-        // start DJIMotorManager thread
-        Hardware::DJIMotorManager::start();
-				 gimbal_init_thread = std::make_unique<std::thread>([&](){gimbal.init_task();});
-				 gimbal_l_init_thread = std::make_unique<std::thread>([&](){gimbal_l.init_task();});
-				gimbal_big_yaw_init_thread = std::make_unique<std::thread>([&](){gimbal_big_yaw.init_task();});
+			// cv_controller_.init(robot_set);
+			chassis.init(robot_set);
+			gimbal.init(robot_set);
+			gimbal_l.init(robot_set);
+			gimbal_big_yaw.init(robot_set);
+			//  shoot.init(robot_set);
+
+			// start DJIMotorManager thread
+			Hardware::DJIMotorManager::start();
+			gimbal_init_thread = std::make_unique<std::thread>([&](){gimbal.init_task();});
+			gimbal_l_init_thread = std::make_unique<std::thread>([&](){gimbal_l.init_task();});
+			gimbal_big_yaw_init_thread = std::make_unique<std::thread>([&](){gimbal_big_yaw.init_task();});
     }
 
     void Robot_ctrl::init_join() const {
@@ -42,10 +43,10 @@ namespace Robot
     void Robot_ctrl::start() {
         chassis_thread = std::make_unique<std::thread>(&Chassis::Chassis::task, &chassis);
         gimbal_thread = std::make_unique<std::thread>(&Gimbal::GimbalT::task, &gimbal);
-        // gimbal_l_thread = std::make_unique<std::thread>(&Gimbal::Gimbal_L::task, &gimbal_l);
-        // gimbal_big_yaw_thread = std::make_unique<std::thread>(&Gimbal::Gimbal_big_yaw::task, &gimbal_big_yaw);
-        // shoot_thread = std::make_unique<std::thread>(&Shoot::Shoot::task, &shoot);
+        gimbal_l_thread = std::make_unique<std::thread>(&Gimbal::GimbalT::task, &gimbal_l);
+        gimbal_big_yaw_thread = std::make_unique<std::thread>(&Gimbal::GimbalSentry::task, &gimbal_big_yaw);
 
+        // shoot_thread = std::make_unique<std::thread>(&Shoot::Shoot::task, &shoot);
         // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
     }
 
@@ -53,15 +54,15 @@ namespace Robot
         if (chassis_thread != nullptr) {
             chassis_thread->join();
         }
-        // if (gimbal_thread != nullptr) {
-        //     gimbal_thread->join();
-        // }
-        // if (gimbal_l_thread != nullptr) {
-        //     gimbal_l_thread->join();
-        // }
-        // if (gimbal_big_yaw_thread != nullptr) {
-        //     gimbal_big_yaw_thread->join();
-        // }
+				if (gimbal_thread != nullptr) {
+				 	 gimbal_thread->join();
+				}
+				if (gimbal_l_thread != nullptr) {
+				 	 gimbal_l_thread->join();
+				}
+				if (gimbal_big_yaw_thread != nullptr) {
+				 	 gimbal_big_yaw_thread->join();
+				}
     }
 
     void Robot_ctrl::load_hardware() {

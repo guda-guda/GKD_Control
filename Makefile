@@ -59,7 +59,7 @@ clean-build: clean
 
 mini-pc:
 	@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL a30b5228ace8 make clean-build
-	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.4:/home/gkd/dev
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.0.114:/home/gkd/dev
 	#sshpass -p 1 ssh gkd@192.168.1.4 "/home/gkd/dev/rx78-2"
 
 mini-pc-os-deps:
