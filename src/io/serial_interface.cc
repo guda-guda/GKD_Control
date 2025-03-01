@@ -37,13 +37,10 @@ namespace IO
     void Serial_interface::task() {
         while (true) {
             if (isOpen()) {
-                read(&header, 1);
-                if (header == 0x55) {
-                    read(&header, 1);
-                    if (header == 0xAA) {
-                        read(&header, 1);
-                        unpack(header);
-                    }
+                read((uint8_t*)&header, 2);
+                if (header == 0xAA55) {
+                    read((uint8_t*)&header, 1);
+                    unpack(header);
                 }
             } else {
                 enumerate_ports();

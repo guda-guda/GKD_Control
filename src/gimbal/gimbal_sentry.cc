@@ -26,7 +26,7 @@ namespace Gimbal
     void GimbalSentry::init_task() {
         while (!inited) {
             update_data();
-            // 0.f >> yaw_relative_pid >> yaw_motor;
+            0.f >> yaw_relative_pid >> yaw_motor;
             //  LOG_INFO("big yaw %f %f\n", yaw_motor_speed,yaw_relative);
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;

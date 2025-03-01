@@ -8,7 +8,9 @@ namespace Robot
     Robot_ctrl::Robot_ctrl()
         : chassis(Config::chassis_config),
           gimbal(Config::gimbal_right_config),
-          gimbal_l(Config::gimbal_left_config) {
+          gimbal_l(Config::gimbal_left_config),
+          // fixup: fix this pls
+          rc_controller("/dev/IMU_BIG_YAW") {
         robot_set = std::make_shared<Robot_set>();
     }
 
@@ -22,6 +24,7 @@ namespace Robot
         gimbal.init(robot_set);
         gimbal_l.init(robot_set);
         gimbal_big_yaw.init(robot_set);
+        rc_controller.enable();
         //  shoot.init(robot_set);
 
         // start DJIMotorManager thread

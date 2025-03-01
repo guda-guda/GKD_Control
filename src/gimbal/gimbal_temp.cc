@@ -52,9 +52,11 @@ namespace Gimbal
         }
         while (!inited) {
             update_data();
+            if (config.gimbal_id == 2)
+                continue;
 
-            // 0.f >> yaw_relative_pid >> yaw_motor;
-            // 0.f >> pitch_absolute_pid >> pitch_motor;
+            0.f >> yaw_relative_pid >> yaw_motor;
+            0.f >> pitch_absolute_pid >> pitch_motor;
 
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP && fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;

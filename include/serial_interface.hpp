@@ -29,7 +29,7 @@ namespace IO
 
        private:
         uint8_t buffer[256];
-        uint8_t header;
+        uint16_t header;
     };
 }  // namespace IO
 #endif

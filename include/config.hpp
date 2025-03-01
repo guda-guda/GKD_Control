@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "chassis/chassis_config.hpp"
+#include "deviece_base.hpp"
 #include "gimbal/gimbal_config.hpp"
 #include "pid_controller.hpp"
 #include "types.hpp"
@@ -161,7 +162,7 @@ namespace Config
     };
 
     const typename Pid::PidConfig GIMBAL_9025_YAW_ABSOLUTE_PID_CONFIG{
-        8.0f, 0.0f, 10.0f, 15.0f, 5.0f,
+        8.0f, 0.5f, 10.0f, 15.0f, 5.0f,
     };
 
     const typename Pid::PidConfig GIMBAL_PITCH_ABSOLUTE_PID_CONFIG{
@@ -189,7 +190,7 @@ namespace Config
     };
 
     const typename Pid::PidConfig YAW_9025_SPEED_PID_CONFIG{
-        450.f, 5.0f, 50.f, 850.0f, 250.0f,
+        450.f, 0.0f, 50.f, 1000.0f, 200.0f,
     };
 
     const typename Pid::PidConfig PITCH_SPEED_PID_CONFIG{
