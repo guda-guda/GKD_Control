@@ -28,7 +28,7 @@ struct Vec3d
 
 namespace Types
 {
-    typedef struct ReceivePacket
+    typedef struct ReceivePacket_IMU
     {
         float yaw;
         float pitch;
@@ -36,9 +36,24 @@ namespace Types
         float yaw_v;
         float pitch_v;
         float roll_v;
-        int16_t ch[5];
-        char s[2];
-    } __attribute__((packed)) ReceivePacket;
+    } __attribute__((packed)) ReceivePacket_IMU;
+
+    typedef struct ReceivePacket_RC_CTRL
+    {
+        int ch0;
+        int ch1;
+        int ch2;
+        int ch3;
+        int ch4;
+        int s1;
+        int s2;
+        int mouse_x;
+        int mouse_y;
+        int mouse_z;
+        int mouse_l;
+        int mouse_r;
+        int key;
+    } __attribute__((packed)) ReceivePacket_RC_CTRL;
 
     typedef struct
     {

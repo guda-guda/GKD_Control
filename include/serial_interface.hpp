@@ -10,8 +10,7 @@
 namespace IO
 {
 
-    template<class T>
-    class Serial_interface : serial::Serial, public Callback<T>
+    class Serial_interface : serial::Serial, public Callback<Types::ReceivePacket_IMU, Types::ReceivePacket_RC_CTRL>
     {
        public:
         Serial_interface(std::string port_name, int baudrate, int simple_timeout);
@@ -21,68 +20,18 @@ namespace IO
 
        private:
         inline void enumerate_ports();
-        inline int unpack();
-        inline void fromVector(const uint8_t *data, T *pkg);
+        inline int unpack(uint8_t pkg_id);
 
        public:
-        T rp;
+        Types::ReceivePacket_IMU imu_pkg;
+        Types::ReceivePacket_RC_CTRL rc_pkg;
         std::string name;
 
        private:
         uint8_t buffer[256];
         uint8_t header;
     };
-
-    template<class T>
-    Serial_interface<T>::Serial_interface(std::string port_name, int baudrate, int simple_timeout)
-        : serial::Serial(port_name, baudrate, serial::Timeout::simpleTimeout(simple_timeout)),
-          name(port_name) {
-    }
-
-    template<class T>
-    Serial_interface<T>::~Serial_interface() = default;
-
-    template<class T>
-    inline void Serial_interface<T>::enumerate_ports() {
-        std::vector<serial::PortInfo> devices_found = serial::list_ports();
-        auto iter = devices_found.begin();
-
-        while (iter != devices_found.end()) {
-            serial::PortInfo device = *iter++;
-            LOG_INFO("(%s, %s, %s)\n", device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());
-        }
-    }
-
-    template<class T>
-    inline void Serial_interface<T>::fromVector(const uint8_t *data, T *pkg) {
-        for (size_t i = 0; i < sizeof(T); ++i) {
-            ((uint8_t *)pkg)[i] = data[i];
-        }
-    }
-
-    template<class T>
-    inline int Serial_interface<T>::unpack() {
-        memcpy(buffer, read(sizeof(T)).c_str(), sizeof(T));
-        fromVector(buffer, &rp);
-        // LOG_INFO("serial data : (angle y/p/r) %f %f %f\n", rp.yaw, rp.pitch, rp.roll);
-        this->callback(rp);
-        return 0;
-    }
-
-    template<class T>
-    void Serial_interface<T>::task() {
-        while (true) {
-            if (isOpen()) {
-                read(&header, 1);
-                if (header == 0xAB)
-                    unpack();
-            } else {
-                enumerate_ports();
-                return;
-            }
-        }
-    }
 }  // namespace IO
 #endif
 
-using SERIAL = IO::Serial_interface<Types::ReceivePacket>;
+using SERIAL = IO::Serial_interface;

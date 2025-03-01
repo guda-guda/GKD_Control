@@ -25,6 +25,13 @@ namespace UserLib
         return ans;
     }
 
+    template<typename T>
+    inline void fromVector(const uint8_t *data, T *pkg) {
+        for (size_t i = 0; i < sizeof(T); ++i) {
+            ((uint8_t *)pkg)[i] = data[i];
+        }
+    }
+
     class RealRad
     {
        public:

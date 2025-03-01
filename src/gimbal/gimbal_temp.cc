@@ -52,18 +52,21 @@ namespace Gimbal
         }
         while (!inited) {
             update_data();
-            0.f >> yaw_relative_pid >> yaw_motor;
-            0.f >> pitch_absolute_pid >> pitch_motor;
-            // LOG_INFO("yaw offset %d\n",yaw_motor.motor_measure_.ecd);
+
+            // 0.f >> yaw_relative_pid >> yaw_motor;
+            // 0.f >> pitch_absolute_pid >> pitch_motor;
+
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP && fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
             } else {
-                //*yaw_set = imu.yaw;
+                // hero && standard
+                // *yaw_set = imu.yaw;
+                // sentry
                 *yaw_set = robot_set->gimbal_sentry_yaw;
                 *pitch_set = 0;
                 init_stop_times = 0;
             }
-            inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+            // inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(config.ControlTime);
         }
     }
@@ -71,7 +74,7 @@ namespace Gimbal
     [[noreturn]] void GimbalT::task() {
         while (true) {
             update_data();
-            LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, fake_yaw_abs);
+            // LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, fake_yaw_abs);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
                 yaw_motor.give_current = 0;
                 pitch_motor.give_current = 0;
