@@ -1,5 +1,5 @@
 #include "device/deviece_base.hpp"
-#include "config.hpp"
+#include CONFIGHPP
 
 using namespace std::chrono;
 

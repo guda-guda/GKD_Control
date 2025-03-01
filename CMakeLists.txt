@@ -4,24 +4,19 @@ project(new_infantry)
 #set(CMAKE_C_COMPILER clang++)
 #set(CMAKE_CXX_COMPILER clang++)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 include_directories(./3rdparty/include)
-include_directories(./include ./include/chassis)
+include_directories(./include ./include/chassis ./include/device)
 
 add_compile_options(-D__DEBUG__)
 add_compile_options(-Wno-pointer-arith -Wno-unused-parameter)
 
-file(GLOB_RECURSE SOURCE src/main.cc ./src/*.cc)
+add_compile_options(-DCONFIGHPP="config_hero.hpp")
 
-add_executable(${PROJECT_NAME} ${SOURCE}
-        include/gimbal/gimbal_config.hpp
-        src/gimbal/gimbal_temp.cc
-        include/gimbal/gimbal_temp.hpp
-        include/device/M9025.hpp
-        src/device/M9025.cc
-        include/gimbal/gimbal_sentry.hpp
-        src/gimbal/gimbal_sentry.cpp)
+file(GLOB_RECURSE SOURCE src/main.cc ./*/*.cc)
+
+add_executable(${PROJECT_NAME} ${SOURCE})
 
 if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/lib/libserial.a)
     execute_process(

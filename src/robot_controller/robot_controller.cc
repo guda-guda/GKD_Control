@@ -1,15 +1,30 @@
 #include "robot_controller.hpp"
-
-#include "config.hpp"
+#include CONFIGHPP
 #include "io.hpp"
+
+template<typename Ptr, typename Config>
+void create_ptr_config(Ptr& ptr, Config&& config)
+{
+    if (config)
+        ptr = new typename std::remove_pointer_t<Ptr>(*config);
+    else
+        ptr = nullptr;
+}
 
 namespace Robot
 {
-    Robot_ctrl::Robot_ctrl()
-        : chassis(Config::chassis_config),
-          gimbal(Config::gimbal_right_config),
-          gimbal_l(Config::gimbal_left_config) {
+    Robot_ctrl::Robot_ctrl() {
+        LOG_INFO("123");
         robot_set = std::make_shared<Robot_set>();
+        create_ptr_config(chassis, Config::chassis_config);
+        create_ptr_config(gimbal, Config::gimbal_right_config);
+        create_ptr_config(gimbal_l, Config::gimbal_left_config);
+
+#ifdef SENTRY
+        gimbal_big_yaw = new Gimbal::GimbalSentry{};
+#endif
+        shoot = new Shoot::Shoot{};
+        cv_controller_ = new Device::Cv_controller{};
     }
 
     Robot_ctrl::~Robot_ctrl() = default;
@@ -18,54 +33,41 @@ namespace Robot
         // NOTE: register motors here
 
         // cv_controller_.init(robot_set);
-        chassis.init(robot_set);
-        gimbal.init(robot_set);
-        gimbal_l.init(robot_set);
-        gimbal_big_yaw.init(robot_set);
         //  shoot.init(robot_set);
+
+        threads.emplace_back(&Chassis::Chassis::init, chassis, robot_set);
+        threads.emplace_back(&Gimbal::GimbalT::init, gimbal, robot_set);
+        threads.emplace_back(&Gimbal::GimbalT::init, gimbal_l, robot_set);
+        threads.emplace_back(&Gimbal::GimbalSentry::init, gimbal_big_yaw, robot_set);
+
+        threads.join();
 
         // start DJIMotorManager thread
         Hardware::DJIMotorManager::start();
-        gimbal_init_thread = std::make_unique<std::thread>([&]() { gimbal.init_task(); });
-        gimbal_l_init_thread = std::make_unique<std::thread>([&]() { gimbal_l.init_task(); });
-        gimbal_big_yaw_init_thread = std::make_unique<std::thread>([&]() { gimbal_big_yaw.init_task(); });
+        LOG_INFO("DJIMotorManager start");
+        
+        threads.emplace_back(&Gimbal::GimbalT::init_task, gimbal);
+        threads.emplace_back(&Gimbal::GimbalT::init_task, gimbal_l);
+        threads.emplace_back(&Gimbal::GimbalSentry::init_task, gimbal_big_yaw);
+
     }
 
-    void Robot_ctrl::init_join() const {
-        if (gimbal_init_thread != nullptr) {
-            gimbal_init_thread->join();
-        }
-        if (gimbal_l_init_thread != nullptr) {
-            gimbal_l_init_thread->join();
-        }
-        if (gimbal_big_yaw_init_thread != nullptr) {
-            gimbal_big_yaw_init_thread->join();
-        }
+    void Robot_ctrl::init_join() {
+        threads.join();
     }
 
     void Robot_ctrl::start() {
         // chassis_thread = std::make_unique<std::thread>(&Chassis::Chassis::task, &chassis);
-        gimbal_thread = std::make_unique<std::thread>(&Gimbal::GimbalT::task, &gimbal);
-        gimbal_l_thread = std::make_unique<std::thread>(&Gimbal::GimbalT::task, &gimbal_l);
-        gimbal_big_yaw_thread = std::make_unique<std::thread>(&Gimbal::GimbalSentry::task, &gimbal_big_yaw);
+        threads.emplace_back(&Gimbal::GimbalT::task, gimbal);
+        threads.emplace_back(&Gimbal::GimbalT::task, gimbal_l);
+        threads.emplace_back(&Gimbal::GimbalSentry::task, gimbal_big_yaw);
 
         // shoot_thread = std::make_unique<std::thread>(&Shoot::Shoot::task, &shoot);
         // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
     }
 
-    void Robot_ctrl::join() const {
-        // if (chassis_thread != nullptr) {
-        //     chassis_thread->join();
-        // }
-        if (gimbal_thread != nullptr) {
-            gimbal_thread->join();
-        }
-        if (gimbal_l_thread != nullptr) {
-            gimbal_l_thread->join();
-        }
-        if (gimbal_big_yaw_thread != nullptr) {
-            gimbal_big_yaw_thread->join();
-        }
+    void Robot_ctrl::join() {
+        threads.join();
     }
 
     void Robot_ctrl::load_hardware() {
