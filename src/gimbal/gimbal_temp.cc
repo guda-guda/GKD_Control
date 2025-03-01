@@ -33,7 +33,12 @@ namespace Gimbal
             Pid::PidPosition(config.pitch_rate_pid_config, pitch_gyro) >> Pid::Invert(config.gimbal_motor_dir));
 
         yaw_relative_pid = Pid::PidRad(config.yaw_relative_pid_config, yaw_relative);
-        yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, imu.yaw) >> Pid::Invert(-1);
+
+        // standard && hero
+        // yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, imu.yaw) >> Pid::Invert(-1);
+        // sentry
+        yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, fake_yaw_abs) >> Pid::Invert(-1);
+
         pitch_absolute_pid = Pid::PidRad(config.pitch_absolute_pid_config, imu.pitch);
 
         imu.enable();
@@ -53,7 +58,8 @@ namespace Gimbal
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP && fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
             } else {
-                *yaw_set = imu.yaw;
+                //*yaw_set = imu.yaw;
+                *yaw_set = robot_set->gimbal_sentry_yaw;
                 *pitch_set = 0;
                 init_stop_times = 0;
             }
@@ -63,10 +69,9 @@ namespace Gimbal
     }
 
     [[noreturn]] void GimbalT::task() {
-        *yaw_set += 0.5;
         while (true) {
             update_data();
-            LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, imu.yaw);
+            LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, fake_yaw_abs);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
                 yaw_motor.give_current = 0;
                 pitch_motor.give_current = 0;
@@ -83,7 +88,9 @@ namespace Gimbal
             UserLib::rad_format(yaw_motor.data_.rotor_angle - Hardware::DJIMotor::ECD_8192_TO_RAD * config.YawOffSet);
         yaw_gyro = std::cos(imu.pitch) * imu.yaw_rate - std::sin(imu.pitch) * imu.roll_rate;
         pitch_gyro = imu.pitch_rate;
+        // gimbal sentry follow needs
         *yaw_rela = yaw_relative;
+        fake_yaw_abs = robot_set->gimbal_sentry_yaw - yaw_relative;
     }
 
 }  // namespace Gimbal

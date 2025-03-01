@@ -29,6 +29,7 @@ namespace Gimbal
         fp32 yaw_gyro = 0.f;
         fp32 pitch_gyro = 0.f;
         fp32 yaw_relative = 0.f;
+        fp32 fake_yaw_abs;
 
         fp32* yaw_set;
         fp32* pitch_set;
