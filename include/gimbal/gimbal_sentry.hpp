@@ -3,6 +3,7 @@
 #include "device/M9025.hpp"
 #include "gimbal/gimbal_config.hpp"
 #include "gimbal/gimbal_temp.hpp"
+#include CONFIGHPP
 
 namespace Gimbal
 {
@@ -18,7 +19,6 @@ namespace Gimbal
 
        public:
         std::shared_ptr<Robot::Robot_set> robot_set;
-
         bool inited = false;
 
         Device::IMU imu;

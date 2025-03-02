@@ -1,6 +1,6 @@
 #include "gimbal/gimbal_temp.hpp"
 
-#include "config.hpp"
+#include CONFIGHPP
 #include "gimbal/gimbal_config.hpp"
 #include "user_lib.hpp"
 
@@ -33,11 +33,12 @@ namespace Gimbal
             Pid::PidPosition(config.pitch_rate_pid_config, pitch_gyro) >> Pid::Invert(config.gimbal_motor_dir));
 
         yaw_relative_pid = Pid::PidRad(config.yaw_relative_pid_config, yaw_relative);
-
-        // standard && hero
-        // yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, imu.yaw) >> Pid::Invert(-1);
-        // sentry
+        
+#ifdef SENTRY
         yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, fake_yaw_abs) >> Pid::Invert(-1);
+#else
+        yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, imu.yaw) >> Pid::Invert(-1);
+#endif
 
         pitch_absolute_pid = Pid::PidRad(config.pitch_absolute_pid_config, imu.pitch);
 

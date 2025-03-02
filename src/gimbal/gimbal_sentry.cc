@@ -1,6 +1,6 @@
 #include "gimbal/gimbal_sentry.hpp"
 
-#include "config.hpp"
+#include CONFIGHPP
 #include "user_lib.hpp"
 
 namespace Gimbal

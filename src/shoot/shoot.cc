@@ -1,6 +1,6 @@
 #include "shoot.hpp"
 
-#include "config.hpp"
+#include CONFIGHPP
 #include "user_lib.hpp"
 
 namespace Shoot
