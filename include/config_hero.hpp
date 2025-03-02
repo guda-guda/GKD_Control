@@ -10,7 +10,7 @@
 
 namespace Config
 {
-    const std::vector<std::string> CanInitList = { "Hero_Chassis", "Hero_Gimbal"};
+    const std::vector<std::string> CanInitList = { "Hero_Chassis", "Hero_Gimbal" };
 
     const std::vector<std::string> SocketInitList = { "CONTROLLER_SOCKET" };
 

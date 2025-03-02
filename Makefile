@@ -21,6 +21,7 @@ CPPFLAGS += -I$(WORK_DIR)/include/device
 
 # NOTE: turn on debug here
 CPPFLAGS += -D__DEBUG__
+CPPFLAGS += -DCONFIGHPP=\"config_hero.hpp\"
 
 # FIXME: imtui dependency linking
 CPPFLAGS += -I "./3rdparty/include"
