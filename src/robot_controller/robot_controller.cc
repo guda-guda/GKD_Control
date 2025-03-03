@@ -17,6 +17,7 @@ namespace Robot
         // cv_controller_.init(robot_set);
         rc_controller.enable();
         //  shoot.init(robot_set);
+        super_cap.init("Hero_Chassis");
 
         chassis.init(robot_set);
         gimbal.init(robot_set);
@@ -24,7 +25,7 @@ namespace Robot
         // start DJIMotorManager thread
         Hardware::DJIMotorManager::start();
 
-        threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
+        // threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
 
     }
 
@@ -33,15 +34,15 @@ namespace Robot
     }
 
     void Robot_ctrl::start() {
-        // chassis_thread = std::make_unique<std::thread>(&Chassis::Chassis::task, &chassis);
-        threads.emplace_back(&Config::GimbalType::task, &gimbal);
-
+        // threads.emplace_back(&Config::GimbalType::task, &gimbal);
+        threads.emplace_back(&Chassis::Chassis::task, &chassis);
         // shoot_thread = std::make_unique<std::thread>(&Shoot::Shoot::task, &shoot);
         // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
     }
 
     void Robot_ctrl::join() {
         threads.clear();
+        std::this_thread::sleep_for(std::chrono::seconds(1000));
     }
 
     void Robot_ctrl::load_hardware() {

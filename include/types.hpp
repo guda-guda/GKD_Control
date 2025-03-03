@@ -55,6 +55,14 @@ namespace Types
         int key;
     } __attribute__((packed)) ReceivePacket_RC_CTRL;
 
+    struct ReceivePacket_Super_Cap
+    {
+        uint8_t errorCode;
+        float chassisPower;
+        uint16_t chassisPowerlimit;
+        uint8_t capEnergy;
+    } __attribute__((packed));
+
     typedef struct
     {
         fp32 input;         // 输入数据

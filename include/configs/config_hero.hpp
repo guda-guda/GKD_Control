@@ -11,7 +11,7 @@
 
 namespace Config
 {
-    using Gimbal_Type = Gimbal::GimbalT;
+    using GimbalType = Gimbal::GimbalT;
 
     const std::vector<std::string> CanInitList = { "Hero_Chassis", "Hero_Gimbal" };
 

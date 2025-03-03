@@ -11,6 +11,7 @@
 #include "serial_interface.hpp"
 #include "shoot.hpp"
 #include "socket_interface.hpp"
+#include "device/super_cap.hpp"
 #include CONFIGHPP
 
 namespace Robot
@@ -39,6 +40,8 @@ namespace Robot
         Chassis::Chassis chassis;
         Config::GimbalType gimbal;
         Shoot::Shoot shoot;
+
+        Device::Super_Cap super_cap;
     };
 
 }  // namespace Robot
