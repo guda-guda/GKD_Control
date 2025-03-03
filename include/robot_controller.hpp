@@ -11,7 +11,7 @@
 #include "serial_interface.hpp"
 #include "shoot.hpp"
 #include "socket_interface.hpp"
-#include "thread_manager.hpp"
+#include CONFIGHPP
 
 namespace Robot
 {
@@ -29,18 +29,16 @@ namespace Robot
         void join();
 
        public:
-        thread_manager threads;
+        std::vector<std::jthread> threads;
 
         std::shared_ptr<Robot_set> robot_set;
 
 
         Device::Rc_Controller rc_controller;
-        Device::Cv_controller* cv_controller_;
-        Chassis::Chassis *chassis;
-        Gimbal::GimbalT *gimbal;
-        Gimbal::GimbalT *gimbal_l;
-        Gimbal::GimbalSentry *gimbal_big_yaw = nullptr;
-        Shoot::Shoot *shoot;
+        Device::Cv_controller cv_controller_;
+        Chassis::Chassis chassis;
+        Config::GimbalType gimbal;
+        Shoot::Shoot shoot;
     };
 
 }  // namespace Robot

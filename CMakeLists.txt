@@ -12,7 +12,7 @@ include_directories(./include ./include/chassis ./include/device)
 add_compile_options(-D__DEBUG__)
 add_compile_options(-Wno-pointer-arith -Wno-unused-parameter)
 
-add_compile_options(-DCONFIGHPP="config_hero.hpp")
+add_compile_options(-DCONFIGHPP="configs/config_sentry.hpp")
 
 file(GLOB_RECURSE SOURCE src/main.cc ./*/*.cc)
 

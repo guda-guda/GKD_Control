@@ -2,10 +2,11 @@
 
 #include CONFIGHPP
 #include "user_lib.hpp"
+#include <future>
 
 namespace Gimbal
 {
-    GimbalSentry::GimbalSentry() : imu("/dev/IMU_BIG_YAW"), yaw_motor("CAN_BULLET", 1) {
+    GimbalSentry::GimbalSentry(const std::pair<GimbalConfig,GimbalConfig>& config) : imu("/dev/IMU_BIG_YAW"), yaw_motor("CAN_BULLET", 1), gimbal_left(config.first), gimbal_right(config.second) {
     }
 
     void GimbalSentry::init(const std::shared_ptr<Robot::Robot_set> &robot) {
@@ -21,9 +22,14 @@ namespace Gimbal
 
         imu.enable();
         yaw_motor.enable();
+
+        gimbal_left.init(robot);
+        gimbal_right.init(robot);
     }
 
     void GimbalSentry::init_task() {
+        std::future<void> future_left = std::async(&GimbalT::init_task, &gimbal_left);
+        std::future<void> future_right = std::async(&GimbalT::init_task, &gimbal_right);
         while (!inited) {
             update_data();
             0.f >> yaw_relative_pid >> yaw_motor;
@@ -37,9 +43,13 @@ namespace Gimbal
             // inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
         }
+        future_left.get();
+        future_right.get();
     }
 
     [[noreturn]] void GimbalSentry::task() {
+        std::thread thread_left{&GimbalT::task, &gimbal_left};
+        std::thread thread_right{&GimbalT::task, &gimbal_right};
         while (true) {
             update_data();
             switch (robot_set->mode) {
