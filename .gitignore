@@ -3,3 +3,4 @@ build/
 *.friction
 *.a
 .vscode
+compile_commands.json

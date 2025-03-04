@@ -5,8 +5,6 @@
 #include "utils.hpp"
 
 int main(int argc, char **argv) {
-    std::cout << "hello" << std::endl;
-    // exit(-1);
     Robot::Robot_ctrl robot;
 
     robot.load_hardware();

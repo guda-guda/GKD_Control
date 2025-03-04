@@ -5,7 +5,10 @@
 namespace Robot
 {
 
-    Robot_ctrl::Robot_ctrl() : rc_controller("/dev/IMU_BIG_YAW"), gimbal(Config::gimbal_config), chassis(Config::chassis_config) {
+    Robot_ctrl::Robot_ctrl()
+        : rc_controller("/dev/IMU_HERO"),
+          gimbal(Config::gimbal_config),
+          chassis(Config::chassis_config) {
         robot_set = std::make_shared<Robot_set>();
     }
 
@@ -17,16 +20,15 @@ namespace Robot
         // cv_controller_.init(robot_set);
         rc_controller.enable();
         //  shoot.init(robot_set);
-        super_cap.init("Hero_Chassis");
+        // super_cap.init("Hero_Chassis");
 
-        chassis.init(robot_set);
+        // chassis.init(robot_set);
         gimbal.init(robot_set);
 
         // start DJIMotorManager thread
         Hardware::DJIMotorManager::start();
 
-        // threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
-
+        threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
     }
 
     void Robot_ctrl::init_join() {

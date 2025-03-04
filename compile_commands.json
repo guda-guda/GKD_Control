@@ -8,6 +8,7 @@
       "-g",
       "-I/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/include",
       "-I/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/include/gimbal",
+      "-I/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/include/configs",
       "-I/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/include/chassis",
       "-I/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/include/device",
       "-D__DEBUG__",
@@ -17,11 +18,11 @@
       "-I",
       "/home/zzlinus/dev/3rdparty/stm32h",
       "-o",
-      "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/build/src/device/device_base.o",
-      "src/device/device_base.cc"
+      "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/build/src/main.o",
+      "src/main.cc"
     ],
     "directory": "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL",
-    "file": "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/src/device/device_base.cc",
-    "output": "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/build/src/device/device_base.o"
+    "file": "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/src/main.cc",
+    "output": "/home/zzlinus/dev/cpp/NeoRMControl_OneForALL/build/src/main.o"
   }
 ]

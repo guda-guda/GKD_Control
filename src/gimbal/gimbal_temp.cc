@@ -1,5 +1,7 @@
 #include "gimbal/gimbal_temp.hpp"
 
+#include "utils.hpp"
+
 #include CONFIGHPP
 #include "gimbal/gimbal_config.hpp"
 #include "user_lib.hpp"
@@ -33,7 +35,7 @@ namespace Gimbal
             Pid::PidPosition(config.pitch_rate_pid_config, pitch_gyro) >> Pid::Invert(config.gimbal_motor_dir));
 
         yaw_relative_pid = Pid::PidRad(config.yaw_relative_pid_config, yaw_relative);
-        
+
 #ifdef SENTRY
         yaw_absolute_pid = Pid::PidRad(config.yaw_absolute_pid_config, fake_yaw_abs) >> Pid::Invert(-1);
 #else
@@ -58,6 +60,7 @@ namespace Gimbal
 
             0.f >> yaw_relative_pid >> yaw_motor;
             0.f >> pitch_absolute_pid >> pitch_motor;
+            LOG_INFO("yaw_v : %6f %6f %6f\n", imu.yaw_rate, imu.pitch_rate, imu.roll_rate);
 
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP && fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
@@ -92,7 +95,7 @@ namespace Gimbal
     void GimbalT::update_data() {
         yaw_relative =
             UserLib::rad_format(yaw_motor.data_.rotor_angle - Hardware::DJIMotor::ECD_8192_TO_RAD * config.YawOffSet);
-        yaw_gyro = std::cos(imu.pitch) * imu.yaw_rate - std::sin(imu.pitch) * imu.roll_rate;
+        yaw_gyro = (std::cos(imu.pitch) * imu.yaw_rate - std::sin(imu.pitch) * imu.roll_rate);
         pitch_gyro = imu.pitch_rate;
         // gimbal sentry follow needs
         *yaw_rela = yaw_relative;

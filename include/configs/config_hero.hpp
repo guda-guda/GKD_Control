@@ -5,8 +5,8 @@
 
 #include "chassis/chassis_config.hpp"
 #include "gimbal/gimbal_config.hpp"
-#include "pid_controller.hpp"
 #include "gimbal/gimbal_temp.hpp"
+#include "pid_controller.hpp"
 #include "types.hpp"
 
 namespace Config
@@ -48,7 +48,7 @@ namespace Config
         .yaw_motor_config = Hardware::DJIMotorConfig(6020, "Hero_Gimbal", 1),
         .pitch_motor_config = Hardware::DJIMotorConfig(6020, "Hero_Gimbal", 2),
         .yaw_rate_pid_config = {
-            .kp =           5000.f,
+            .kp =           8000.f,
             .ki =           0.0f,
             .kd =           0.f,
             .max_out =      20000.0f,
@@ -62,7 +62,7 @@ namespace Config
             .max_iout =     5000.0f,
         },
         .yaw_relative_pid_config ={
-            .kp =           8.0f,
+            .kp =           10.0f,
             .ki =           0.0f,
             .kd =           0.3f,
             .max_out =      10.0f,
@@ -85,7 +85,7 @@ namespace Config
         .gimbal_motor_dir = 1.0,
         .gimbal_id = 1,
         .ControlTime = 1,
-        .YawOffSet = 6094
+        .YawOffSet = 7114
     };
 
     // NOTE: PID CONFIG
