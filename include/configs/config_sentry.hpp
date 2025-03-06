@@ -13,13 +13,18 @@ namespace Config
 {
     using GimbalType = Gimbal::GimbalSentry;
 
-    const std::vector<std::string> CanInitList = { "CAN_CHASSIS", "CAN_BULLET", "CAN_LEFT_HEAD", "CAN_RIGHT_HEAD" };
+    const std::vector<std::string> CanInitList = { "CAN_CHASSIS",
+                                                   "CAN_BULLET",
+                                                   "CAN_LEFT_HEAD",
+                                                   "CAN_RIGHT_HEAD" };
 
     const std::vector<std::string> SocketInitList = { "AUTO_AIM_CONTROL" };
 
-    const std::vector<std::tuple<std::string, int, int>> SerialInitList = { { "/dev/IMU_RIGHT", 115200, 2000 },
-                                                                            { "/dev/IMU_LEFT", 115200, 2000 },
-                                                                            { "/dev/IMU_BIG_YAW", 115200, 2000 } };
+    const std::vector<std::tuple<std::string, int, int>> SerialInitList = {
+        { "/dev/IMU_RIGHT", 115200, 2000 },
+        { "/dev/IMU_LEFT", 115200, 2000 },
+        { "/dev/IMU_BIG_YAW", 115200, 2000 }
+    };
 
     const std::string rc_controller_serial = "/dev/IMU_BIG_YAW";
 
@@ -90,7 +95,7 @@ namespace Config
             .gimbal_motor_dir = -1.0,
             .gimbal_id = 2,
             .ControlTime = 1,
-            .YawOffSet = 6033,
+            .YawOffSet = 614,
             .shoot_config = {
                 .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_LEFT_HEAD", 1, 0.075},
                 .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_LEFT_HEAD", 2, 0.075},
@@ -103,8 +108,8 @@ namespace Config
                     2000.0f,   // MAX_IOUT
                 },
                 .trigger_speed_pid_config = Pid::PidConfig{
-                    800.0f,    // KP
-                    0.5f,      // KI
+                    1000.0f,    // KP
+                    50.f,      // KI
                     0.0f,      // KD
                     10000.0f,  // MAX_OUT
                     9000.0f,   // MAX_IOUT
@@ -154,7 +159,7 @@ namespace Config
             .gimbal_motor_dir = 1.0,
             .gimbal_id = 1,
             .ControlTime = 1,
-            .YawOffSet = 6094,
+            .YawOffSet = 716,
             .shoot_config = {
                 .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 1, 0.075},
                 .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 2, 0.075},
@@ -167,8 +172,8 @@ namespace Config
                     2000.0f,   // MAX_IOUT
                 },
                 .trigger_speed_pid_config = Pid::PidConfig{
-                    800.0f,    // KP
-                    0.5f,      // KI
+                    1000.0f,    // KP
+                    50.0f,      // KI
                     0.0f,      // KD
                     10000.0f,  // MAX_OUT
                     9000.0f,   // MAX_IOUT
@@ -359,7 +364,7 @@ namespace Config
 
     constexpr fp32 FRICTION_MAX_SPEED = 3.7f;
     constexpr fp32 FRICTION_ADD_SPEED = 1.0f;
-    constexpr fp32 CONTINUE_TRIGGER_SPEED = 4.f;
+    constexpr fp32 CONTINUE_TRIGGER_SPEED = 6.f;
 
     constexpr uint32_t CHASSIS_CONTROL_TIME = 2;
     constexpr uint32_t GIMBAL_CONTROL_TIME = 1;

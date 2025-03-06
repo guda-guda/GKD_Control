@@ -70,8 +70,12 @@ namespace Gimbal
 
             0.f >> yaw_relative_pid >> yaw_motor;
             0.f >> pitch_absolute_pid >> pitch_motor;
-            // LOG_INFO("imu : %6f %6f %6f %6d\n", imu.yaw, imu.pitch, imu.roll,
-            // yaw_motor.motor_measure_.ecd);
+            // LOG_INFO(
+            //    "imu : %6f %6f %6f %6d\n",
+            //    imu.yaw,
+            //    imu.pitch,
+            //    imu.roll,
+            //    yaw_motor.motor_measure_.ecd);
 
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP &&
                 fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
