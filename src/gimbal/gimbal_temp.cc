@@ -68,20 +68,23 @@ namespace Gimbal
 
         IO::io<SOCKET>["AUTO_AIM_CONTROL"]->register_callback_key(
             config.header, [this](const Robot::Auto_aim_control &vc) {
-                LOG_INFO("socket recive %f %f %d %d\n", vc.yaw_set, vc.pitch_set, vc.fire, config.gimbal_id);
+                LOG_INFO(
+                    "socket recive %f %f %d %d\n",
+                    vc.yaw_set,
+                    vc.pitch_set,
+                    vc.fire,
+                    config.gimbal_id);
                 receive_auto_aim = std::chrono::steady_clock::now();
                 if (vc.fire == false)
-                return;
+                    return;
                 robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL);
                 robot_set->cv_fire = true;
-                if (vc.fire && ISDEF(CONFIG_SENTRY))
-                {
+                if (vc.fire && ISDEF(CONFIG_SENTRY)) {
                     robot_set->shoot_open |= config.gimbal_id;
                 }
-                if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0)
-                {
+                if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0) {
                     *another_yaw_set = vc.yaw_set;
-                    *another_pitch_set = vc.pitch_set;                  
+                    *another_pitch_set = vc.pitch_set;
                 }
 
                 if (!ISDEF(CONFIG_SENTRY) && !robot_set->auto_aim_status)
@@ -97,9 +100,8 @@ namespace Gimbal
                     robot_set->shoot_open &= (((1 << 30) - 1) ^ config.gimbal_id);
                     robot_set->cv_fire = false;
                 }
-                if (robot_set->shoot_open == 0)
-                {
-                    robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH);
+                if (robot_set->shoot_open == 0) {
+                    IFDEF(CONFIG_SENTRY, robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH));
                 }
                 UserLib::sleep_ms(10);
             }
