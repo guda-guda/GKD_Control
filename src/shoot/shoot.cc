@@ -47,7 +47,10 @@ namespace Shoot
                         right_friction.data_.output_linear_velocity < 0.5
                     ? false
                     : true;
-            // LOG_INFO("fric?: %d\n", robot_set->friction_real_state);
+            // LOG_INFO(
+            //     "fire heat: %d %d\n",
+            //     robot_set->referee_info.power_heat_data.shooter_id_1_17_mm_cooling_heat,
+            // robot_set->referee_info.game_robot_status_data.shooter_cooling_limit);
             //  LOG_INFO("ramp %f %f\n", friction_ramp.out,
             //  right_friction.data_.output_linear_velocity);
             left_friction.set(-friction_ramp.out);
@@ -57,9 +60,11 @@ namespace Shoot
                 CONFIG_HERO,
                 robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_42_mm > 0,
                 robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0);
+            // referee_fire_allowance = true;
 
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE ||
-                !(robot_set->shoot_open & gimbal_id) || !referee_fire_allowance) {
+                !(robot_set->shoot_open & gimbal_id) || !referee_fire_allowance ||
+                !robot_set->friction_real_state) {
                 trigger.set(0);
             } else {
                 trigger.set(Config::CONTINUE_TRIGGER_SPEED);

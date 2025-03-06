@@ -125,10 +125,14 @@ namespace Device
     void Dji_referee::task() {
         while (1) {
             read();
+            bool referee_fire_allowance = MUXDEF(
+                CONFIG_HERO,
+                robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_42_mm > 0,
+                robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0);
             // LOG_INFO("ui update\n");
             update_ui_data(
                 &base_,
-                robot_set->friction_real_state,
+                robot_set->friction_real_state && referee_fire_allowance,
                 robot_set->cv_fire,
                 robot_set->spin_state,
                 ((float)robot_set->super_cap_info.capEnergy / 250) * 100);

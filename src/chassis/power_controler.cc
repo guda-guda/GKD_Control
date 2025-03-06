@@ -104,7 +104,7 @@ namespace Power
         float sumError = 0.0f;
         float error[4];
 
-        MUXDEF(CONFIG_SENTRY, float maxPower = 100;
+        MUXDEF(CONFIG_SENTRY, float maxPower = 90;
                , float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);)
 
         float allocatablePower = maxPower;
@@ -203,13 +203,13 @@ namespace Power
             newCmdPower += newTorqueCurrent[i] * k0 * p->curAv + fabs(p->curAv) * k1 +
                            newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
         }
-        LOG_INFO(
-            "sumPower: %f, NewCMDPower power: %f, measuredPower: %f, capEnergy: %d %f\n",
-            sumPowerRequired,
-            newCmdPower,
-            robot_set->super_cap_info.chassisPower,
-            robot_set->super_cap_info.capEnergy,
-            refereeMaxPower);
+        // LOG_INFO(
+        //     "sumPower: %f, NewCMDPower power: %f, measuredPower: %f, capEnergy: %d %f\n",
+        //     sumPowerRequired,
+        //     newCmdPower,
+        //     robot_set->super_cap_info.chassisPower,
+        //     robot_set->super_cap_info.capEnergy,
+        //     refereeMaxPower);
 
         //      #endif
 

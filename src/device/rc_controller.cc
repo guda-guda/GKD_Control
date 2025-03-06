@@ -22,6 +22,10 @@ namespace Device
     }
 
     void Rc_Controller::unpack(const Types::ReceivePacket_RC_CTRL &pkg) {
+        if (pkg.s1 == 2 && pkg.s2 == 2 && pkg.ch4 == -660) {
+            inited = true;
+        }
+
 #ifndef CONFIG_SENTRY
         float vx = 0, vy = 0;
         float speed = 1;
@@ -57,8 +61,9 @@ namespace Device
             key_status[1] = 0;
         }
 
-        if (pkg.mouse_r) {
+        if (pkg.mouse_r || (pkg.s1 == 2 && pkg.s2 == 1)) {
             robot_set->auto_aim_status = true;
+            // LOG_INFO("auto aim status : %d\n", pkg.s1);
         } else {
             robot_set->auto_aim_status = false;
         }
@@ -74,16 +79,17 @@ namespace Device
 
         robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
         robot_set->gimbalT_2_yaw_set += pkg.mouse_x / 10000.;
-        
+
         robot_set->gimbalT_1_pitch_set += pkg.mouse_y / 10000.;
         robot_set->gimbalT_2_pitch_set += pkg.mouse_y / 10000.;
-        
-        // LOG_INFO("mouse : %d %d\n", pkg.mouse_x, pkg.mouse_y);
-        
+
         robot_set->gimbalT_1_pitch_set =
-        std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
+            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
         robot_set->gimbalT_2_pitch_set =
-        std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
+            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
+
+        IFDEF(CONFIG_SENTRY, if (pkg.s2 == 2) robot_set->sentry_follow_gimbal = true;
+              else robot_set->sentry_follow_gimbal = false;)
 #endif
 
         static bool use_key = false;
@@ -94,16 +100,12 @@ namespace Device
         if (use_key)
             return;
 
-        // LOG_INFO("rc controller ch1 %d %d %d %d\n", pkg.s1, pkg.s2, pkg.ch1, pkg.ch3);
-        if (pkg.s1 == 2 && pkg.s2 == 2 && pkg.ch4 == -660) {
-            inited = true;
-        }
-
         // auto-aim, disable control
         if (pkg.s1 == 2)
             return;
 
         if (inited) {
+            LOG_INFO("rc controller ch1 %d %d %d %d\n", pkg.s1, pkg.s2, pkg.ch1, pkg.ch3);
             robot_set->vx_set = ((float)pkg.ch3 / 660) * 3;
             robot_set->vy_set = ((float)pkg.ch2 / 660) * 3;
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
@@ -121,7 +123,7 @@ namespace Device
                 robot_set->wz_set = 0;
 
             if (pkg.ch4 == 660)
-                robot_set->shoot_open = 1;
+                robot_set->shoot_open = 3;
             else
                 robot_set->shoot_open = 0;
 

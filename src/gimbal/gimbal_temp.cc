@@ -101,7 +101,10 @@ namespace Gimbal
                     robot_set->cv_fire = false;
                 }
                 if (robot_set->shoot_open == 0) {
-                    IFDEF(CONFIG_SENTRY, robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH));
+                    IFDEF(
+                        CONFIG_SENTRY,
+                        if (robot_set->sentry_follow_gimbal)
+                            robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH));
                 }
                 UserLib::sleep_ms(10);
             }
@@ -111,10 +114,14 @@ namespace Gimbal
     }
 
     void GimbalT::init_task() {
+        static int delta = 0;
         while (imu.offline() || yaw_motor.offline() || pitch_motor.offline()) {
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
             LOG_INFO(
                 "offline %d %d %d\n", imu.offline(), yaw_motor.offline(), pitch_motor.offline());
+            delta++;
+            if (delta > 1000)
+                exit(-1);
         }
         while (robot_set->inited != Types::Init_status::INIT_FINISH) {
             update_data();

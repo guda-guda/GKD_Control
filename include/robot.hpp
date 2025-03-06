@@ -29,7 +29,8 @@ namespace Robot
 
         /** shoot_control **/
         bool friction_open = false;
-        bool friction_real_state = false;    //friction's real state (motor linear speed < 0.5 ? false : true)
+        bool friction_real_state =
+            false;  // friction's real state (motor linear speed < 0.5 ? false : true)
         bool cv_fire = false;
         int shoot_open = 0;
 
@@ -52,6 +53,8 @@ namespace Robot
         fp32 aimz;
         bool is_aiming = false;
         uint8_t inited = 0;
+
+        uint8_t sentry_follow_gimbal = 0;
 
         bool auto_aim_status = false;
 
