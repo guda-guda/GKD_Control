@@ -38,9 +38,7 @@ namespace Device
         if (pkg.s2 == 1) {
             robot_set->friction_open = true;
             // :robot_set->gimbalT_1_pitch_set = 0;
-        }
-        else {
-
+        } else {
             robot_set->friction_open = false;
         }
 

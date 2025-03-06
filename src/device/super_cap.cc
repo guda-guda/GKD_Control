@@ -28,13 +28,13 @@ namespace Device
         }
 
         std::memcpy(&robot_set->super_cap_info, frame.data, 8);
-
-        // LOG_INFO(
-        //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\tcapEnergy %d\n",
-        //     robot_set->super_cap_info.errorCode,
-        //     robot_set->super_cap_info.chassisPower,
-        //     (int)robot_set->super_cap_info.chassisPowerlimit,
-        //     (int)robot_set->super_cap_info.capEnergy);
+        LOG_INFO(
+            "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\tcapEnergy %d %d\n",
+            robot_set->super_cap_info.errorCode,
+            robot_set->super_cap_info.chassisPower,
+            (int)robot_set->super_cap_info.chassisPowerlimit,
+            (int)robot_set->super_cap_info.capEnergy,
+            power_limit);
     }
 
     void Super_Cap::set(bool enable, uint16_t power_limit) {
@@ -47,8 +47,8 @@ namespace Device
             send.data[0] = 0x01;
         send.data[1] = power_limit & 0xff;
         send.data[2] = power_limit >> 8;
-        send.data[3] = chassis_power_buffer & 0xff;
-        send.data[4] = chassis_power_buffer >> 8;
+        send.data[3] = 50 & 0xff;
+        send.data[4] = 50 >> 8;
 
         can->send(send);
     }

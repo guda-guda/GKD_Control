@@ -49,6 +49,7 @@ namespace Device
                     "discard possible wrong frames, data length: %d\n", frame_header.data_length);
                 return 0;
             }
+
             // printf("data len %x %d %x\n", frame_header.sof, frame_header.data_length, rx_data[6]
             // << 8 | rx_data[5]);
             frame_len =
@@ -123,7 +124,18 @@ namespace Device
     void Dji_referee::task() {
         while (1) {
             read();
+            // LOG_INFO("ui update\n");
+            update_ui_data(
+                &base_,
+                false,
+                false,
+                false,
+                ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+    }
+
+    void Dji_referee::task_ui() {
+        custom_ui_task(&base_);
     }
 }  // namespace Device
