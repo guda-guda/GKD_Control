@@ -13,6 +13,8 @@ namespace Config
 {
     using GimbalType = Gimbal::GimbalSentry;
 
+    const std::string super_cap_can_interface = "CAN_CHASSIS";
+
     const std::vector<std::string> CanInitList = { "CAN_CHASSIS",
                                                    "CAN_BULLET",
                                                    "CAN_LEFT_HEAD",

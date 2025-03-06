@@ -70,12 +70,20 @@ run: all
 clean-build: clean
 	@make all -j8
 
-to-minipc:
+to-hero:
 	@sudo docker exec --workdir /home/zzsunil/dev/cpp/GKD_Control 9d33ed2d8c3c make hero -j8
 	sshpass -p 1 scp build/rx78-2 fish@192.168.1.10:/home/fish/dev
 	#@sudo docker exec --workdir /home/zzlinus/dev/cpp/NeoRMControl_OneForALL  a30b5228ace8 make infantry -j8
 	#sshpass -p 1 scp build/rx78-2 gkd@192.168.1.204:/home/gkd/dev
 	#sshpass -p 1 ssh gkd@192.168.1.4 "/home/gkd/dev/rx78-2"
+
+to-infantry:
+	@sudo docker exec --workdir /home/zzsunil/dev/cpp/GKD_Control 9d33ed2d8c3c make infantry -j8
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.204:/home/gkd/dev
+
+to-sentry:
+	@sudo docker exec --workdir /home/zzsunil/dev/cpp/GKD_Control 9d33ed2d8c3c make sentry -j8
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.211:/home/gkd/dev
 
 serial: $(SERIAL_DIR)
 	@$(MAKE) -C $< -j8

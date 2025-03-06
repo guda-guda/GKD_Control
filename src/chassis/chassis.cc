@@ -77,11 +77,9 @@ namespace Chassis
                 static Power::PowerObj *pObjs[4] = { &objs[0], &objs[1], &objs[2], &objs[3] };
                 float *cmd_power = power_manager.getControlledOutput(pObjs);
 
-                MUXDEF(
-                    CONFIG_SENTRY,
-                    for (int i = 0; i < 4; ++i) { motors[i].give_current = wheels_pid[i].out; },
-
-                    for (int i = 0; i < 4; ++i) { motors[i].give_current = cmd_power[i]; })
+                for (int i = 0; i < 4; ++i) {
+                    motors[i].give_current = cmd_power[i];
+                }
             }
             UserLib::sleep_ms(config.ControlTime);
         }

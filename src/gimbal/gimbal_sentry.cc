@@ -49,10 +49,10 @@ namespace Gimbal
             0.f >> yaw_relative_pid >> yaw_motor;
             // LOG_INFO("big yaw %d %f\n", yaw_motor.motor_measure.ecd, yaw_relative);
             // LOG_INFO("yaw r %f\n", yaw_relative);
+            *yaw_set = imu.yaw;
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
             } else {
-                *yaw_set = imu.yaw;
                 init_stop_times = 0;
             }
             if (init_stop_times >= Config::GIMBAL_INIT_STOP_TIME)

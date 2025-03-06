@@ -3,8 +3,10 @@
 #include <iostream>
 #include <thread>
 
+#include "macro_helpers.hpp"
 #include "pid_controller.hpp"
 #include "power_controller.hpp"
+#include "robot_type_config.hpp"
 
 namespace Power
 {
@@ -102,7 +104,8 @@ namespace Power
         float sumError = 0.0f;
         float error[4];
 
-        float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);
+        MUXDEF(CONFIG_SENTRY, float maxPower = 100;
+               , float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);)
 
         float allocatablePower = maxPower;
         float sumPowerRequired = 0.0f;
@@ -130,7 +133,9 @@ namespace Power
         //     maxPower,
         //     measuredPower,
         //     robot_set->super_cap_info.capEnergy,
-        //     robot_set->referee_info.game_robot_status_data.robot_id);
+        // robot_set->referee_info.game_robot_status_data.robot_id);
+
+        // LOG_INFO("k1 %f k2 %f k3 %f max %f\n", k1, k2, k3, maxPower);
 
         // LOG_INFO("referee level %d\n",
         // robot_set->referee_info.game_robot_status_data.robot_level);
@@ -198,14 +203,15 @@ namespace Power
             newCmdPower += newTorqueCurrent[i] * k0 * p->curAv + fabs(p->curAv) * k1 +
                            newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
         }
-        // LOG_INFO(
-        //     "sumPower: %f, NewCMDPower power: %f, measuredPower: %f, capEnergy: %d %f\n",
-        //     sumPowerRequired,
-        //     newCmdPower,
-        //     robot_set->super_cap_info.chassisPower,
-        //     robot_set->super_cap_info.capEnergy,
-        //     refereeMaxPower);
-        //    #endif
+        LOG_INFO(
+            "sumPower: %f, NewCMDPower power: %f, measuredPower: %f, capEnergy: %d %f\n",
+            sumPowerRequired,
+            newCmdPower,
+            robot_set->super_cap_info.chassisPower,
+            robot_set->super_cap_info.capEnergy,
+            refereeMaxPower);
+
+        //      #endif
 
         return newTorqueCurrent;
     }
