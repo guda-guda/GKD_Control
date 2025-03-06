@@ -82,6 +82,7 @@ namespace Gimbal
                 if (vc.fire && ISDEF(CONFIG_SENTRY)) {
                     robot_set->shoot_open |= config.gimbal_id;
                 }
+
                 if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0) {
                     *another_yaw_set = vc.yaw_set;
                     *another_pitch_set = vc.pitch_set;
@@ -95,16 +96,19 @@ namespace Gimbal
 
         std::thread check_auto_aim([this] {
             while (true) {
+                if (robot_set->sentry_follow_gimbal) {
+                    IFDEF(
+                        CONFIG_SENTRY, robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL));
+                    continue;
+                }
                 if (std::chrono::steady_clock::now() - receive_auto_aim >
-                    std::chrono::milliseconds(100)) {
-                    robot_set->shoot_open &= (((1 << 30) - 1) ^ config.gimbal_id);
+                    std::chrono::milliseconds(300)) {
+                    robot_set->shoot_open &= ~config.gimbal_id;
                     robot_set->cv_fire = false;
                 }
+                // LOG_INFO("shoot open %d\n", robot_set->shoot_open);
                 if (robot_set->shoot_open == 0) {
-                    IFDEF(
-                        CONFIG_SENTRY,
-                        if (robot_set->sentry_follow_gimbal)
-                            robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH));
+                    IFDEF(CONFIG_SENTRY, robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH));
                 }
                 UserLib::sleep_ms(10);
             }

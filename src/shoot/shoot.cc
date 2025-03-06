@@ -48,19 +48,31 @@ namespace Shoot
                     ? false
                     : true;
             // LOG_INFO(
-            //     "fire heat: %d %d\n",
-            //     robot_set->referee_info.power_heat_data.shooter_id_1_17_mm_cooling_heat,
-            // robot_set->referee_info.game_robot_status_data.shooter_cooling_limit);
-            //  LOG_INFO("ramp %f %f\n", friction_ramp.out,
-            //  right_friction.data_.output_linear_velocity);
+            //     "ramp %f %f\n", friction_ramp.out, right_friction.data_.output_linear_velocity);
             left_friction.set(-friction_ramp.out);
             right_friction.set(friction_ramp.out);
 
-            bool referee_fire_allowance = MUXDEF(
+            bool shoot_heat = true;
+
+            bool remain_bullet = MUXDEF(
                 CONFIG_HERO,
                 robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_42_mm > 0,
-                robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0);
-            // referee_fire_allowance = true;
+                MUXDEF(
+                    CONFIG_INFANTRY,
+                    robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0,
+                    robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0));
+
+            bool referee_fire_allowance =
+                (shoot_heat && remain_bullet) ||
+                !((robot_set->referee_info.game_status_data.game_progress & 0x0f) == 4);
+
+            // LOG_INFO(
+            //     "referee fire allowance %d %d %d %d %d\n",
+            //     referee_fire_allowance,
+            //     remain_bullet,
+            //     shoot_heat,
+            //     robot_set->referee_info.power_heat_data.shooter_id_1_17_mm_cooling_heat,
+            //     robot_set->referee_info.game_robot_status_data.shooter_cooling_limit);
 
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE ||
                 !(robot_set->shoot_open & gimbal_id) || !referee_fire_allowance ||

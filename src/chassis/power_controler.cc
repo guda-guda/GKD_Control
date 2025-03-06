@@ -104,8 +104,7 @@ namespace Power
         float sumError = 0.0f;
         float error[4];
 
-        MUXDEF(CONFIG_SENTRY, float maxPower = 90;
-               , float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);)
+        float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);
 
         float allocatablePower = maxPower;
         float sumPowerRequired = 0.0f;
@@ -127,13 +126,14 @@ namespace Power
             }
         }
 
-        // LOG_INFO(
-        //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d\n",
-        //     sumCmdPower,
-        //     maxPower,
-        //     measuredPower,
-        //     robot_set->super_cap_info.capEnergy,
-        // robot_set->referee_info.game_robot_status_data.robot_id);
+        LOG_INFO(
+            "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d %d\n",
+            sumCmdPower,
+            maxPower,
+            measuredPower,
+            robot_set->super_cap_info.capEnergy,
+            robot_set->referee_info.game_robot_status_data.robot_id,
+            robot_set->referee_info.game_robot_status_data.robot_level);
 
         // LOG_INFO("k1 %f k2 %f k3 %f max %f\n", k1, k2, k3, maxPower);
 

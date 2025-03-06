@@ -79,7 +79,7 @@ to-hero:
 
 to-infantry:
 	@sudo docker exec --workdir /home/zzsunil/dev/cpp/GKD_Control 9d33ed2d8c3c make infantry -j8
-	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.204:/home/gkd/dev
+	sshpass -p 1 scp build/rx78-2 gkd@192.168.1.203:/home/gkd/dev
 
 to-sentry:
 	@sudo docker exec --workdir /home/zzsunil/dev/cpp/GKD_Control 9d33ed2d8c3c make sentry -j8

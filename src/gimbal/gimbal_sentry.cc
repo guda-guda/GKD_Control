@@ -82,6 +82,12 @@ namespace Gimbal
                              robot_set->referee_info.game_robot_status_data.max_hp;
             gimbal_info.start =
                 (robot_set->referee_info.game_status_data.game_progress & 0x0f) == 4;
+
+            // FIXME: random robot_set used
+            if (gimbal_info.start) {
+                robot_set->wz_set = 0.3;
+                robot_set->friction_open = true;
+            }
             // LOG_INFO("game progress %d\n", robot_set->referee_info.game_status_data.game_progress
             // & 0x0f); IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(gimbal_info);
 

@@ -118,7 +118,7 @@ namespace Config
                 },
                 .gimbal_id = 2
             },
-            .header = 0xB6,
+            .header = 0x6B,
             .auto_aim_ip = "192.168.10.2",
             .auto_aim_port = 11453,
         };
@@ -186,7 +186,7 @@ namespace Config
                 },
                 .gimbal_id = 1
             },
-            .header = 0xA6,
+            .header = 0x6A,
             .auto_aim_ip = "127.0.0.1",
             .auto_aim_port = 11453,
         };

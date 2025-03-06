@@ -68,7 +68,7 @@ namespace Device
             robot_set->auto_aim_status = false;
         }
 
-        if (pkg.mouse_l) {
+        if (pkg.mouse_l || pkg.ch4 == 660) {
             robot_set->shoot_open = 1;
         } else {
             robot_set->shoot_open = 0;
@@ -88,8 +88,6 @@ namespace Device
         robot_set->gimbalT_2_pitch_set =
             std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
 
-        IFDEF(CONFIG_SENTRY, if (pkg.s2 == 2) robot_set->sentry_follow_gimbal = true;
-              else robot_set->sentry_follow_gimbal = false;)
 #endif
 
         static bool use_key = false;
@@ -105,7 +103,7 @@ namespace Device
             return;
 
         if (inited) {
-            LOG_INFO("rc controller ch1 %d %d %d %d\n", pkg.s1, pkg.s2, pkg.ch1, pkg.ch3);
+            // LOG_INFO("rc controller ch1 %d %d %d %d\n", pkg.s1, pkg.s2, pkg.ch1, pkg.ch3);
             robot_set->vx_set = ((float)pkg.ch3 / 660) * 3;
             robot_set->vy_set = ((float)pkg.ch2 / 660) * 3;
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
@@ -122,15 +120,24 @@ namespace Device
             else
                 robot_set->wz_set = 0;
 
-            if (pkg.ch4 == 660)
-                robot_set->shoot_open = 3;
-            else
-                robot_set->shoot_open = 0;
-
             if (pkg.s2 == 1)
                 robot_set->friction_open = true;
             else
                 robot_set->friction_open = false;
+
+            IFDEF(
+                CONFIG_SENTRY,
+                if (pkg.s2 == 2) {
+                    robot_set->sentry_follow_gimbal = true;
+                    robot_set->friction_open = true;
+                    if (pkg.ch4 == 660)
+                        robot_set->shoot_open = 3;
+                    else
+                        robot_set->shoot_open = 0;
+                } else {
+                    robot_set->sentry_follow_gimbal = false;
+                    robot_set->friction_open = false;
+                })
         }
         update_time();
     }

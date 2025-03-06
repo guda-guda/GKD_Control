@@ -20,8 +20,11 @@ namespace Device
         uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
         uint16_t power_limit = MUXDEF(
             CONFIG_HERO,
-            Power::HeroChassisPowerLimit_HP_FIRST[robot_level],
-            MUXDEF(CONFIG_INFANTRY, Power::InfantryChassisPowerLimit_HP_FIRST[robot_level], 100U));
+            Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+            MUXDEF(
+                CONFIG_INFANTRY,
+                Power::InfantryChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+                100U * 0.9));
 
         if (delta >= 500) {
             set(true, power_limit);
