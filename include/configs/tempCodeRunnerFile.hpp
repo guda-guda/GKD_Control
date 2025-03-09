@@ -21,23 +21,8 @@ namespace Config
     const std::vector<std::tuple<std::string, int, int>> SerialInitList = { { "/dev/IMU_HERO", 115200, 2000 } };
 
     const Shoot::ShootConfig shoot_config = {
-        .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .trigger_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .friction_speed_pid_config = Pid::PidConfig{
-            5.f,       // KP
-            0.05f,     // KI
-            10.0f,     // KD
-            16000.0f,  // MAX_OUT
-            2000.0f,   // MAX_IOUT
-        },
-        .trigger_speed_pid_config = Pid::PidConfig{
-            800.0f,    // KP
-            0.5f,      // KI
-            0.0f,      // KD
-            10000.0f,  // MAX_OUT
-            9000.0f,   // MAX_IOUT
-        }
+        .friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
+        .trigger_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075}
     };
 
     const Chassis::ChassisConfig chassis_config = {
@@ -173,6 +158,27 @@ namespace Config
     const typename Pid::PidConfig PITCH_SPEED_PID_CONFIG{
         5500.0f, 100.0f, 0.0f, 30000.0f, 5000.0f,
     };
+
+    /** SHOOT **/
+    const typename Pid::PidConfig FRIC_SPEED_PID_CONFIG{
+        5.f,       // KP
+        0.05f,     // KI
+        10.0f,     // KD
+        16000.0f,  // MAX_OUT
+        2000.0f,   // MAX_IOUT
+    };
+
+    const typename Pid::PidConfig TRIGGER_SPEED_PID_CONFIG{
+        800.0f,    // KP
+        0.5f,      // KI
+        0.0f,      // KD
+        10000.0f,  // MAX_OUT
+        9000.0f,   // MAX_IOUT
+    };
+    /** shoot config **/
+
+    constexpr uint32_t FRICTION_NUM = 4;
+    constexpr uint32_t TRIGGER_NUM = 2;
 
     constexpr fp32 GIMBAL_INIT_YAW_SPEED = 0.005f;
     constexpr fp32 GIMBAL_INIT_PITCH_SPEED = 0.004f;

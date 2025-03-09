@@ -4,16 +4,16 @@
 #include "ramp.hpp"
 #include "robot.hpp"
 #include <memory>
+#include "shoot_config.hpp"
 
 namespace Shoot
 {
     class Shoot
     {
        public:
-        Shoot();
+        Shoot(const ShootConfig& config);
         void init(const std::shared_ptr<Robot::Robot_set> &robot);
         ~Shoot() = default;
-        void update_speed();
         void decomposition_speed();
         [[noreturn]] void task();
         bool isJam();
@@ -24,8 +24,9 @@ namespace Shoot
         int jam_time = 0;
         int back_time = 0;
 
-        //std::vector<Hardware::Motor> friction;
-        //std::vector<Hardware::Motor> trigger;
+        Hardware::DJIMotor left_friction;
+        Hardware::DJIMotor right_friction;
+        Hardware::DJIMotor trigger;
 
         std::shared_ptr<Robot::Robot_set> robot_set;
        private:

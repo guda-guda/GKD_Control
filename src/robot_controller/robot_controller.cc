@@ -8,7 +8,8 @@ namespace Robot
     Robot_ctrl::Robot_ctrl()
         : rc_controller("/dev/IMU_HERO"),
           gimbal(Config::gimbal_config),
-          chassis(Config::chassis_config) {
+          chassis(Config::chassis_config),
+          shoot(Config::shoot_config) {
         robot_set = std::make_shared<Robot_set>();
     }
 
@@ -19,7 +20,7 @@ namespace Robot
 
         // cv_controller_.init(robot_set);
         rc_controller.enable();
-        //  shoot.init(robot_set);
+        shoot.init(robot_set);
         // super_cap.init("Hero_Chassis");
 
         // chassis.init(robot_set);
@@ -38,7 +39,7 @@ namespace Robot
     void Robot_ctrl::start() {
         // threads.emplace_back(&Config::GimbalType::task, &gimbal);
         threads.emplace_back(&Chassis::Chassis::task, &chassis);
-        // shoot_thread = std::make_unique<std::thread>(&Shoot::Shoot::task, &shoot);
+        threads.emplace_back(&Shoot::Shoot::task, &shoot);
         // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
     }
 
