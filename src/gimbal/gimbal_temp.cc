@@ -15,11 +15,13 @@ namespace Gimbal
           pitch_motor(config.pitch_motor_config),
           yaw_set(nullptr),
           pitch_set(nullptr),
-          yaw_rela(nullptr) {
+          yaw_rela(nullptr),
+          shoot(config.shoot_config) {
     }
 
     void GimbalT::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
+        shoot.init(robot);
         if (config.gimbal_id == 1) {
             yaw_set = &robot_set->gimbalT_1_yaw_set;
             pitch_set = &robot_set->gimbalT_1_pitch_set;
@@ -52,15 +54,16 @@ namespace Gimbal
     void GimbalT::init_task() {
         while (imu.offline() || yaw_motor.offline() || pitch_motor.offline()) {
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
+            LOG_INFO("offline %d %d %d\n",imu.offline() , yaw_motor.offline() , pitch_motor.offline());
         }
         while (!inited) {
             update_data();
-            if (config.gimbal_id == 2)
-                continue;
+            // if (config.gimbal_id == 2)
+            //     continue;
 
             0.f >> yaw_relative_pid >> yaw_motor;
             0.f >> pitch_absolute_pid >> pitch_motor;
-            LOG_INFO("yaw_v : %6f %6f %6f\n", imu.yaw_rate, imu.pitch_rate, imu.roll_rate);
+            // LOG_INFO("yaw_v : %6f %6f %6f\n", imu.yaw_rate, imu.pitch_rate, imu.roll_rate);
 
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP && fabs(imu.pitch) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
@@ -72,15 +75,16 @@ namespace Gimbal
                 *pitch_set = 0;
                 init_stop_times = 0;
             }
-            // inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+            inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(config.ControlTime);
         }
     }
 
     [[noreturn]] void GimbalT::task() {
+        std::jthread shoot_thread(&Shoot::Shoot::task, &shoot);
         while (true) {
             update_data();
-            // LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, fake_yaw_abs);
+            LOG_INFO("yaw set %f, imu yaw %f\n", *yaw_set, fake_yaw_abs);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
                 yaw_motor.give_current = 0;
                 pitch_motor.give_current = 0;

@@ -6,10 +6,9 @@ namespace Robot
 {
 
     Robot_ctrl::Robot_ctrl()
-        : rc_controller("/dev/IMU_HERO"),
+        : rc_controller("/dev/IMU_BIG_YAW"),
           gimbal(Config::gimbal_config),
-          chassis(Config::chassis_config),
-          shoot(Config::shoot_config) {
+          chassis(Config::chassis_config) {
         robot_set = std::make_shared<Robot_set>();
     }
 
@@ -20,7 +19,6 @@ namespace Robot
 
         // cv_controller_.init(robot_set);
         rc_controller.enable();
-        shoot.init(robot_set);
         // super_cap.init("Hero_Chassis");
 
         // chassis.init(robot_set);
@@ -37,9 +35,8 @@ namespace Robot
     }
 
     void Robot_ctrl::start() {
-        // threads.emplace_back(&Config::GimbalType::task, &gimbal);
-        threads.emplace_back(&Chassis::Chassis::task, &chassis);
-        threads.emplace_back(&Shoot::Shoot::task, &shoot);
+        threads.emplace_back(&Config::GimbalType::task, &gimbal);
+        // threads.emplace_back(&Chassis::Chassis::task, &chassis);
         // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
     }
 
@@ -55,8 +52,13 @@ namespace Robot
         for (auto& [name, baud_rate, simple_timeout] : Config::SerialInitList) {
             IO::io<SERIAL>.insert(name, baud_rate, simple_timeout);
         }
-        // for(auto & name : Config :: SocketInitList) {
-        //     IO::io<SOCKET>.insert(name);
-        // }
+        for(auto & name : Config :: SocketInitList) {
+            IO::io<SOCKET>.insert(name);
+            IO::io<SOCKET>[name]->register_callback<Vison_control>([this](const Vison_control& vc){
+                LOG_INFO("%f %f\n", vc.yaw_set, vc.pitch_set);
+                robot_set->gimbalT_1_yaw_set += vc.yaw_set;
+            });
+        }
+
     }
 };  // namespace Robot

@@ -28,27 +28,26 @@ namespace Gimbal
     }
 
     void GimbalSentry::init_task() {
-        std::future<void> future_left = std::async(&GimbalT::init_task, &gimbal_left);
-        std::future<void> future_right = std::async(&GimbalT::init_task, &gimbal_right);
+        // std::jthread thread_left{&GimbalT::init_task, &gimbal_left};
+        std::jthread thread_right{&GimbalT::init_task, &gimbal_right};
         while (!inited) {
             update_data();
             0.f >> yaw_relative_pid >> yaw_motor;
             //  LOG_INFO("big yaw %f %f\n", yaw_motor_speed,yaw_relative);
+            LOG_INFO("yaw r %f\n",yaw_relative);
             if (fabs(yaw_relative) < Config::GIMBAL_INIT_EXP) {
                 init_stop_times += 1;
             } else {
                 *yaw_set = imu.yaw;
                 init_stop_times = 0;
             }
-            // inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
+            inited = init_stop_times >= Config::GIMBAL_INIT_STOP_TIME;
             UserLib::sleep_ms(Config::GIMBAL_CONTROL_TIME);
         }
-        future_left.get();
-        future_right.get();
     }
 
     [[noreturn]] void GimbalSentry::task() {
-        std::thread thread_left{&GimbalT::task, &gimbal_left};
+        // std::thread thread_left{&GimbalT::task, &gimbal_left};
         std::thread thread_right{&GimbalT::task, &gimbal_right};
         while (true) {
             update_data();
@@ -67,7 +66,8 @@ namespace Gimbal
         yaw_motor_speed = Config::RPM_TO_RAD_S * (fp32)yaw_motor.motor_measure.speed_rpm;
         yaw_relative = UserLib::rad_format(
             Config::M9025_ECD_TO_RAD * ((fp32)yaw_motor.motor_measure.ecd - Config::GIMBAL3_YAW_OFFSET_ECD));
-        yaw_relative_with_two_head = robot_set->gimbalT_1_yaw_reletive + robot_set->gimbalT_2_yaw_reletive;
+        // yaw_relative_with_two_head = robot_set->gimbalT_1_yaw_reletive + robot_set->gimbalT_2_yaw_reletive;
+        yaw_relative_with_two_head = robot_set->gimbalT_1_yaw_reletive;
         robot_set->gimbal_sentry_yaw_reletive = yaw_relative;
         robot_set->gimbal_sentry_yaw = imu.yaw;
     }

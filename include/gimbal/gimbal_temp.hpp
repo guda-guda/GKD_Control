@@ -6,6 +6,7 @@
 #include "dji_motor.hpp"
 #include "gimbal/gimbal_config.hpp"
 #include "robot.hpp"
+#include "shoot.hpp"
 
 namespace Gimbal
 {
@@ -46,6 +47,8 @@ namespace Gimbal
         ControllerList yaw_relative_pid;
         ControllerList yaw_absolute_pid;
         ControllerList pitch_absolute_pid;
+
+        Shoot::Shoot shoot;
     };
 
 }  // namespace Gimbal

@@ -20,26 +20,6 @@ namespace Config
 
     const std::vector<std::tuple<std::string, int, int>> SerialInitList = { { "/dev/IMU_HERO", 115200, 2000 } };
 
-    const Shoot::ShootConfig shoot_config = {
-        .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .trigger_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
-        .friction_speed_pid_config = Pid::PidConfig{
-            5.f,       // KP
-            0.05f,     // KI
-            10.0f,     // KD
-            16000.0f,  // MAX_OUT
-            2000.0f,   // MAX_IOUT
-        },
-        .trigger_speed_pid_config = Pid::PidConfig{
-            800.0f,    // KP
-            0.5f,      // KI
-            0.0f,      // KD
-            10000.0f,  // MAX_OUT
-            9000.0f,   // MAX_IOUT
-        }
-    };
-
     const Chassis::ChassisConfig chassis_config = {
         .wheels_config = {
             Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
@@ -106,7 +86,26 @@ namespace Config
         .gimbal_motor_dir = 1.0,
         .gimbal_id = 1,
         .ControlTime = 1,
-        .YawOffSet = 7114
+        .YawOffSet = 7114,
+        .shoot_config = {
+            .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
+            .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
+            .trigger_motor_config = Hardware::DJIMotorConfig{3508, "Hero_Chassis", 1, 0.075},
+            .friction_speed_pid_config = Pid::PidConfig{
+                5.f,       // KP
+                0.05f,     // KI
+                10.0f,     // KD
+                16000.0f,  // MAX_OUT
+                2000.0f,   // MAX_IOUT
+            },
+            .trigger_speed_pid_config = Pid::PidConfig{
+                800.0f,    // KP
+                0.5f,      // KI
+                0.0f,      // KD
+                10000.0f,  // MAX_OUT
+                9000.0f,   // MAX_IOUT
+            }
+        }
     };
 
     // NOTE: PID CONFIG

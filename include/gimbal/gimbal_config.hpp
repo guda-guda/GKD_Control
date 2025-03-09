@@ -2,6 +2,7 @@
 
 #include "dji_motor.hpp"
 #include "pid_controller.hpp"
+#include "shoot_config.hpp"
 
 namespace Gimbal
 {
@@ -19,5 +20,6 @@ namespace Gimbal
         int gimbal_id;
         const int ControlTime{};
         const fp32 YawOffSet{};
+        Shoot::ShootConfig shoot_config;
     };
 }  // namespace Gimbal

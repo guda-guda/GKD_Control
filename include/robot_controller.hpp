@@ -39,7 +39,6 @@ namespace Robot
         Device::Cv_controller cv_controller_;
         Chassis::Chassis chassis;
         Config::GimbalType gimbal;
-        Shoot::Shoot shoot;
 
         Device::Super_Cap super_cap;
     };
