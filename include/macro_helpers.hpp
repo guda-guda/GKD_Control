@@ -1,3 +1,7 @@
+#ifndef __MACROS__
+#define __MACROS__
+#include "utils.hpp"
+
 // macro concatenation
 #define concat_temp(x, y)      x##y
 #define concat(x, y)           concat_temp(x, y)
@@ -48,3 +52,9 @@
 #define IFONE(macro, ...) MUXONE(macro, __KEEP, __IGNORE)(__VA_ARGS__)
 // keep the code if a boolean macro is defined to 0
 #define IFZERO(macro, ...) MUXZERO(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+
+#define configASSERT(x) \
+    if (!(x))           \
+        LOG_ERR("power management module assert falied\n");
+
+#endif

@@ -19,6 +19,7 @@ CPPFLAGS += -I$(WORK_DIR)/include/gimbal
 CPPFLAGS += -I$(WORK_DIR)/include/configs
 CPPFLAGS += -I$(WORK_DIR)/include/chassis
 CPPFLAGS += -I$(WORK_DIR)/include/device
+CPPFLAGS += -I$(WORK_DIR)/include/utils
 CPPFLAGS += -I$(WORK_DIR)/include/device/referee
 
 # NOTE: turn on debug here

@@ -8,7 +8,8 @@
 
 namespace Device
 {
-    void Super_Cap::init(const std::string& can_name) {
+    void Super_Cap::init(const std::string& can_name, const std::shared_ptr<Robot::Robot_set>& robot) {
+        robot_set = robot;
         can = IO::io<CAN>[can_name];
         can->register_callback_key(0x51, std::bind(&Super_Cap::unpack, this, std::placeholders::_1));
     }
@@ -23,6 +24,7 @@ namespace Device
             (int)info.chassisPowerlimit,
             (int)info.capEnergy);
     }
+
     void Super_Cap::set(bool enable, uint16_t power_limit) {
         can_frame send{};
         if (enable)
