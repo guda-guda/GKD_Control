@@ -21,7 +21,7 @@ namespace Config
 
     const std::string rc_controller_serial = "/dev/IMU_HERO";
 
-    const std::string super_cap_can_interface = "CAN_CHASSIS";
+    const std::string super_cap_can_interface = "Hero_Chassis";
 
     const Chassis::ChassisConfig chassis_config = {
         .wheels_config = {

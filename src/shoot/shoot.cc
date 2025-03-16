@@ -38,7 +38,7 @@ namespace Shoot
 
             friction_ramp.update(robot_set->friction_open ? Config::FRICTION_MAX_SPEED : 0.f);
 
-            // LOG_INFO("ramp %f %f\n", friction_ramp.out, left_friction.data_.output_linear_velocity);
+            // LOG_INFO("ramp %f %f\n", friction_ramp.out, right_friction.data_.output_linear_velocity);
             left_friction.set(-friction_ramp.out);
             right_friction.set(friction_ramp.out);
 

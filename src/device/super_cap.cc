@@ -1,11 +1,5 @@
 #include "device/super_cap.hpp"
 
-#include <cstring>
-
-#include "io.hpp"
-#include "super_cap.hpp"
-#include "types.hpp"
-
 namespace Device
 {
     void Super_Cap::init(const std::string& can_name, const std::shared_ptr<Robot::Robot_set>& robot) {

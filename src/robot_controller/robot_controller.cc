@@ -1,6 +1,5 @@
 #include "robot_controller.hpp"
 
-#include "config_hero.hpp"
 #include "io.hpp"
 #include "referee.hpp"
 #include "robot_type_config.hpp"
@@ -26,7 +25,7 @@ namespace Robot
 
         // cv_controller_.init(robot_set);
         rc_controller.enable(robot_set);
-        IFNDEF(CONFIG_SENTRY, super_cap.init(Config::super_cap_can_interface));
+        IFNDEF(CONFIG_SENTRY, super_cap.init(Config::super_cap_can_interface, robot_set));
 
         chassis.init(robot_set);
         gimbal.init(robot_set);

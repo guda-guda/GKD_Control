@@ -1,7 +1,14 @@
 #pragma once
+
+#include <cstring>
+#include <memory>
+
 #include "can.hpp"
 #include "deviece_base.hpp"
+#include "io.hpp"
 #include "robot.hpp"
+#include "super_cap.hpp"
+#include "types.hpp"
 
 namespace Device
 {
@@ -10,6 +17,7 @@ namespace Device
        private:
         IO::Can_interface* can;
         Types::ReceivePacket_Super_Cap supercap_info;
+        std::shared_ptr<Robot::Robot_set> robot_set;
 
        public:
         void init(const std::string& can_name, const std::shared_ptr<Robot::Robot_set>& robot);

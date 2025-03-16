@@ -139,9 +139,11 @@ namespace Power
      */
 
     float *getControlledOutput(PowerObj *objs[4]) {
-        const float k0 = manager.torqueConst * manager.motors[0]->getCurrentLimit() /
-                         manager.motors[0]->getOutputLimit();  // torque current rate of the motor,
-                                                               // defined as Nm/Output
+        // FIXME:
+        // const float k0 = manager.torqueConst * manager.motors[0]->getCurrentLimit() /
+        //                  manager.motors[0]->getOutputLimit();  // torque current rate of the motor,
+        //                                                        // defined as Nm/Output
+        const float k0 = 1;
 
         static float newTorqueCurrent[4];
 
@@ -262,24 +264,24 @@ namespace Power
     static inline void setErrorFlag() {
         /*Judge the error status*/
         // #if USE_SUPER_CAPACITOR
-        if (not capStatus.isConnected || not capStatus.capacitorTx.enableDCDC ||
-            not capStatus.capacitorRx.errorCode == 0)
-            setErrorFlag(manager.error, Manager::CAPDisConnect);
-        else
-            clearErrorFlag(manager.error, Manager::CAPDisConnect);
+        // if (not capStatus.isConnected || not capStatus.capacitorTx.enableDCDC ||
+        //    not capStatus.capacitorRx.errorCode == 0)
+        //    setErrorFlag(manager.error, Manager::CAPDisConnect);
+        // else
+        //    clearErrorFlag(manager.error, Manager::CAPDisConnect);
         // #else
         //   setErrorFlag(manager.error, Manager::CAPDisConnect);
         // #endif
 
-        if (not RefereeSystem::isConnected())
-            setErrorFlag(manager.error, Manager::RefereeDisConnect);
-        else
-            clearErrorFlag(manager.error, Manager::RefereeDisConnect);
+        // if (not RefereeSystem::isConnected())
+        //     setErrorFlag(manager.error, Manager::RefereeDisConnect);
+        // else
+        //     clearErrorFlag(manager.error, Manager::RefereeDisConnect);
 
-        if (not isAllMotorConnected())
-            setErrorFlag(manager.error, Manager::MotorDisconnect);
-        else
-            clearErrorFlag(manager.error, Manager::MotorDisconnect);
+        // if (not isAllMotorConnected())
+        //     setErrorFlag(manager.error, Manager::MotorDisconnect);
+        // else
+        //     clearErrorFlag(manager.error, Manager::MotorDisconnect);
     }
 
     void powerDaemon [[noreturn]] (void *pvParam) {
@@ -287,7 +289,7 @@ namespace Power
         static Math::Matrixf<2, 1> params;
         static float effectivePower = 0;
 
-        manager.torqueConst = manager.motors[0]->getKA() * manager.motors[0]->getReductionRatio();
+        // manager.torqueConst = manager.motors[0]->getKA() * manager.motors[0]->getReductionRatio();
         isInitialized = true;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -305,38 +307,40 @@ namespace Power
             // #if USE_SUPER_CAPACITOR
             //  If super capacitor is disconnected from the circuit, disable the rls
             //  update
-            if (isFlagged(manager.error, Manager::CAPDisConnect)) {
-                // Judge whether the cap energy is used-up
-                if (not isFlagged(manager.error, Manager::RefereeDisConnect)) {
-                    if (powerMessage.getData().bufferEnergy < MAX_POEWR_REFEREE_BUFF &&
-                        powerMessage.getData().chassisPower > CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD) {
-                        isCapEnergyOut = true;
-                        manager.estimatedCapEnergy = 0.0f;
-                    } else {
-                        isCapEnergyOut = false;
-                        manager.rlsEnabled = Manager::Disable;
-                        if (powerMessage.getData().chassisPower < MIN_MAXPOWER_CONFIGURED &&
-                            powerMessage.getData().bufferEnergy == 60U) {
-                            manager.estimatedCapEnergy = 2100.0f;
-                        } else {
-                            manager.estimatedCapEnergy +=
-                                (powerMessage.getData().chassisPower - manager.estimatedPower) *
-                                static_cast<float>((now - manager.lastUpdateTick) / (CLOCKS_PER_SEC / 1000));
-                            manager.estimatedCapEnergy = Utils::Math::clamp(manager.estimatedCapEnergy, 0.0f, 2100.0f);
-                        }
-                    }
-                } else {
-                    isCapEnergyOut = false;
-                    manager.rlsEnabled = Manager::Disable;
-                    manager.estimatedCapEnergy +=
-                        (CAP_OFFLINE_ENERGY_TARGET_POWER - manager.estimatedPower) *
-                        static_cast<flogetControlledOutputat>((now - manager.lastUpdateTick) / (CLOCKS_PER_SEC / 1000));
-                    manager.estimatedCapEnergy = std::clamp(manager.estimatedCapEnergy, 0.0f, 2100.0f);
-                }
-            } else {
-                isCapEnergyOut = false;
-                manager.estimatedCapEnergy = capStatus.capacitorRx.capEnergy / 255.0f * 2100.0f;
-            }
+            // if (isFlagged(manager.error, Manager::CAPDisConnect)) {
+            //    // Judge whether the cap energy is used-up
+            //    if (not isFlagged(manager.error, Manager::RefereeDisConnect)) {
+            //        if (powerMessage.getData().bufferEnergy < MAX_POEWR_REFEREE_BUFF &&
+            //            powerMessage.getData().chassisPower > CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD) {
+            //            isCapEnergyOut = true;
+            //            manager.estimatedCapEnergy = 0.0f;
+            //        } else {
+            //            isCapEnergyOut = false;
+            //            manager.rlsEnabled = Manager::Disable;
+            //            if (powerMessage.getData().chassisPower < MIN_MAXPOWER_CONFIGURED &&
+            //                powerMessage.getData().bufferEnergy == 60U) {
+            //                manager.estimatedCapEnergy = 2100.0f;
+            //            } else {
+            //                manager.estimatedCapEnergy +=
+            //                    (powerMessage.getData().chassisPower - manager.estimatedPower) *
+            //                    static_cast<float>((now - manager.lastUpdateTick) / (CLOCKS_PER_SEC / 1000));
+            //                manager.estimatedCapEnergy = Utils::Math::clamp(manager.estimatedCapEnergy, 0.0f,
+            //                2100.0f);
+            //            }
+            //        }
+            //    } else {
+            //        isCapEnergyOut = false;
+            //        manager.rlsEnabled = Manager::Disable;
+            //        manager.estimatedCapEnergy +=
+            //            (CAP_OFFLINE_ENERGY_TARGET_POWER - manager.estimatedPower) *
+            //            static_cast<flogetControlledOutputat>((now - manager.lastUpdateTick) / (CLOCKS_PER_SEC /
+            //            1000));
+            //        manager.estimatedCapEnergy = std::clamp(manager.estimatedCapEnergy, 0.0f, 2100.0f);
+            //    }
+            //} else {
+            isCapEnergyOut = false;
+            manager.estimatedCapEnergy = capStatus.capacitorRx.capEnergy / 255.0f * 2100.0f;
+            //}
             // #else // Only Use Referee System, disable the rls update if referee data
             // is
             //       // invalid
