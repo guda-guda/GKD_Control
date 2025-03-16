@@ -117,11 +117,13 @@ namespace Gimbal
                 *pitch_set >> pitch_absolute_pid >> pitch_motor;
             }
 
-            Robot::SendGimbalInfo gimbal_info;
-            gimbal_info.header = 0xA6;
-            gimbal_info.yaw = imu.yaw;
-            gimbal_info.pitch = imu.pitch;
-            IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(gimbal_info);
+            if (config.gimbal_id == 1) {
+                Robot::SendGimbalInfo gimbal_info;
+                gimbal_info.header = 0xA6;
+                MUXDEF(CONFIG_SENTRY, gimbal_info.yaw = fake_yaw_abs, gimbal_info.yaw = imu.yaw);
+                gimbal_info.pitch = imu.pitch;
+                IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(gimbal_info);
+            }
 
             UserLib::sleep_ms(config.ControlTime);
         }

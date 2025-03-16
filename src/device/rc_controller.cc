@@ -39,7 +39,7 @@ namespace Device
             }
 
             if (pkg.s1 == 1)
-                robot_set->wz_set = 0.5;
+                robot_set->wz_set = 1.0;
             else
                 robot_set->wz_set = 0;
 
