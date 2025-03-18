@@ -51,7 +51,8 @@ namespace Robot
         threads.emplace_back(&Device::Dji_referee::task, &referee);
         IFDEF(CONFIG_SENTRY, threads.emplace_back(&Gimbal::GimbalT::task, &gimbal_left));
         IFDEF(CONFIG_SENTRY, threads.emplace_back(&Gimbal::GimbalT::task, &gimbal_right));
-        // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task, &cv_controller_);
+        // vision_thread = std::make_unique<std::thread>(&Device::Cv_controller::task,
+        // &cv_controller_);
     }
 
     void Robot_ctrl::join() {
@@ -68,11 +69,13 @@ namespace Robot
         }
         for (auto& name : Config::SocketInitList) {
             IO::io<SOCKET>.insert(name);
-            IO::io<SOCKET>[name] -> register_callback<Auto_aim_control>([this](const Auto_aim_control& vc) {
-                // LOG_INFO("socket recive %f %f\n", vc.yaw_set, vc.pitch_set);
-                robot_set->gimbalT_1_yaw_set = vc.yaw_set;
-                robot_set->gimbalT_1_pitch_set = vc.pitch_set;
-            });
+            IO::io<SOCKET>[name] -> register_callback<Auto_aim_control>(
+                                     [this](const Auto_aim_control& vc) {
+                                         // LOG_INFO("socket recive %f %f\n", vc.yaw_set,
+                                         // vc.pitch_set);
+                                         robot_set->gimbalT_1_yaw_set = vc.yaw_set;
+                                         robot_set->gimbalT_1_pitch_set = vc.pitch_set;
+                                     });
         }
     }
 };  // namespace Robot

@@ -284,7 +284,7 @@ namespace Power
             // LOG_INFO(
             //     "%f %f %f %f %f %f\n", measuredPower, effectivePower, estimatedPower, k1, k2,
             //     k3);
-            printf("%f, %f\n", baseMaxPower, fullMaxPower);
+            // printf("%f, %f\n", baseMaxPower, fullMaxPower);
 
             // update power status
             powerStatus.userConfiguredMaxPower = userConfiguredMaxPower;

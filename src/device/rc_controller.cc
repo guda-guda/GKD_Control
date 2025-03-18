@@ -26,6 +26,11 @@ namespace Device
         if (pkg.s1 == 2 && pkg.s2 == 2 && pkg.ch4 == -660) {
             inited = true;
         }
+
+        // auto-aim, disable control
+        if (pkg.s1 == 2)
+            return;
+
         if (inited) {
             robot_set->vx_set = ((float)pkg.ch3 / 660) * 3;
             robot_set->vy_set = ((float)pkg.ch2 / 660) * 3;
