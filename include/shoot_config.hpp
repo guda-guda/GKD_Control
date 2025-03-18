@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
+
 #include "dji_motor.hpp"
 #include "pid_controller.hpp"
 
-namespace Shoot 
+namespace Shoot
 {
     struct ShootConfig
     {
@@ -12,6 +13,7 @@ namespace Shoot
         Hardware::DJIMotorConfig trigger_motor_config;
         Pid::PidConfig friction_speed_pid_config;
         Pid::PidConfig trigger_speed_pid_config;
+        int8_t trigger_dir;
     };
 
-} // namespace Shoot    
+}  // namespace Shoot

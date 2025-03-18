@@ -49,8 +49,12 @@ namespace Robot
         fp32 aimz;
         bool is_aiming = false;
         uint8_t inited = 0;
+
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
         Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
+
+        Types::ReceivePacket_Super_Cap super_cap_info;
+        Types::Referee_info referee_info;
 
         void set_mode(Types::ROBOT_MODE set_mode) {
             this->last_mode = this->mode;

@@ -1,5 +1,7 @@
 #include "chassis/chassis.hpp"
 
+#include <thread>
+
 #include "chassis_config.hpp"
 #include "robot_type_config.hpp"
 #include "user_lib.hpp"
@@ -8,26 +10,32 @@ namespace Chassis
 {
     Chassis::Chassis(const ChassisConfig &config)
         : config(config),
-          motors(config.wheels_config.begin(), config.wheels_config.end()) {
+          motors(config.wheels_config.begin(), config.wheels_config.end()),
+          power_manager(motors, Power::Division::HERO) {
     }
 
     void Chassis::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
-        MUXDEF(
-            CONFIG_SENTRY,
-            chassis_angle_pid =
-                Pid::PidRad(config.chassis_follow_gimbal_pid_config, robot_set->gimbal_sentry_yaw_reletive),
-            chassis_angle_pid =
-                Pid::PidRad(config.chassis_follow_gimbal_pid_config, robot_set->gimbalT_1_yaw_reletive) >>
-                Pid::Invert(-1));
+
+        power_manager.init(robot);
+
+        chassis_angle_pid = Pid::PidRad(
+                                config.chassis_follow_gimbal_pid_config,
+                                MUXDEF(
+                                    CONFIG_SENTRY,
+                                    robot_set->gimbal_sentry_yaw_reletive,
+                                    robot_set->gimbalT_1_yaw_reletive)) >>
+                            Pid::Invert(config.follow_dir);
 
         for (auto &motor : motors) {
-            motor.setCtrl(Pid::PidPosition(config.wheel_speed_pid_config, motor.data_.output_linear_velocity));
+            motor.setCtrl(Pid::PidPosition(
+                config.wheel_speed_pid_config, motor.data_.output_linear_velocity));
             motor.enable();
         }
     }
 
     [[noreturn]] void Chassis::task() {
+        std::jthread power_daemon(&Power::Manager::powerDaemon, &power_manager);
         while (true) {
             decomposition_speed();
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
@@ -48,6 +56,16 @@ namespace Chassis
                 for (int i = 0; i < 4; i++) {
                     motors[i].set(wheel_speed[i]);
                 }
+
+                // Power Limit
+                for (int i = 0; i < 4; ++i) {
+                    objs[i].curAv = motors[i].motor_measure_.speed_rpm * M_PIf / 30;
+                    objs[i].pidOutput = motors[i].give_current;
+                    objs[i].setAv = wheel_speed[i];
+                    objs[i].pidMaxOutput = 14000;
+                }
+                static Power::PowerObj *pObjs[4] = { &objs[0], &objs[1], &objs[2], &objs[3] };
+                power_manager.getControlledOutput(pObjs);
             }
             UserLib::sleep_ms(config.ControlTime);
         }

@@ -1,10 +1,14 @@
 // NOTE: lagacy from rm_control (needs update every YEAR!)
 #pragma once
+#include <memory>
+
 #include "device/deviece_base.hpp"
 #include "referee_base.hpp"
+#include "robot.hpp"
 
 namespace Device
 {
+
     class Dji_referee : public DeviceBase
     {
        public:
@@ -13,12 +17,14 @@ namespace Device
         };
         void task();
         void read();
+        void init(const std::shared_ptr<Robot::Robot_set> &robot);
         void clearRxBuffer() {
             rx_buffer_.clear();
             rx_len_ = 0;
         }
         Base base_;
         std::vector<uint8_t> rx_buffer_;
+        std::shared_ptr<Robot::Robot_set> robot_set;
         int rx_len_;
 
        private:

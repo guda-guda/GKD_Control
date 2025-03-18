@@ -44,7 +44,8 @@ namespace Config
             .max_out =      14000.0f,
             .max_iout =     2000.0f,
         },
-        .ControlTime = 2
+        .ControlTime = 2,
+				.follow_dir = -1,
     };
 
     const Gimbal::GimbalConfig gimbal_config = {
@@ -208,7 +209,7 @@ namespace Config
 
     constexpr fp32 FRICTION_MAX_SPEED = 3.7f;
     constexpr fp32 FRICTION_ADD_SPEED = 1.0f;
-    constexpr fp32 CONTINUE_TRIGGER_SPEED = 9.f;
+    constexpr fp32 CONTINUE_TRIGGER_SPEED = 4.f;
 
     constexpr uint32_t CHASSIS_CONTROL_TIME = 2;
     constexpr uint32_t GIMBAL_CONTROL_TIME = 1;

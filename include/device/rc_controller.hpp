@@ -21,7 +21,7 @@ namespace Device
         fp32 pitch_rate = 0;
         fp32 roll_rate = 0;
 
-        void enable(const std::shared_ptr<Robot::Robot_set>& robot);
+        void init(const std::shared_ptr<Robot::Robot_set>& robot);
         void unpack(const Types::ReceivePacket_RC_CTRL& pkg);
 
        private:

@@ -6,8 +6,11 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 
 #include "dji_motor.hpp"
+#include "pid_controller.hpp"
+#include "referee.hpp"
 #include "robot.hpp"
 #include "super_cap.hpp"
 #define USE_POWER_CONTROLLER TRUE
@@ -64,6 +67,15 @@ namespace Power
         SENTRY
     };
 
+    struct PowerObj
+    {
+       public:
+        float pidOutput;     // torque current command, [-maxOutput, maxOutput], no unit
+        float curAv;         // Measured angular velocity, [-maxAv, maxAv], rad/s
+        float setAv;         // target angular velocity, [-maxAv, maxAv], rad/s
+        float pidMaxOutput;  // pid max output
+    };
+
     struct Manager
     {
         enum RLSEnabled : bool
@@ -79,35 +91,6 @@ namespace Power
             CAPDisConnect = 4U
         };
 
-        struct Motors  // For overloading
-        {
-            const Hardware::DJIMotor *motorRf;
-            const Hardware::DJIMotor *motorLf;
-            const Hardware::DJIMotor *motorLb;
-            const Hardware::DJIMotor *motorRb;
-
-            const Hardware::DJIMotor *&operator[](int index) {
-                switch (index) {
-                    case 0: return motorRf;
-                    case 1: return motorLf;
-                    case 2: return motorLb;
-                    case 3: return motorRb;
-                    default: return motorRf;
-                }
-            }
-
-            Motors(
-                const Hardware::DJIMotor *motorRf_,
-                const Hardware::DJIMotor *motorLf_,
-                const Hardware::DJIMotor *motorLb_,
-                const Hardware::DJIMotor *motorRb_)
-                : motorRf(motorRf_),
-                  motorLf(motorLf_),
-                  motorLb(motorLb_),
-                  motorRb(motorRb_) {
-            }
-        };
-
         uint8_t error;
 
         /**
@@ -115,24 +98,8 @@ namespace Power
          */
         Manager() = delete;
 
-        /**
-         * @brief The constructor of the power manager object
-         * @param motors_               The motor objects
-         * @todo                        This will change to the type of
-         * "AbstractFeedbackMotor*"
-         * @param division_             The type of robot
-         * @param rlsEnabled_           Enable or disable the RLS adaptive param mode
-         * @param torqueConst_          The torque const (KA) of the motor, measured
-         * by (N.m / A)
-         * @param k1_                   The frequency-dissipate params on the power
-         * estimation motor
-         * @param k2_                   The current-dissipate's square params on the
-         * power estimation motor
-         * @param k3_                   The constant power loss
-         * @param lambda_               The RLS update forgetting factor
-         */
         Manager(
-            const Motors &motors_,
+            std::deque<Hardware::DJIMotor> &motors_,
             const Division division_,
             RLSEnabled rlsEnabled_ = Enable,
             const float k1_ = 0.22f,
@@ -140,7 +107,7 @@ namespace Power
             const float k3_ = 2.78f,
             const float lambda_ = 0.9999f);
 
-        Motors motors;
+        std::deque<Hardware::DJIMotor> &motors;
         Division division;
 
         float powerBuff;
@@ -159,26 +126,34 @@ namespace Power
         float estimatedPower;
         float estimatedCapEnergy;
 
-        float torqueConst;
-
         float k1;
         float k2;
         float k3;
 
         size_t lastUpdateTick;
+
         Math::RLS<2> rls;
+
+        ControllerList powerPD_base;
+        ControllerList powerPD_full;
 
         std::shared_ptr<Robot::Robot_set> robot_set;
         std::shared_ptr<Device::Super_Cap> supercap;
+        std::shared_ptr<Device::Dji_referee> referee;
+
+        void init(const std::shared_ptr<Robot::Robot_set> &robot);
+        float *getControlledOutput(PowerObj *objs[4]);
+        void setMaxPowerConfigured(float maxPower);
+        void setMode(uint8_t mode);
+        void powerDaemon [[noreturn]] ();
     };
 
-    struct PowerObj
-    {
-       public:
-        float pidOutput;     // torque current command, [-maxOutput, maxOutput], no unit
-        float curAv;         // Measured angular velocity, [-maxAv, maxAv], rad/s
-        float setAv;         // target angular velocity, [-maxAv, maxAv], rad/s
-        float pidMaxOutput;  // pid max output
+#define POWER_PD_KP 50.0f
+    const typename Pid::PidConfig powerPD_base_pid_config{
+        POWER_PD_KP, 0.0f, 0.2f, MAX_CAP_POWER_OUT, 0.0f,
+    };
+    const typename Pid::PidConfig powerPD_full_pid_config{
+        POWER_PD_KP, 0.0f, 0.2f, MAX_CAP_POWER_OUT, 0.0f,
     };
 
     /**
@@ -220,7 +195,6 @@ namespace Power
      * @param manager The manager object
      * @note This function should be called before the scheduler starts
      */
-    void init(const Manager &manager);
 
     /**
      * @brief set the user configured max power

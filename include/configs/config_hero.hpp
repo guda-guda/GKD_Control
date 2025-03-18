@@ -43,8 +43,9 @@ namespace Config
             .max_out =      14000.0f,
             .max_iout =     2000.0f,
         },
-        .ControlTime = 2
-    };
+        .ControlTime = 2,
+				.follow_dir = 1,
+};  // namespace Config
 
     const Gimbal::GimbalConfig gimbal_config = {
         .imu_serial_port = "/dev/IMU_HERO",
@@ -90,8 +91,8 @@ namespace Config
         .ControlTime = 1,
         .YawOffSet = 3866,
         .shoot_config = {
-            .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 2, 0.075},
-            .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 3, 0.075},
+            .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 3, 0.075},
+            .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 2, 0.075},
             .trigger_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 4, 0.075},
             .friction_speed_pid_config = Pid::PidConfig{
                 2000.f,       // KP
@@ -101,14 +102,15 @@ namespace Config
                 2000.0f,   // MAX_IOUT
             },
             .trigger_speed_pid_config = Pid::PidConfig{
-                800.0f,    // KP
+                2000.0f,    // KP
                 0.5f,      // KI
                 0.0f,      // KD
                 10000.0f,  // MAX_OUT
                 9000.0f,   // MAX_IOUT
             }
-        }
-    };
+}  // namespace Config
+}
+;
 
     // NOTE: PID CONFIG
 
@@ -207,7 +209,7 @@ namespace Config
 
     constexpr fp32 FRICTION_MAX_SPEED = 3.7f;
     constexpr fp32 FRICTION_ADD_SPEED = 1.0f;
-    constexpr fp32 CONTINUE_TRIGGER_SPEED = 9.f;
+    constexpr fp32 CONTINUE_TRIGGER_SPEED = -2.f;
 
     constexpr uint32_t CHASSIS_CONTROL_TIME = 2;
     constexpr uint32_t GIMBAL_CONTROL_TIME = 1;

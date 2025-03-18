@@ -10,7 +10,7 @@ namespace Device
     Rc_Controller::Rc_Controller(const std::string &serial_name) : serial_name(serial_name) {
     }
 
-    void Rc_Controller::enable(const std::shared_ptr<Robot::Robot_set> &robot) {
+    void Rc_Controller::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
         auto serial_interface = IO::io<SERIAL>[serial_name];
         if (serial_interface == nullptr) {

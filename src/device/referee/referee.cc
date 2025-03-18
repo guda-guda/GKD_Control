@@ -32,6 +32,10 @@ namespace Device
         clearRxBuffer();
     }
 
+    void Dji_referee::init(const std::shared_ptr<Robot::Robot_set> &robot) {
+        robot_set = robot;
+    }
+
     int Dji_referee::unpack(uint8_t *rx_data) {
         uint16_t cmd_id;
         int frame_len;
@@ -50,80 +54,40 @@ namespace Device
                 cmd_id = (rx_data[6] << 8 | rx_data[5]);
                 switch (cmd_id) {
                     case Referee::RefereeCmdId::GAME_STATUS_CMD: {
-                        Referee::GameStatus game_status_ref;
-                        Referee::GameStatus game_status_data;
-                        memcpy(&game_status_ref, rx_data + 7, sizeof(Referee::GameStatus));
-
-                        game_status_data.game_type = game_status_ref.game_type;
-                        game_status_data.game_progress = game_status_ref.game_progress;
-                        game_status_data.stage_remain_time = game_status_ref.stage_remain_time;
-                        game_status_data.sync_time_stamp = game_status_ref.sync_time_stamp;
+                        memcpy(&robot_set->referee_info.game_status_data, rx_data + 7, sizeof(Referee::GameStatus));
 
                         printf("game status\n");
                         break;
                     }
                     case Referee::RefereeCmdId::GAME_RESULT_CMD: {
-                        Referee::GameResult game_result_ref;
-                        memcpy(&game_result_ref, rx_data + 7, sizeof(Referee::GameResult));
+                        memcpy(&robot_set->referee_info.game_result_ref, rx_data + 7, sizeof(Referee::GameResult));
                         printf("game result\n");
                         break;
                     }
                     case Referee::RefereeCmdId::REFEREE_WARNING_CMD: {
-                        Referee::RefereeWarning referee_warning_ref;
-                        memcpy(&referee_warning_ref, rx_data + 7, sizeof(Referee::RefereeWarning));
+                        memcpy(
+                            &robot_set->referee_info.referee_warning_ref, rx_data + 7, sizeof(Referee::RefereeWarning));
                         break;
                     }
                     case Referee::RefereeCmdId::ROBOT_STATUS_CMD: {
-                        Referee::GameRobotStatus game_robot_status_ref;
-                        Referee::GameRobotStatus game_robot_status_data;
-                        memcpy(&game_robot_status_ref, rx_data + 7, sizeof(Referee::GameRobotStatus));
-
-                        game_robot_status_data.remain_hp = game_robot_status_ref.remain_hp;
-                        game_robot_status_data.robot_level = game_robot_status_ref.robot_level;
-                        game_robot_status_data.max_hp = game_robot_status_ref.max_hp;
-                        game_robot_status_data.shooter_cooling_limit = game_robot_status_ref.shooter_cooling_limit;
-                        game_robot_status_data.shooter_cooling_rate = game_robot_status_ref.shooter_cooling_rate;
-                        game_robot_status_data.chassis_power_limit = game_robot_status_ref.chassis_power_limit;
-                        game_robot_status_data.mains_power_chassis_output =
-                            game_robot_status_ref.mains_power_chassis_output;
-                        game_robot_status_data.mains_power_gimbal_output =
-                            game_robot_status_ref.mains_power_gimbal_output;
-                        game_robot_status_data.mains_power_shooter_output =
-                            game_robot_status_ref.mains_power_shooter_output;
-                        game_robot_status_data.robot_id = game_robot_status_ref.robot_id;
-                        base_.robot_id_ = game_robot_status_ref.robot_id;
+                        memcpy(
+                            &robot_set->referee_info.game_robot_status_data,
+                            rx_data + 7,
+                            sizeof(Referee::GameRobotStatus));
                         printf("robot result\n");
-
                         break;
                     }
                     case Referee::RefereeCmdId::POWER_HEAT_DATA_CMD: {
-                        Referee::PowerHeatData power_heat_ref;
-                        Referee::PowerHeatData power_heat_data;
-                        memcpy(&power_heat_ref, rx_data + 7, sizeof(Referee::PowerHeatData));
-
-                        power_heat_data.chassis_power_buffer = power_heat_ref.chassis_power_buffer;
-                        power_heat_data.shooter_id_1_17_mm_cooling_heat =
-                            power_heat_ref.shooter_id_1_17_mm_cooling_heat;
-                        power_heat_data.shooter_id_2_17_mm_cooling_heat =
-                            power_heat_ref.shooter_id_2_17_mm_cooling_heat;
-                        power_heat_data.shooter_id_1_42_mm_cooling_heat =
-                            power_heat_ref.shooter_id_1_42_mm_cooling_heat;
+                        memcpy(&robot_set->referee_info.power_heat_data, rx_data + 7, sizeof(Referee::PowerHeatData));
                         printf("power heat\n");
-
                         break;
                     }
                     case Referee::RefereeCmdId::BULLET_REMAINING_CMD: {
-                        Referee::BulletAllowance bullet_allowance_ref;
-                        Referee::BulletAllowance bullet_allowance_data;
-                        memcpy(&bullet_allowance_ref, rx_data + 7, sizeof(Referee::BulletAllowance));
-
-                        bullet_allowance_data.bullet_allowance_num_17_mm =
-                            bullet_allowance_ref.bullet_allowance_num_17_mm;
-                        bullet_allowance_data.bullet_allowance_num_42_mm =
-                            bullet_allowance_ref.bullet_allowance_num_42_mm;
-                        bullet_allowance_data.coin_remaining_num = bullet_allowance_ref.coin_remaining_num;
+                        memcpy(
+                            &robot_set->referee_info.bullet_allowance_data,
+                            rx_data + 7,
+                            sizeof(Referee::BulletAllowance));
                         printf("bullet remaining \n");
-
                         break;
                     }
                     default: printf("Referee command ID %d not found.\n", cmd_id); break;

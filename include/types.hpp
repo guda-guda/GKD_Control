@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "macro_helpers.hpp"
+#include "protocol.hpp"
 #include "string"
 
 // NOTE: defines and type defines
@@ -63,6 +64,16 @@ namespace Types
         uint16_t chassisPowerlimit;
         uint8_t capEnergy;
     } __attribute__((packed));
+
+    struct Referee_info
+    {
+        Referee::GameStatus game_status_data;
+        Referee::GameResult game_result_ref;
+        Referee::RefereeWarning referee_warning_ref;
+        Referee::GameRobotStatus game_robot_status_data;
+        Referee::BulletAllowance bullet_allowance_data;
+        Referee::PowerHeatData power_heat_data;
+    };
 
     typedef struct
     {

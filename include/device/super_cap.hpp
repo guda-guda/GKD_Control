@@ -16,7 +16,6 @@ namespace Device
     {
        private:
         IO::Can_interface* can;
-        Types::ReceivePacket_Super_Cap supercap_info;
         std::shared_ptr<Robot::Robot_set> robot_set;
 
        public:

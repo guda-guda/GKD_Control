@@ -1,11 +1,11 @@
 #pragma once
 
-#include "dji_motor.hpp"
-#include <iostream>
 #include <array>
-#include "pid_controller.hpp"
+#include <iostream>
 
+#include "dji_motor.hpp"
 #include "io.hpp"
+#include "pid_controller.hpp"
 
 namespace Chassis
 {
@@ -15,5 +15,6 @@ namespace Chassis
         Pid::PidConfig chassis_follow_gimbal_pid_config{};
         Pid::PidConfig wheel_speed_pid_config{};
         const int ControlTime{};
+        int8_t follow_dir;
     };
 }  // namespace Chassis
