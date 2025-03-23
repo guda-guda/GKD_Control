@@ -28,6 +28,27 @@ namespace Device
         }
 
         // auto-aim, disable control
+        static int last_p2 = 0;
+        if (last_p2 == 2 && pkg.s2 != 2) {
+            IO::io<SERIAL>["/dev/IMU_HERO"]->send(static_cast<uint8_t>(0x5A));
+            LOG_INFO("send serial\n");
+        }
+        last_p2 = pkg.s2;
+
+        if (pkg.s2 == 1) {
+            robot_set->friction_open = true;
+            // :robot_set->gimbalT_1_pitch_set = 0;
+        }
+        else {
+
+            robot_set->friction_open = false;
+        }
+
+        if (pkg.ch4 == 660)
+            robot_set->shoot_open = robot_set->cv_fire;
+        else
+            robot_set->shoot_open = false;
+
         if (pkg.s1 == 2)
             return;
 

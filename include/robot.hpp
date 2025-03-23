@@ -29,6 +29,7 @@ namespace Robot
         /** shoot_control **/
         bool friction_open = false;
         bool shoot_open = false;
+        bool cv_fire = false;
 
         /** other **/
         fp32 gimbalT_1_yaw_set = 0.f;
@@ -137,6 +138,7 @@ namespace Robot
         // 欧拉角
         float yaw_set;
         float pitch_set;
+        bool fire;
 
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
     } __attribute__((packed));

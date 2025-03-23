@@ -126,12 +126,12 @@ namespace Power
             }
         }
 
-        LOG_INFO(
-            "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d\n",
-            sumCmdPower,
-            maxPower,
-            measuredPower,
-            robot_set->super_cap_info.capEnergy);
+        // LOG_INFO(
+        //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d\n",
+        //     sumCmdPower,
+        //     maxPower,
+        //     measuredPower,
+        //     robot_set->super_cap_info.capEnergy);
 
         //      update power status
         powerStatus.maxPowerLimited = maxPower;

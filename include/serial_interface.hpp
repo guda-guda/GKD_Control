@@ -17,6 +17,10 @@ namespace IO
         Serial_interface() = delete;
         ~Serial_interface();
         void task();
+        template<typename T>
+        void send(T val) {
+           write(&val, sizeof(T));
+        }
 
        private:
         inline void enumerate_ports();

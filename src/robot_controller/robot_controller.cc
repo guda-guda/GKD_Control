@@ -76,6 +76,7 @@ namespace Robot
                                          // vc.pitch_set);
                                          robot_set->gimbalT_1_yaw_set = vc.yaw_set;
                                          robot_set->gimbalT_1_pitch_set = vc.pitch_set;
+                                         robot_set->cv_fire = vc.fire;
                                      });
         }
     }
