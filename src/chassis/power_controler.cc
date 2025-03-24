@@ -10,9 +10,7 @@ namespace Power
 {
 
     PowerStatus powerStatus;
-    static uint8_t LATEST_FEEDBACK_JUDGE_ROBOT_LEVEL;
     static bool isCapEnergyOut = false;
-    static uint16_t motorDisconnectCounter[4] = { 0U, 0U, 0U, 0U };
     static float MIN_MAXPOWER_CONFIGURED = 30.0f;
 
     static inline bool floatEqual(float a, float b) {
@@ -132,6 +130,8 @@ namespace Power
         //     maxPower,
         //     measuredPower,
         //     robot_set->super_cap_info.capEnergy);
+        // LOG_INFO("referee level %d\n",
+        // robot_set->referee_info.game_robot_status_data.robot_level);
 
         //      update power status
         powerStatus.maxPowerLimited = maxPower;
@@ -226,7 +226,6 @@ namespace Power
             float k0 =
                 torqueConst * 20 / 16384;  // torque current rate of the motor, defined as Nm/Output
             // FIXME: DEBUG SET LEVEL TO 1
-            robot_set->referee_info.game_robot_status_data.robot_level = 1;
 
             size_t now = clock();
 
@@ -258,12 +257,6 @@ namespace Power
             refereeMaxPower = fmax(
                 robot_set->super_cap_info.chassisPowerlimit,
                 CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD);
-
-            if (robot_set->referee_info.game_robot_status_data.robot_level > 10U)
-                LATEST_FEEDBACK_JUDGE_ROBOT_LEVEL = 1U;
-            else
-                LATEST_FEEDBACK_JUDGE_ROBOT_LEVEL =
-                    fmax(1U, robot_set->referee_info.game_robot_status_data.robot_level);
 
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
             // FIXME: referee leve to set lower limit
@@ -359,7 +352,6 @@ namespace Power
             return;
 
         robot_set = robot;
-        LATEST_FEEDBACK_JUDGE_ROBOT_LEVEL = division == Division::SENTRY ? 10U : 1U;
         MIN_MAXPOWER_CONFIGURED = 30.0f;
         powerUpperLimit = CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD;
         powerPD_base = Pid::PidPosition(powerPD_base_pid_config, powerBuff);

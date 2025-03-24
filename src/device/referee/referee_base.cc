@@ -5,7 +5,7 @@ namespace Device
 
     void Base::initSerial() {
         serial::Timeout timeout = serial::Timeout::simpleTimeout(50);
-        serial_.setPort("/dev/ttyUSB0");
+        serial_.setPort("/dev/REFEREE");
         serial_.setBaudrate(115200);
         serial_.setTimeout(timeout);
         if (serial_.isOpen())
@@ -18,7 +18,10 @@ namespace Device
     }
 
     // CRC check
-    uint8_t Base::getCRC8CheckSum(unsigned char *pch_message, unsigned int dw_length, unsigned char uc_crc_8) {
+    uint8_t Base::getCRC8CheckSum(
+        unsigned char *pch_message,
+        unsigned int dw_length,
+        unsigned char uc_crc_8) {
         unsigned char uc_index;
         while (dw_length--) {
             uc_index = uc_crc_8 ^ (*pch_message++);
@@ -50,7 +53,8 @@ namespace Device
         while (dw_length--) {
             chData = *pch_message++;
             (w_crc) = (static_cast<uint16_t>(w_crc) >> 8) ^
-                      Referee::wCRC_table[(static_cast<uint16_t>(w_crc) ^ static_cast<uint16_t>(chData)) & 0x00ff];
+                      Referee::wCRC_table
+                          [(static_cast<uint16_t>(w_crc) ^ static_cast<uint16_t>(chData)) & 0x00ff];
         }
         return w_crc;
     }
@@ -69,7 +73,8 @@ namespace Device
         uint16_t wCRC;
         if ((pch_message == nullptr) || (dw_length <= 2))
             return;
-        wCRC = getCRC16CheckSum(static_cast<uint8_t *>(pch_message), dw_length - 2, Referee::kCrc16Init);
+        wCRC = getCRC16CheckSum(
+            static_cast<uint8_t *>(pch_message), dw_length - 2, Referee::kCrc16Init);
         pch_message[dw_length - 2] = static_cast<uint8_t>((wCRC & 0x00ff));
         pch_message[dw_length - 1] = static_cast<uint8_t>(((wCRC >> 8) & 0x00ff));
     }
