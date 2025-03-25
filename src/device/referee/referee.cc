@@ -128,7 +128,7 @@ namespace Device
             // LOG_INFO("ui update\n");
             update_ui_data(
                 &base_,
-                false,
+                robot_set->friction_real_state,
                 robot_set->cv_fire,
                 false,
                 ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
