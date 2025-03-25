@@ -116,7 +116,10 @@ namespace Config
                 9000.0f,   // MAX_IOUT
             },
             .gimbal_id = 1
-        }
+        },
+        .header = 0x6A,
+        .auto_aim_ip = "127.0.0.1",
+        .auto_aim_port = 11453
     };
 
     // NOTE: PID CONFIG

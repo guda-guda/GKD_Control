@@ -128,7 +128,7 @@ namespace Device
             update_ui_data(
                 &base_,
                 false,
-                false,
+                robot_set->cv_fire,
                 false,
                 ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));

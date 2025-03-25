@@ -731,7 +731,7 @@ void update_ui_data(
     bool spin_state,
     float cap_state) {
     UI_Data.distance = 10;
-    UI_Data.auto_aim_state = auto_aim_state;
+    UI_Data.auto_aim_state = auto_aim_state ? AUTOAIM_LOCKED : AUTOAIM_LOST;
     UI_Data.fric_state = fric_state;
     UI_Data.shoot_speed = 10;
     UI_Data.spin_state = spin_state;
@@ -1118,7 +1118,7 @@ void sync_parameter() {
     State_Data.spin_state = UI_Data.spin_state;
     // UI_Data.auto_aim_state = AutoAimData.auto_aim_status;
     // 测试
-    UI_Data.auto_aim_state = 0;
+    // UI_Data.auto_aim_state = 0;
 }
 
 // 从裁判系统读取机器人ID

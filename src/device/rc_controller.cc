@@ -62,16 +62,13 @@ namespace Device
             key_status[1] = 0;
         }
         
-        static bool skip_control = false;
         if (pkg.mouse_r)
         {
-            if (key_status[2] == 0)
-                skip_control = !skip_control;
-            key_status[2] = 1;
+            robot_set->auto_aim_status = true;
         }
         else
         {
-            key_status[2] = 0;
+            robot_set->auto_aim_status = false;
         }
 
             
@@ -85,7 +82,7 @@ namespace Device
             robot_set->shoot_open = 0;
         }
 
-        if (skip_control)
+        if (robot_set->auto_aim_status)
         return;
         
         robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
@@ -94,7 +91,7 @@ namespace Device
         robot_set->gimbalT_1_pitch_set += pkg.mouse_y / 10000.;
         robot_set->gimbalT_2_pitch_set += pkg.mouse_y / 10000.;
 
-        LOG_INFO("mouse : %d %d\n", pkg.mouse_x, pkg.mouse_y);
+        // LOG_INFO("mouse : %d %d\n", pkg.mouse_x, pkg.mouse_y);
 
         robot_set->gimbalT_1_pitch_set = std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
         robot_set->gimbalT_2_pitch_set = std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));

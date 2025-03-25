@@ -51,6 +51,8 @@ namespace Robot
         bool is_aiming = false;
         uint8_t inited = 0;
 
+        bool auto_aim_status = false;
+
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
         Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
 

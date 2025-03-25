@@ -9,7 +9,8 @@
 #include "types.hpp"
 #include "user_lib.hpp"
 #include "utils.hpp"
-
+#include "UI.hpp"
+auto receive_auto_aim = std::chrono::steady_clock::now();
 namespace Gimbal
 {
     GimbalT::GimbalT(const GimbalConfig &config)
@@ -58,14 +59,27 @@ namespace Gimbal
         IO::io<SOCKET>["AUTO_AIM_CONTROL"]->add_client(config.header, config.auto_aim_ip, config.auto_aim_port);
 
         LOG_INFO("%x\n",config.header);
+
+
         IO::io<SOCKET>["AUTO_AIM_CONTROL"]->register_callback_key(
             config.header, [this](const Robot::Auto_aim_control &vc) {
                 LOG_INFO("socket recive %f %f %d\n", vc.yaw_set, vc.pitch_set, config.gimbal_id);
+                receive_auto_aim = std::chrono::steady_clock::now();
+                robot_set->cv_fire = true;
+                if (!robot_set->auto_aim_status)
+                    return;
                 *yaw_set = vc.yaw_set;
                 *pitch_set = vc.pitch_set;
-                robot_set->cv_fire = vc.fire;
-                
             });
+        
+        static std::thread check_auto_aim([this] {
+            while (true) {
+                if (std::chrono::steady_clock::now() - receive_auto_aim > std::chrono::milliseconds(100)) {
+                    robot_set->cv_fire = false;
+                }
+                UserLib::sleep_ms(10);
+            }
+        });
     }
 
 
