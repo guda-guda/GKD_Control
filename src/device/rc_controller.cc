@@ -32,59 +32,45 @@ namespace Device
             vy--;
         if (pkg.key & 0x8)
             vy++;
-        
+
         robot_set->vx_set = vx * speed;
         robot_set->vy_set = vy * speed;
         if (pkg.key)
-        LOG_INFO("key : %d\n", pkg.key);
+            LOG_INFO("key : %d\n", pkg.key);
 
         static std::vector<int> key_status(8);
 
-        if (pkg.key & 0x40)
-        {
+        if (pkg.key & 0x40) {
             if (key_status[0] == 0)
                 robot_set->wz_set = 1 - robot_set->wz_set;
             key_status[0] = 1;
-        }
-        else
-        {
+        } else {
             key_status[0] = 0;
         }
 
-        if (pkg.key & 0x80)
-        {
+        if (pkg.key & 0x80) {
             if (key_status[1] == 0)
                 robot_set->friction_open = !robot_set->friction_open;
             key_status[1] = 1;
-        }
-        else
-        {
+        } else {
             key_status[1] = 0;
         }
-        
-        if (pkg.mouse_r)
-        {
+
+        if (pkg.mouse_r) {
             robot_set->auto_aim_status = true;
-        }
-        else
-        {
+        } else {
             robot_set->auto_aim_status = false;
         }
 
-            
-
-        if (pkg.mouse_l)
-        {
+        if (pkg.mouse_l) {
             robot_set->shoot_open = 1;
-        }
-        else
-        {
+        } else {
             robot_set->shoot_open = 0;
         }
 
         if (robot_set->auto_aim_status)
-        return;
-        
+            return;
+
         robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
         robot_set->gimbalT_2_yaw_set += pkg.mouse_x / 10000.;
 
@@ -93,17 +79,17 @@ namespace Device
 
         // LOG_INFO("mouse : %d %d\n", pkg.mouse_x, pkg.mouse_y);
 
-        robot_set->gimbalT_1_pitch_set = std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
-        robot_set->gimbalT_2_pitch_set = std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
+        robot_set->gimbalT_1_pitch_set =
+            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
+        robot_set->gimbalT_2_pitch_set =
+            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
         static bool use_key = false;
-        if (pkg.key & 0xff)
-        {
+        if (pkg.key & 0xff) {
             use_key = true;
         }
 
         if (use_key)
             return;
-
 
         // LOG_INFO("rc controller ch1 %d %d %d %d\n", pkg.s1, pkg.s2, pkg.ch1, pkg.ch3);
         if (pkg.s1 == 2 && pkg.s2 == 2 && pkg.ch4 == -660) {

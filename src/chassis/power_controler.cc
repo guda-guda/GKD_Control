@@ -125,11 +125,13 @@ namespace Power
         }
 
         // LOG_INFO(
-        //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d\n",
+        //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d\n",
         //     sumCmdPower,
         //     maxPower,
         //     measuredPower,
-        //     robot_set->super_cap_info.capEnergy);
+        //     robot_set->super_cap_info.capEnergy,
+        //     robot_set->referee_info.power_heat_data.chassis_power_buffer);
+
         // LOG_INFO("referee level %d\n",
         // robot_set->referee_info.game_robot_status_data.robot_level);
 
@@ -357,5 +359,4 @@ namespace Power
         powerPD_base = Pid::PidPosition(powerPD_base_pid_config, powerBuff);
         powerPD_full = Pid::PidPosition(powerPD_full_pid_config, powerBuff);
     }
-
 }  // namespace Power

@@ -2,14 +2,15 @@
 
 #include <algorithm>
 
+#include "UI.hpp"
 #include "gimbal/gimbal_config.hpp"
+#include "macro_helpers.hpp"
 #include "robot_controller.hpp"
 #include "robot_type_config.hpp"
 #include "serial/serial.h"
 #include "types.hpp"
 #include "user_lib.hpp"
 #include "utils.hpp"
-#include "UI.hpp"
 auto receive_auto_aim = std::chrono::steady_clock::now();
 namespace Gimbal
 {
@@ -56,10 +57,8 @@ namespace Gimbal
         yaw_motor.enable();
         pitch_motor.enable();
 
-        IO::io<SOCKET>["AUTO_AIM_CONTROL"]->add_client(config.header, config.auto_aim_ip, config.auto_aim_port);
-
-        LOG_INFO("%x\n",config.header);
-
+        IO::io<SOCKET>["AUTO_AIM_CONTROL"]->add_client(
+            config.header, config.auto_aim_ip, config.auto_aim_port);
 
         IO::io<SOCKET>["AUTO_AIM_CONTROL"]->register_callback_key(
             config.header, [this](const Robot::Auto_aim_control &vc) {
@@ -71,17 +70,17 @@ namespace Gimbal
                 *yaw_set = vc.yaw_set;
                 *pitch_set = vc.pitch_set;
             });
-        
+
         static std::thread check_auto_aim([this] {
             while (true) {
-                if (std::chrono::steady_clock::now() - receive_auto_aim > std::chrono::milliseconds(100)) {
+                if (std::chrono::steady_clock::now() - receive_auto_aim >
+                    std::chrono::milliseconds(100)) {
                     robot_set->cv_fire = false;
                 }
                 UserLib::sleep_ms(10);
             }
         });
     }
-
 
     void GimbalT::init_task() {
         while (imu.offline() || yaw_motor.offline() || pitch_motor.offline()) {
@@ -149,8 +148,27 @@ namespace Gimbal
                 *pitch_set = std::clamp((double)pitch, -0.18, 0.51);
                 *pitch_set >> pitch_absolute_pid >> pitch_motor;
             } else {
-                *yaw_set >> yaw_absolute_pid >> yaw_motor;
-                *pitch_set >> pitch_absolute_pid >> pitch_motor ;
+                // NOTE: 抽象双头限位
+                MUXDEF(
+                    CONFIG_SENTRY, static float yr; static float ty;
+                    yr = -UserLib::rad_format(*yaw_set - robot_set->gimbal_sentry_yaw);
+                    if (config.gimbal_id == 1 && (yr < -2.6 || yr > 0.5)) {
+                        if (yr > 0)
+                            ty = robot_set->gimbal_sentry_yaw - (0.5);
+                        else
+                            ty = robot_set->gimbal_sentry_yaw - (-2.6);
+                    } else if (config.gimbal_id == 2 && (yr < -0.5 || yr > 2.6)) {
+                        if (yr > 0)
+                            ty = robot_set->gimbal_sentry_yaw - 2.6;
+                        else
+                            ty = robot_set->gimbal_sentry_yaw - (-0.5);
+                    } else { ty = *yaw_set; }
+
+                    ty >>
+                    yaw_absolute_pid >> yaw_motor;
+                    , *yaw_set >> yaw_absolute_pid >> yaw_motor;)
+
+                *pitch_set >> pitch_absolute_pid >> pitch_motor;
             }
 
             Robot::SendGimbalInfo gimbal_info;
