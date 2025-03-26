@@ -23,7 +23,6 @@ namespace Gimbal
 
        public:
         uint32_t init_stop_times = 0;
-        uint32_t gimbal_id = 0;
 
         fp32 yaw_gyro = 0.f;
         fp32 pitch_gyro = 0.f;
@@ -31,6 +30,7 @@ namespace Gimbal
         fp32 fake_yaw_abs;
 
         fp32* yaw_set;
+        fp32* another_yaw_set;
         fp32* pitch_set;
         fp32* yaw_rela;
 

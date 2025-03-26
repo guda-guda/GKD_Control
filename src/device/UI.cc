@@ -737,7 +737,7 @@ void custom_ui_task(Device::Base *base_, uint8_t &robot_id_) {
     while (1) {
         Robot_ID_Read = robot_id_;
         Cilent_ID_Read = 0x100 + robot_id_;
-        LOG_INFO("robot_id_ %x client id %x\n", Robot_ID_Read, Cilent_ID_Read);
+        // LOG_INFO("robot_id_ %x client id %x\n", Robot_ID_Read, Cilent_ID_Read);
         sync_parameter();
         update_dynamic_paramater(base_);
 

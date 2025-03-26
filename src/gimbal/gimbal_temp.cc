@@ -20,6 +20,7 @@ namespace Gimbal
           yaw_motor(config.yaw_motor_config),
           pitch_motor(config.pitch_motor_config),
           yaw_set(nullptr),
+          another_yaw_set(nullptr),
           pitch_set(nullptr),
           yaw_rela(nullptr),
           shoot(config.shoot_config) {
@@ -30,10 +31,12 @@ namespace Gimbal
         shoot.init(robot);
         if (config.gimbal_id == 1) {
             yaw_set = &robot_set->gimbalT_1_yaw_set;
+            another_yaw_set = &robot_set->gimbalT_2_yaw_set;
             pitch_set = &robot_set->gimbalT_1_pitch_set;
             yaw_rela = &robot_set->gimbalT_1_yaw_reletive;
         } else {
             yaw_set = &robot_set->gimbalT_2_yaw_set;
+            another_yaw_set = &robot_set->gimbalT_1_yaw_set;
             pitch_set = &robot_set->gimbalT_2_pitch_set;
             yaw_rela = &robot_set->gimbalT_2_yaw_reletive;
         }
@@ -62,10 +65,19 @@ namespace Gimbal
 
         IO::io<SOCKET>["AUTO_AIM_CONTROL"]->register_callback_key(
             config.header, [this](const Robot::Auto_aim_control &vc) {
-                LOG_INFO("socket recive %f %f %d\n", vc.yaw_set, vc.pitch_set, config.gimbal_id);
+                LOG_INFO("socket recive %f %f %d %d\n", vc.yaw_set, vc.pitch_set, vc.fire, config.gimbal_id);
                 receive_auto_aim = std::chrono::steady_clock::now();
                 robot_set->cv_fire = true;
-                if (!robot_set->auto_aim_status)
+                if (vc.fire && ISDEF(CONFIG_SENTRY))
+                {
+                    robot_set->shoot_open |= config.gimbal_id;
+                }
+                if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0)
+                {
+                    *another_yaw_set = vc.yaw_set;
+                }
+
+                if (!ISDEF(CONFIG_SENTRY) && !robot_set->auto_aim_status)
                     return;
                 *yaw_set = vc.yaw_set;
                 *pitch_set = vc.pitch_set;
@@ -75,6 +87,7 @@ namespace Gimbal
             while (true) {
                 if (std::chrono::steady_clock::now() - receive_auto_aim >
                     std::chrono::milliseconds(100)) {
+                    robot_set->shoot_open &= (((1 << 30) - 1) ^ config.gimbal_id);
                     robot_set->cv_fire = false;
                 }
                 UserLib::sleep_ms(10);

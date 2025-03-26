@@ -56,6 +56,7 @@ namespace Device
             key_status[1] = 0;
         }
 
+#ifndef CONFIG_SENTRY
         if (pkg.mouse_r) {
             robot_set->auto_aim_status = true;
         } else {
@@ -70,6 +71,7 @@ namespace Device
 
         if (robot_set->auto_aim_status)
             return;
+#endif
 
         robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
         robot_set->gimbalT_2_yaw_set += pkg.mouse_x / 10000.;
