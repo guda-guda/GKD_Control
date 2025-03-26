@@ -140,11 +140,12 @@ namespace Robot
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
     } __attribute__((packed));
 
-    struct SendGimbalInfo
+    struct SendAutoAimInfo
     {
         uint8_t header;
         float yaw;
         float pitch;
+        bool red;
     } __attribute__((packed));
 
     struct SendVisionControl

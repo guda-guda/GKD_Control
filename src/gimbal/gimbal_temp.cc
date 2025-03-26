@@ -83,7 +83,7 @@ namespace Gimbal
                 *pitch_set = vc.pitch_set;
             });
 
-        static std::thread check_auto_aim([this] {
+        std::thread check_auto_aim([this] {
             while (true) {
                 if (std::chrono::steady_clock::now() - receive_auto_aim >
                     std::chrono::milliseconds(100)) {
@@ -93,6 +93,8 @@ namespace Gimbal
                 UserLib::sleep_ms(10);
             }
         });
+
+        check_auto_aim.detach();
     }
 
     void GimbalT::init_task() {
@@ -184,11 +186,13 @@ namespace Gimbal
                 *pitch_set >> pitch_absolute_pid >> pitch_motor;
             }
 
-            Robot::SendGimbalInfo gimbal_info;
-            gimbal_info.header = config.header;
-            MUXDEF(CONFIG_SENTRY, gimbal_info.yaw = fake_yaw_abs, gimbal_info.yaw = imu.yaw);
-            gimbal_info.pitch = imu.pitch;
-            IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(gimbal_info);
+            // LOG_INFO("robot id % d\n", robot_set->referee_info.game_robot_status_data.robot_id);
+            Robot::SendAutoAimInfo pkg;
+            pkg.header = config.header;
+            MUXDEF(CONFIG_SENTRY, pkg.yaw = fake_yaw_abs, pkg.yaw = imu.yaw);
+            pkg.pitch = imu.pitch;
+            pkg.red = robot_set->referee_info.game_robot_status_data.robot_id < 100;
+            IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(pkg);
 
             UserLib::sleep_ms(config.ControlTime);
         }
