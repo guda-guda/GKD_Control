@@ -23,7 +23,7 @@ namespace Device
 
     void Rc_Controller::unpack(const Types::ReceivePacket_RC_CTRL &pkg) {
         float vx = 0, vy = 0;
-        float speed = .5;
+        float speed = 1;
         if (pkg.key & 0x1)
             vx++;
         if (pkg.key & 0x2)

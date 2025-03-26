@@ -696,7 +696,43 @@ int count = 0;  // 计数器
 void custom_ui_task(Device::Base *base_, uint8_t &robot_id_) {
     custom_UI_init(base_);
     sync_parameter();
-    UI_init_draw(base_);
+    /*刷新超电部分*/
+    Line_Draw(
+        &cap_percentage,
+        "cap",
+        UI_Graph_ADD,
+        1,
+        State_Data.cap_bar_color,
+        State_Data.cap_display_with,
+        State_Data.cap_text_pos[0],
+        State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8,
+        State_Data.cap_text_pos[0] +
+            ((State_Data.cap_display_length * State_Data.cap_percent) / 100),
+        State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8);
+
+    UI_ReFresh(base_, 2, shoot_distance_bar, cap_percentage);
+    osDelay(100);
+    state_str(cap_text, State_Data.cap_percent, State_Data.spin_state, State_Data.fric_state);
+
+    String_Draw(
+        &state_text_data,
+        "sta",
+        UI_Graph_ADD,
+        1,
+        State_Data.cap_text_color,
+        State_Data.cap_text_size,
+        21,
+        2,
+        State_Data.cap_text_pos[0],
+        State_Data.cap_text_pos[1],
+        cap_text);
+    String_ReFresh(base_, state_text_data);
+    osDelay(150);
+
+    // 瞄准框
+    Rectangle_Draw(&auto_aim_range, "aui", UI_Graph_ADD, 0, UI_Color_Cyan, 3, 700, 300, 1300, 800);
+    UI_ReFresh(base_, 1, auto_aim_range);
+    osDelay(100);
 
     while (1) {
         Robot_ID_Read = robot_id_;
@@ -712,7 +748,44 @@ void custom_ui_task(Device::Base *base_, uint8_t &robot_id_) {
         else if (UI_MODE == UI_INFANTRY)
             draw_crosshair_infantry(base_);
         osDelay(100);
-        UI_init_draw(base_);
+        /*刷新超电部分*/
+        Line_Draw(
+            &cap_percentage,
+            "cap",
+            UI_Graph_Change,
+            1,
+            State_Data.cap_bar_color,
+            State_Data.cap_display_with,
+            State_Data.cap_text_pos[0],
+            State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8,
+            State_Data.cap_text_pos[0] +
+                ((State_Data.cap_display_length * State_Data.cap_percent) / 100),
+            State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8);
+
+        UI_ReFresh(base_, 2, shoot_distance_bar, cap_percentage);
+        osDelay(100);
+        state_str(cap_text, State_Data.cap_percent, State_Data.spin_state, State_Data.fric_state);
+
+        String_Draw(
+            &state_text_data,
+            "sta",
+            UI_Graph_Change,
+            1,
+            State_Data.cap_text_color,
+            State_Data.cap_text_size,
+            21,
+            2,
+            State_Data.cap_text_pos[0],
+            State_Data.cap_text_pos[1],
+            cap_text);
+        String_ReFresh(base_, state_text_data);
+        osDelay(150);
+
+        // 瞄准框
+        Rectangle_Draw(
+            &auto_aim_range, "aui", UI_Graph_ADD, 0, UI_Color_Cyan, 3, 700, 300, 1300, 800);
+        UI_ReFresh(base_, 1, auto_aim_range);
+        osDelay(100);
         // //测试刷新用
         // UI_Data.Super_cap_percent+=2;
         // if(UI_Data.Super_cap_percent>=100) UI_Data.Super_cap_percent=0;
@@ -742,7 +815,6 @@ void update_ui_data(
 /*画英雄的静止准星*/
 void draw_crosshair_hero(Device::Base *base_) {
     char line_id[7][3] = { "L1", "L2", "L3", "L4", "L5", "L6", "L7" };
-    LOG_INFO("draw hero\n");
     /*准星*/
     // 横着的主准星
     Line_Draw(
@@ -836,59 +908,6 @@ void draw_crosshair_infantry(Device::Base *base_) {
 }
 
 void UI_init_draw(Device::Base *base_) {
-    // 测距部分的刷新
-    // Line_Draw(
-    //    &shoot_distance_bar,
-    //    "dst",
-    //    UI_Graph_ADD,
-    //    1,
-    //    Crosshair_Data.shoot_bar_color,
-    //    Crosshair_Data.dist_display_width,
-    //    Crosshair_Data.center[0] + Crosshair_Data.dist_start_point[0],
-    //    Crosshair_Data.center[1] + Crosshair_Data.dist_start_point[1] -
-    //        Crosshair_Data.dist_display_width,
-    //    Crosshair_Data.center[0] + Crosshair_Data.dist_start_point[0] +
-    //        ((Crosshair_Data.dist_display_length * Crosshair_Data.shoot_dist_percent) / 100),
-    //    Crosshair_Data.center[1] + Crosshair_Data.dist_start_point[1] -
-    //        Crosshair_Data.dist_display_width);
-
-    /*刷新超电部分*/
-    Line_Draw(
-        &cap_percentage,
-        "cap",
-        UI_Graph_ADD,
-        1,
-        State_Data.cap_bar_color,
-        State_Data.cap_display_with,
-        State_Data.cap_text_pos[0],
-        State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8,
-        State_Data.cap_text_pos[0] +
-            ((State_Data.cap_display_length * State_Data.cap_percent) / 100),
-        State_Data.cap_text_pos[1] - State_Data.cap_text_size * 4.8);
-
-    UI_ReFresh(base_, 2, shoot_distance_bar, cap_percentage);
-    osDelay(100);
-    state_str(cap_text, State_Data.cap_percent, State_Data.spin_state, State_Data.fric_state);
-
-    String_Draw(
-        &state_text_data,
-        "sta",
-        UI_Graph_ADD,
-        1,
-        State_Data.cap_text_color,
-        State_Data.cap_text_size,
-        21,
-        2,
-        State_Data.cap_text_pos[0],
-        State_Data.cap_text_pos[1],
-        cap_text);
-    String_ReFresh(base_, state_text_data);
-    osDelay(150);
-
-    // 瞄准框
-    Rectangle_Draw(&auto_aim_range, "aui", UI_Graph_ADD, 0, UI_Color_Cyan, 3, 700, 300, 1300, 800);
-    UI_ReFresh(base_, 1, auto_aim_range);
-    osDelay(100);
 }
 
 /*刷新动态参数*/
@@ -1117,9 +1136,9 @@ void sync_parameter() {
     State_Data.cap_percent = (u32)(UI_Data.Super_cap_percent);
     State_Data.fric_state = UI_Data.fric_state;
     State_Data.spin_state = UI_Data.spin_state;
-    // UI_Data.auto_aim_state = AutoAimData.auto_aim_status;
-    // 测试
-    // UI_Data.auto_aim_state = 0;
+    //  UI_Data.auto_aim_state = AutoAimData.auto_aim_status;
+    //  测试
+    //  UI_Data.auto_aim_state = 0;
 }
 
 // 从裁判系统读取机器人ID
