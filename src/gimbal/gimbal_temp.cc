@@ -11,7 +11,6 @@
 #include "types.hpp"
 #include "user_lib.hpp"
 #include "utils.hpp"
-auto receive_auto_aim = std::chrono::steady_clock::now();
 namespace Gimbal
 {
     GimbalT::GimbalT(const GimbalConfig &config)
@@ -21,9 +20,11 @@ namespace Gimbal
           pitch_motor(config.pitch_motor_config),
           yaw_set(nullptr),
           another_yaw_set(nullptr),
+          another_pitch_set(nullptr),
           pitch_set(nullptr),
           yaw_rela(nullptr),
           shoot(config.shoot_config) {
+        receive_auto_aim = std::chrono::steady_clock::now();
     }
 
     void GimbalT::init(const std::shared_ptr<Robot::Robot_set> &robot) {
@@ -32,11 +33,13 @@ namespace Gimbal
         if (config.gimbal_id == 1) {
             yaw_set = &robot_set->gimbalT_1_yaw_set;
             another_yaw_set = &robot_set->gimbalT_2_yaw_set;
+            another_pitch_set = &robot_set->gimbalT_2_pitch_set;
             pitch_set = &robot_set->gimbalT_1_pitch_set;
             yaw_rela = &robot_set->gimbalT_1_yaw_reletive;
         } else {
             yaw_set = &robot_set->gimbalT_2_yaw_set;
             another_yaw_set = &robot_set->gimbalT_1_yaw_set;
+            another_pitch_set = &robot_set->gimbalT_1_pitch_set;
             pitch_set = &robot_set->gimbalT_2_pitch_set;
             yaw_rela = &robot_set->gimbalT_2_yaw_reletive;
         }
@@ -67,6 +70,9 @@ namespace Gimbal
             config.header, [this](const Robot::Auto_aim_control &vc) {
                 LOG_INFO("socket recive %f %f %d %d\n", vc.yaw_set, vc.pitch_set, vc.fire, config.gimbal_id);
                 receive_auto_aim = std::chrono::steady_clock::now();
+                if (vc.fire == false)
+                return;
+                robot_set->set_mode(Types::ROBOT_MODE::ROBOT_FOLLOW_GIMBAL);
                 robot_set->cv_fire = true;
                 if (vc.fire && ISDEF(CONFIG_SENTRY))
                 {
@@ -75,6 +81,7 @@ namespace Gimbal
                 if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0)
                 {
                     *another_yaw_set = vc.yaw_set;
+                    *another_pitch_set = vc.pitch_set;                  
                 }
 
                 if (!ISDEF(CONFIG_SENTRY) && !robot_set->auto_aim_status)
@@ -89,6 +96,10 @@ namespace Gimbal
                     std::chrono::milliseconds(100)) {
                     robot_set->shoot_open &= (((1 << 30) - 1) ^ config.gimbal_id);
                     robot_set->cv_fire = false;
+                }
+                if (robot_set->shoot_open == 0)
+                {
+                    robot_set->set_mode(Types::ROBOT_MODE::ROBOT_SEARCH);
                 }
                 UserLib::sleep_ms(10);
             }
@@ -185,7 +196,8 @@ namespace Gimbal
 
                 *pitch_set >> pitch_absolute_pid >> pitch_motor;
             }
-
+            // if (config.gimbal_id == 1)
+            // LOG_INFO("%dpitch set %f\n", config.gimbal_id, *pitch_set);
             // LOG_INFO("robot id % d\n", robot_set->referee_info.game_robot_status_data.robot_id);
             Robot::SendAutoAimInfo pkg;
             pkg.header = config.header;

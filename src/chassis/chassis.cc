@@ -65,7 +65,7 @@ namespace Chassis
                 }
 
                 robot_set->spin_state = robot_set->wz_set < 0.1 ? false : true;
-                LOG_INFO("spin?: %d\n", robot_set->spin_state);
+                // LOG_INFO("spin?: %d\n", robot_set->spin_state);
 
                 // Power Limit
                 for (int i = 0; i < 4; ++i) {

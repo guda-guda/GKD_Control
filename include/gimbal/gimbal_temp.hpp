@@ -31,6 +31,7 @@ namespace Gimbal
 
         fp32* yaw_set;
         fp32* another_yaw_set;
+        fp32* another_pitch_set;
         fp32* pitch_set;
         fp32* yaw_rela;
 
@@ -47,6 +48,9 @@ namespace Gimbal
         ControllerList pitch_absolute_pid;
 
         Shoot::Shoot shoot;
+
+        std::chrono::_V2::steady_clock::time_point receive_auto_aim;
+
     };
 
 }  // namespace Gimbal

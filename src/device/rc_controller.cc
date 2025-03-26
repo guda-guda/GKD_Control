@@ -22,6 +22,7 @@ namespace Device
     }
 
     void Rc_Controller::unpack(const Types::ReceivePacket_RC_CTRL &pkg) {
+#ifndef CONFIG_SENTRY
         float vx = 0, vy = 0;
         float speed = 1;
         if (pkg.key & 0x1)
@@ -56,7 +57,6 @@ namespace Device
             key_status[1] = 0;
         }
 
-#ifndef CONFIG_SENTRY
         if (pkg.mouse_r) {
             robot_set->auto_aim_status = true;
         } else {
@@ -71,20 +71,21 @@ namespace Device
 
         if (robot_set->auto_aim_status)
             return;
-#endif
 
         robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
         robot_set->gimbalT_2_yaw_set += pkg.mouse_x / 10000.;
-
+        
         robot_set->gimbalT_1_pitch_set += pkg.mouse_y / 10000.;
         robot_set->gimbalT_2_pitch_set += pkg.mouse_y / 10000.;
-
+        
         // LOG_INFO("mouse : %d %d\n", pkg.mouse_x, pkg.mouse_y);
-
+        
         robot_set->gimbalT_1_pitch_set =
-            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
+        std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_1_pitch_set));
         robot_set->gimbalT_2_pitch_set =
-            std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
+        std::max(-0.3f, std::min(0.3f, robot_set->gimbalT_2_pitch_set));
+#endif
+
         static bool use_key = false;
         if (pkg.key & 0xff) {
             use_key = true;
