@@ -360,7 +360,7 @@ typedef struct
     int fric_state;
 } State_Indicate_Type;
 
-extern void custom_ui_task(Device::Base *base_);
+void custom_ui_task(Device::Base *base_, uint8_t &robot_id_);
 extern void custom_UI_init(Device::Base *base_);
 extern UI_DisplayData_Type UI_Data;
 

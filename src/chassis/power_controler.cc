@@ -130,7 +130,7 @@ namespace Power
         //     maxPower,
         //     measuredPower,
         //     robot_set->super_cap_info.capEnergy,
-        //     robot_set->referee_info.power_heat_data.chassis_power_buffer);
+        //     robot_set->referee_info.game_robot_status_data.robot_id);
 
         // LOG_INFO("referee level %d\n",
         // robot_set->referee_info.game_robot_status_data.robot_level);

@@ -137,6 +137,6 @@ namespace Device
     }
 
     void Dji_referee::task_ui() {
-        custom_ui_task(&base_);
+        custom_ui_task(&base_, robot_set->referee_info.game_robot_status_data.robot_id);
     }
 }  // namespace Device

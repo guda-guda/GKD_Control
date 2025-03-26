@@ -69,8 +69,8 @@ void UI_Delete(Device::Base *base_, u8 Del_Operate, u8 Del_Layer) {
     framehead.CMD_ID = UI_CMD_Robo_Exchange;  // 填充包头数据
 
     datahead.Data_ID = UI_Data_ID_Del;
-    datahead.Sender_ID = 3;
-    datahead.Receiver_ID = 0x103;  // 填充操作数据
+    datahead.Sender_ID = Robot_ID_Read;
+    datahead.Receiver_ID = Cilent_ID_Read;  // 填充操作数据
 
     del.Delete_Operate = Del_Operate;
     del.Layer = Del_Layer;  // 控制信息
@@ -375,8 +375,8 @@ int UI_ReFresh(Device::Base *base_, int cnt, ...) {
         case 7: datahead.Data_ID = UI_Data_ID_Draw7; break;
         default: return (-1);
     }
-    datahead.Sender_ID = 3;
-    datahead.Receiver_ID = 0x103;  // 填充操作数据
+    datahead.Sender_ID = Robot_ID_Read;
+    datahead.Receiver_ID = Cilent_ID_Read;  // 填充操作数据
 
     framepoint = (unsigned char *)&framehead;
     frametail = base_->getCRC16CheckSum(framepoint, sizeof(framehead), frametail);
@@ -446,8 +446,8 @@ int String_ReFresh(Device::Base *base_, String_Data string_Data) {
 
     datahead.Data_ID = UI_Data_ID_DrawString;
 
-    datahead.Sender_ID = 3;
-    datahead.Receiver_ID = 0x103;  // 填充操作数据
+    datahead.Sender_ID = Robot_ID_Read;
+    datahead.Receiver_ID = Cilent_ID_Read;  // 填充操作数据
 
     framepoint = (unsigned char *)&framehead;
     frametail = base_->getCRC16CheckSum(framepoint, sizeof(framehead), frametail);
@@ -693,18 +693,19 @@ Graph_Data still_cross_line[7];
 char cap_text[30], auto_aim_text[10];
 int count = 0;  // 计数器
 
-void custom_ui_task(Device::Base *base_) {
+void custom_ui_task(Device::Base *base_, uint8_t &robot_id_) {
     custom_UI_init(base_);
     sync_parameter();
     UI_init_draw(base_);
 
     while (1) {
-        Read_Robot_ID(base_);
+        Robot_ID_Read = robot_id_;
+        Cilent_ID_Read = 0x100 + robot_id_;
+        LOG_INFO("robot_id_ %x client id %x\n", Robot_ID_Read, Cilent_ID_Read);
         sync_parameter();
         update_dynamic_paramater(base_);
 
         // 间隔一定时间重新初始化ui
-        Read_Robot_ID(base_);
         osDelay(100);
         if (UI_MODE == UI_HERO)
             draw_crosshair_hero(base_);
