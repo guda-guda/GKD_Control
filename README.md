@@ -26,6 +26,8 @@ $ make run
 ## 使用 XMake 编译
 XMake 是一个基于 Lua 的轻量级跨平台构建工具，使用 xmake.lua 维护项目构建，相比 makefile/CMakeLists.txt，配置语法更加简洁直观，对新手非常友好，短时间内就能快速入门，能够让用户把更多的精力集中在实际的项目开发上。
 
+> 关于如何安装 XMake, 请参考 [XMake 安装教程](https://xmake.io/#/zh-cn/guide/installation)
+
 ### 1.设置编译选项
 
 ```bash
