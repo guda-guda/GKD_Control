@@ -3,7 +3,6 @@
 #include <thread>
 
 #include "chassis/chassis.hpp"
-#include "device/cv_controller.hpp"
 #include "device/super_cap.hpp"
 #include "gimbal/gimbal_sentry.hpp"
 #include "gimbal/gimbal_temp.hpp"
@@ -14,6 +13,7 @@
 #include "serial_interface.hpp"
 #include "shoot.hpp"
 #include "socket_interface.hpp"
+#include "logger.hpp"
 
 namespace Robot
 {
@@ -36,11 +36,10 @@ namespace Robot
         std::shared_ptr<Robot_set> robot_set;
 
         Device::Rc_Controller rc_controller;
-        Device::Cv_controller cv_controller_;
         Device::Dji_referee referee;
         Chassis::Chassis chassis;
         Config::GimbalType gimbal;
-        IFDEF(CONFIG_SENTRY, Gimbal::GimbalT gimbal_left, gimbal_right);
+        IFDEF(CONFIG_SENTRY, Gimbal::GimbalT gimbal_sentry);
 
         Device::Super_Cap super_cap;
     };
