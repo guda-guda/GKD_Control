@@ -25,13 +25,13 @@ $ make run
 
 ## 使用 XMake 编译
 XMake 是一个基于 Lua 的轻量级跨平台构建工具，使用 xmake.lua 维护项目构建，相比 makefile/CMakeLists.txt，配置语法更加简洁直观，对新手非常友好，短时间内就能快速入门，能够让用户把更多的精力集中在实际的项目开发上。
-
-> 关于如何安装 XMake, 请参考 [XMake 安装教程](https://xmake.io/#/zh-cn/guide/installation)
+### 安装 XMake
+`curl -fsSL https://xmake.io/shget.text | bash`
 
 ### 1.设置编译选项
 
 ```bash
-xmake -f --type=<type> --mode=<debug/release>
+xmake config --type=<type> --mode=<debug/release>
 ```
 
 其中 `<type>` 为 `sentry`、`infantry`、`hero` 之一，`mode` 表示当前以 `debug` 模式编译还是 `release` 模式。
@@ -41,8 +41,9 @@ xmake -f --type=<type> --mode=<debug/release>
 ### 2.编译
 
 ```bash
-xmake build
+xmake
 ```
+### 
 
 在构建过程中会要求安装第三方库，输入 `y` 即可。
 

@@ -1,5 +1,6 @@
 add_rules("mode.debug", "mode.release")
 add_requires("serial")
+set_toolchains("clang")
 
 option("type")
     set_default("infantry")
@@ -25,7 +26,8 @@ target("GKDControl")
         "include/device",
         "include/device/referee",
         "include/gimbal",
-        "include/utils"
+        "include/utils",
+        "include/logger"
     )
     add_packages("serial")
     set_warnings("allextra")
