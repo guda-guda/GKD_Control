@@ -26,7 +26,11 @@ namespace Device
             inited = true;
         }
 
+<<<<<<< HEAD
     if (delta == 0) {       
+=======
+    if(delta == 0) {       
+>>>>>>> ec2d435 (add logger && change sentry(not test yet) && improve rc_controller)
         logger.push_value("rc.ch0",  pkg.ch0);
         logger.push_value("rc.ch1",  pkg.ch1);
         logger.push_value("rc.ch2",  pkg.ch2);
@@ -106,6 +110,7 @@ namespace Device
             robot_set->shoot_open = SHOOT_PERMISSION_NONE;
         }
 
+<<<<<<< HEAD
         if (robot_set->auto_aim_status == false) {
             robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
             robot_set->gimbalT_1_pitch_set += pkg.mouse_y / 10000.;
@@ -113,6 +118,18 @@ namespace Device
                 std::clamp(robot_set->gimbalT_1_pitch_set, -0.3f, 0.3f); 
         }
             
+=======
+        // if (robot_set->auto_aim_status)
+        //     return;
+
+        robot_set->gimbalT_1_yaw_set += pkg.mouse_x / 10000.;
+
+        robot_set->gimbalT_1_pitch_set += pkg.mouse_y / 10000.;
+
+        robot_set->gimbalT_1_pitch_set =
+            std::clamp(robot_set->gimbalT_1_pitch_set, -0.3f, 0.3f); 
+
+>>>>>>> ec2d435 (add logger && change sentry(not test yet) && improve rc_controller)
 #endif
 
         static bool use_key = false;
@@ -139,6 +156,12 @@ namespace Device
             } else {
                 robot_set->gimbalT_1_yaw_set += ((float)pkg.ch0 / RC_SCALE) * GIMBAL_YAW_SENSITIVITY;
                 robot_set->gimbalT_1_pitch_set = ((float)pkg.ch1 / RC_SCALE) * GIMBAL_PITCH_SENSITIVITY;
+<<<<<<< HEAD
+=======
+                
+                IFDEF(CONFIG_SENTRY, robot_set->gimbalT_2_yaw_set = robot_set->gimbalT_1_yaw_set;
+                    robot_set->gimbalT_2_pitch_set = robot_set->gimbalT_1_pitch_set;)
+>>>>>>> ec2d435 (add logger && change sentry(not test yet) && improve rc_controller)
             }
 
             if (pkg.s1 == S1_UP)
