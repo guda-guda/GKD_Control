@@ -27,7 +27,7 @@ namespace Device
             inited = true;
         }
 
-    if(delta == 0) {       
+    if (delta == 0) {       
         logger.push_value("rc.ch0",  pkg.ch0);
         logger.push_value("rc.ch1",  pkg.ch1);
         logger.push_value("rc.ch2",  pkg.ch2);
