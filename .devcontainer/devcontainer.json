@@ -1,0 +1,16 @@
+{
+  "name": "Ubuntu Dev",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "gkd",
+  "postCreateCommand": "xmake project -k compile_commands",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools-extension-pack",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "tboox.xmake-vscode",
+        "vadimcn.vscode-lldb"
+      ]
+    }
+  }
+}
