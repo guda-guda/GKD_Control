@@ -2,6 +2,7 @@
   "name": "Ubuntu Dev",
   "build": { "dockerfile": "Dockerfile" },
   "remoteUser": "gkd",
+  "runArgs": ["--network=host"],
   "postCreateCommand": "xmake project -k compile_commands",
   "customizations": {
     "vscode": {
