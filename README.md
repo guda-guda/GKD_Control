@@ -22,6 +22,12 @@ $ mkdir build
 $ cd build && make -j 8
 $ make run
 ```
+## 使用Docker开发
+为了节省同学们在配置环境上的时间，我们隆重推出基于Docker的开发方式。首先，你应该安装docker，然后在vscode中安装Dev Containers插件，这时再在vscode
+中打开后就会弹出一个弹窗让你在docker中打开。点确定，然后打开《三角洲行动》，在普坝跑把刀，结束时环境就应该配好了。如果报错了，大概是网络问题，重试几次或者开梯子就行了。
+
+环境配好后会自动调用xmake生成compile_commands,这个过程会自动安装第三方库，在终端输入 `y` 确认安装就可以了。
+
 
 ## 使用 XMake 编译
 XMake 是一个基于 Lua 的轻量级跨平台构建工具，使用 xmake.lua 维护项目构建，相比 makefile/CMakeLists.txt，配置语法更加简洁直观，对新手非常友好，短时间内就能快速入门，能够让用户把更多的精力集中在实际的项目开发上。
