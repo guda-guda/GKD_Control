@@ -95,7 +95,7 @@ namespace Hardware {
                 return;
             }
             auto can_interface = IO::io<CAN>[motor.can_info.can_name_];
-            if(can_interface == nullptr) {
+            if (can_interface == nullptr) {
                 LOG_ERR("Motor error[%s]: can device is invalid\n", motor.motor_name_.c_str());
                 return;
             }
