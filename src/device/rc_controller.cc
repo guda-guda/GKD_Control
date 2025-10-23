@@ -1,6 +1,6 @@
 #include "device/rc_controller.hpp"
-#include "io/io.hpp"
-#include "io/serial_interface.hpp"
+#include "io.hpp"
+#include "serial_interface.hpp"
 #include "types.hpp"
 
 namespace Device

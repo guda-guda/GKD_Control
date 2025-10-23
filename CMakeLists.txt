@@ -7,23 +7,7 @@ project(new_infantry)
 set(CMAKE_CXX_STANDARD 23)
 
 include_directories(./3rdparty/include)
-<<<<<<< HEAD
 include_directories(./include ./include/chassis ./include/device ./include/device/referee ./include/configs ./include/utils ./include/logger)
-=======
-include_directories(
-        ./include
-        ./include/chassis
-        ./include/device
-        ./include/device/referee
-        ./include/configs
-        ./include/logger
-        ./include/utils
-        ./include/control
-        ./include/robot_controller
-        ./include/io
-        ./include/shoot
-        )
->>>>>>> 264d060 (The project's directory structure has been reorganized. see changes.md for details.)
 
 add_compile_options(-D__DEBUG__)
 add_compile_options(-Wno-pointer-arith -Wno-unused-parameter)
