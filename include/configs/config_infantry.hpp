@@ -99,7 +99,7 @@ namespace Config
         .YawOffSet = 2114,
         .shoot_config = {
             .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "can0", 1, 0.075},
-            .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "can", 2, 0.075},
+            .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "can0", 2, 0.075},
             .trigger_motor_config = Hardware::DJIMotorConfig{2006, "can0", 3, 0.075},
             .friction_speed_pid_config = Pid::PidConfig{
                 2000.f,       // KP
