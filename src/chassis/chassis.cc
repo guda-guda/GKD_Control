@@ -84,10 +84,10 @@ namespace Chassis
                 std::array<float, 4> cmd_power = power_manager.getControlledOutput(pObjs);
 
                 //logger
-                for (int i = 0; i < 4; ++i) {
-                   logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
+                // for (int i = 0; i < 4; ++i) {
+                //    logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
                 //    logger.push_console_message("<h1>111</h1>");
-                }
+                // }
 
                 for (int i = 0; i < 4; ++i) {
                     if(motors[i].offline()) {
@@ -113,13 +113,28 @@ namespace Chassis
             vx_set = cos_yaw * robot_set->vx_set + sin_yaw * robot_set->vy_set;
             vy_set = -sin_yaw * robot_set->vx_set + cos_yaw * robot_set->vy_set;
 
-            if (robot_set->wz_set == 0.f) {
-                chassis_angle_pid.set(0.f);
-                wz_set = chassis_angle_pid.out;
-            } else {
-                wz_set = robot_set->wz_set;
-            }
+            if (robot_set->wz_set == 0.f) {  
+                if (last_wz_direction != 0.f) {  
+                    fp32 current_angle = MUXDEF(  
+                        CONFIG_SENTRY,  
+                        robot_set->gimbal_sentry_yaw_reletive,  
+                        robot_set->gimbalT_1_yaw_reletive);  
+                    if (fabs(current_angle) > 0.05f) {  
+                        wz_set = last_wz_direction * 0.5f;    
+                    } else {  
+                        chassis_angle_pid.set(0.f);  
+                        wz_set = chassis_angle_pid.out;  
+                        last_wz_direction = 0.f;   
+                    }  
+                } else {  
+                    chassis_angle_pid.set(0.f);  
+                    wz_set = chassis_angle_pid.out;  
+            }  
+        } else {  
+            wz_set = robot_set->wz_set;  
+            last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
         }
+    }
 
         wheel_speed[0] = -vx_set + vy_set + wz_set;
         wheel_speed[1] = vx_set + vy_set + wz_set;
