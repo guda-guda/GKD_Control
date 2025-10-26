@@ -81,7 +81,10 @@ namespace Chassis
                     objs[i].pidMaxOutput = 14000;
                 }
                 static Power::PowerObj *pObjs[4] = { &objs[0], &objs[1], &objs[2], &objs[3] };
+
                 std::array<float, 4> cmd_power = power_manager.getControlledOutput(pObjs);
+                
+                
                 //LOG_INFO("chassis.cmd_power: %f, %f, %f, %f\n", cmd_power[0], cmd_power[1], cmd_power[2], cmd_power[3]);
 
                 //logger
@@ -94,7 +97,10 @@ namespace Chassis
                     if(motors[i].offline()) {
                         LOG_ERR("chassis_%d offline\n", i + 1);
                     }
-                    motors[i].give_current = cmd_power[i];
+                /*
+                TODO功率限制需要修改，现在直接输出pidout
+                */
+                    motors[i].give_current = wheels_pid[i].out;
                 }
             }
             UserLib::sleep_ms(config.ControlTime);
