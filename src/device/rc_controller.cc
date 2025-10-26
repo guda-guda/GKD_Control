@@ -75,7 +75,7 @@ namespace Device
         // 切换自旋状态
         if (pkg.key & KEY_R) {
             if (!wz_key_pressed_last) {
-                robot_set->wz_set = 1 - robot_set->wz_set;
+                robot_set->spin_state = 1 - robot_set->spin_state;
             }
             wz_key_pressed_last = true;
         } else {
@@ -148,9 +148,9 @@ namespace Device
             }
 
             if (pkg.s1 == S1_UP)
-                robot_set->wz_set = 1.0;
-            else
-                robot_set->wz_set = 0;
+                robot_set->spin_state = 1.0;
+            // else
+            //     robot_set->spin_state = 0;
 
             if (pkg.s2 == S2_UP)
                 robot_set->friction_open = true;
