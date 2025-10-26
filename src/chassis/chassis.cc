@@ -81,17 +81,13 @@ namespace Chassis
                     objs[i].pidMaxOutput = 14000;
                 }
                 static Power::PowerObj *pObjs[4] = { &objs[0], &objs[1], &objs[2], &objs[3] };
-
                 std::array<float, 4> cmd_power = power_manager.getControlledOutput(pObjs);
-                
-                
-                //LOG_INFO("chassis.cmd_power: %f, %f, %f, %f\n", cmd_power[0], cmd_power[1], cmd_power[2], cmd_power[3]);
 
                 //logger
-                // for (int i = 0; i < 4; ++i) {
-                //    logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
+                for (int i = 0; i < 4; ++i) {
+                   logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
                 //    logger.push_console_message("<h1>111</h1>");
-                // }
+                }
 
                 for (int i = 0; i < 4; ++i) {
                     if(motors[i].offline()) {
@@ -117,14 +113,9 @@ namespace Chassis
             vx_set = cos_yaw * robot_set->vx_set + sin_yaw * robot_set->vy_set;
             vy_set = -sin_yaw * robot_set->vx_set + cos_yaw * robot_set->vy_set;
 
-
-            //小陀螺
-            if (robot_set->spin_state == false) {
+            if (robot_set->wz_set == 0.f) {
                 chassis_angle_pid.set(0.f);
                 wz_set = chassis_angle_pid.out;
-            } else if (robot_set->spin_state == true) {
-                robot_set->wz_set = 1.f;
-                chassis_angle_pid.set(wz_set);
             } else {
                 wz_set = robot_set->wz_set;
             }
