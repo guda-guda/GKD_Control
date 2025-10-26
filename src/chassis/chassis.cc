@@ -120,7 +120,7 @@ namespace Chassis
                         robot_set->gimbal_sentry_yaw_reletive,  
                         robot_set->gimbalT_1_yaw_reletive);  
                     if (fabs(current_angle) > 0.05f) {  
-                        wz_set = last_wz_direction * 0.5f;    
+                        wz_set = last_wz_direction;    
                     } else {  
                         chassis_angle_pid.set(0.f);  
                         wz_set = chassis_angle_pid.out;  
