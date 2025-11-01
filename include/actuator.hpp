@@ -11,19 +11,22 @@ class Actuator
     Actuator() = default;
 
     bool operator=(const Actuator &other) = delete;
-    virtual void set(float x) = 0;
+    virtual void set(float x) = 0;  //统一控制接口
     virtual ~Actuator() = default;
 
     template<ControllerBase Ctrl>
+    //设置控制器
     void setCtrl(Ctrl &&ctrl) {
         controller = std::forward<Ctrl>(ctrl);
     }
 
+    //在控制器前添加一个控制器
     template<ControllerBase Ctrl>
     void pushFrontCtrl(Ctrl &&ctrl) {
         controller = std::forward<Ctrl>(ctrl) >> std::move(controller);
     }
 
+    //在控制器后添加一个控制器
     template<ControllerBase Ctrl>
     void pushBackCtrl(Ctrl &&ctrl) {
         controller = std::move(controller) >> std::forward<Ctrl>(ctrl);

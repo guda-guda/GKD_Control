@@ -5,71 +5,72 @@
 namespace Robot
 {
     // robot set header = 0xEA;
+    //单写多读
     struct Robot_set
     {
-        uint8_t header;
+        uint8_t header;                     // 数据包头
         /** chassis_control **/
-        fp32 vx_set = 0.f;
-        fp32 vy_set = 0.f;
-        fp32 wz_set = 0.f;
-        bool spin_state = false;
+        fp32 vx_set = 0.f;                  // 期望机器人在全局坐标系下的x轴速度
+        fp32 vy_set = 0.f;                  // 期望机器人在全局坐标系下的y轴速度
+        fp32 wz_set = 0.f;                  // 期望机器人绕z轴旋转速度，即角速度指令
+        bool spin_state = false;            // 机器人旋转状态，true表示正在旋转，false表示不旋转
 
         /** gimbal_control **/
-        fp32 gimbal1_yaw_set = 0.f;
-        fp32 gimbal1_yaw_offset = 0.f;
-        fp32 gimbal1_pitch_set = 0.f;
+        fp32 gimbal1_yaw_set = 0.f;         // 期望云台1的绝对yaw角度
+        fp32 gimbal1_yaw_offset = 0.f;      // 云台1的yaw角度偏移，用于校准
+        fp32 gimbal1_pitch_set = 0.f;       // 期望云台1的绝对pitch角度
 
-        fp32 gimbal2_yaw_set = 0.f;
-        fp32 gimbal2_yaw_offset = 0.f;
-        fp32 gimbal2_pitch_set = 0.f;
+        fp32 gimbal2_yaw_set = 0.f;       // 期望云台2的绝对yaw角度
+        fp32 gimbal2_yaw_offset = 0.f;    // 云台2的yaw角度偏移，用于校准
+        fp32 gimbal2_pitch_set = 0.f;     // 期望云台2的绝对pitch角度
 
-        fp32 gimbal3_yaw_set = 0.f;
-        fp32 gimbal3_yaw_offset = 0.f;
-        fp32 gimbal3_pitch_set = 0.f;
+        fp32 gimbal3_yaw_set = 0.f;       // 期望云台3的绝对yaw角度
+        fp32 gimbal3_yaw_offset = 0.f;    // 云台3的yaw角度偏移，用于校准
+        fp32 gimbal3_pitch_set = 0.f;     // 期望云台3的绝对pitch角度
 
         /** shoot_control **/
-        bool friction_open = false;
-        bool friction_real_state =
+        bool friction_open = false;      //摩擦轮开关
+        bool friction_real_state =          
             false;  // friction's real state (motor linear speed < 0.5 ? false : true)
-        bool cv_fire = false;
-        int shoot_open = 0;
+        bool cv_fire = false;             //视觉触发射击
+        int shoot_open = 0;               //射击权限，按位表示各个云台的射击权限
 
         /** other **/
-        fp32 gimbalT_1_yaw_set = 0.f;
-        fp32 gimbalT_1_pitch_set = 0.f;
-        fp32 gimbalT_1_yaw_reletive = 0.f;
+        fp32 gimbalT_1_yaw_set = 0.f;       // 期望云台1的绝对yaw角度
+        fp32 gimbalT_1_pitch_set = 0.f;     // 期望云台1的绝对pitch角度
+        fp32 gimbalT_1_yaw_reletive = 0.f;  // 云台1相对机器人前进方向的yaw角度    
 
         // only sentry needs gimbalT_2
-        fp32 gimbalT_2_yaw_set = 0.f;
-        fp32 gimbalT_2_pitch_set = 0.f;
-        fp32 gimbalT_2_yaw_reletive = 0.f;
+        fp32 gimbalT_2_yaw_set = 0.f;       // 期望云台2的绝对yaw角度
+        fp32 gimbalT_2_pitch_set = 0.f;     // 期望云台2的绝对pitch角度
+        fp32 gimbalT_2_yaw_reletive = 0.f;  // 云台2相对机器人前进方向的yaw角度
 
-        fp32 gimbal_sentry_yaw_set = 0.f;
-        fp32 gimbal_sentry_yaw = 0.f;
-        fp32 gimbal_sentry_yaw_reletive = 0.f;
+        fp32 gimbal_sentry_yaw_set = 0.f;   // 期望哨兵云台的绝对yaw角度
+        fp32 gimbal_sentry_yaw = 0.f;       // 哨兵云台的yaw角度
+        fp32 gimbal_sentry_yaw_reletive = 0.f;// 哨兵云台相对机器人前进方向的yaw角度
 
-        fp32 aimx;
-        fp32 aimy;
-        fp32 aimz;
-        bool is_aiming = false;
-        uint8_t inited = 0;
+        fp32 aimx;                          // 目标坐标x，由视觉提供
+        fp32 aimy;                          // 目标坐标y，由视觉提供
+        fp32 aimz;                          // 目标坐标z，由视觉提供
+        bool is_aiming = false;             // 是否有目标，由视觉提供
+        uint8_t inited = 0;                // 初始化状态
 
-        uint8_t sentry_follow_gimbal = 0;
+        uint8_t sentry_follow_gimbal = 0;   // 哨兵云台是否跟随主云台
 
-        bool auto_aim_status = false;
+        bool auto_aim_status = false;       // 是否处于自瞄状态
 
-        Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
-        Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
+        Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;         // 机器人当前工作模式
+        Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;    // 上一个机器人工作模式
 
-        Types::ReceivePacket_Super_Cap super_cap_info;
-        Types::Referee_info referee_info;
+        Types::ReceivePacket_Super_Cap super_cap_info;                      // 超级电容信息
+        Types::Referee_info referee_info;                                   // 裁判系统信息
 
-        void set_mode(Types::ROBOT_MODE set_mode) {
+        void set_mode(Types::ROBOT_MODE set_mode) {                         // 设置机器人工作模式
             this->last_mode = this->mode;
             this->mode = set_mode;
         }
 
-        bool mode_changed() {
+        bool mode_changed() {                                               // 检测机器人工作模式是否改变   
             if (this->last_mode != this->mode) {
                 this->last_mode = this->mode;
                 return true;
@@ -142,7 +143,7 @@ namespace Robot
 
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;
     } __attribute__((packed));
-
+ 
     struct SendAutoAimInfo
     {
         uint8_t header;
@@ -151,6 +152,7 @@ namespace Robot
         bool red;
     } __attribute__((packed));
 
+    // not used currently
     struct SendVisionControl
     {
         uint8_t header = 0xA6;

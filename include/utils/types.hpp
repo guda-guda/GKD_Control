@@ -52,7 +52,7 @@ namespace Types
         int mouse_x;
         int mouse_y;
         int mouse_z;
-        int mouse_l;
+        int mouse_l; 
         int mouse_r;
         int key;
     } __attribute__((packed)) ReceivePacket_RC_CTRL;

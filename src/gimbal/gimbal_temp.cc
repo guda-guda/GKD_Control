@@ -82,7 +82,7 @@ namespace Gimbal
                 if (vc.fire && ISDEF(CONFIG_SENTRY)) {
                     robot_set->shoot_open |= config.gimbal_id;
                 }
-
+            
                 if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0) {
                     *another_yaw_set = vc.yaw_set;
                     *another_pitch_set = vc.pitch_set;
@@ -94,6 +94,7 @@ namespace Gimbal
                 *pitch_set = vc.pitch_set;
             });
 
+        //定时检查视觉系统开火指令是否超时，超时则关闭射击权限
         std::thread check_auto_aim([this] {
             while (true) {
                 if (robot_set->sentry_follow_gimbal) {
@@ -170,9 +171,11 @@ namespace Gimbal
             logger.push_value("gimbal.yaw.set", (double)*yaw_set);
             logger.push_value("gimbal.yaw.imu", (double)imu.yaw);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
+                //安全模式，电机停止
                 yaw_motor.give_current = 0;
                 pitch_motor.give_current = 0;
             } else if (robot_set->mode == Types::ROBOT_MODE::ROBOT_SEARCH) {
+                // 搜索模式，云台来回摆动，模拟搜索行为
                 static float delta = 0;
                 static float delta_1 = 0;
 
@@ -214,24 +217,28 @@ namespace Gimbal
             // if (config.gimbal_id == 1)
             // LOG_INFO("%dpitch set %f\n", config.gimbal_id, *pitch_set);
             // LOG_INFO("robot id % d\n", robot_set->referee_info.game_robot_status_data.robot_id);
+            //发送当前云台姿态给视觉
             Robot::SendAutoAimInfo pkg;
             pkg.header = config.header;
             MUXDEF(CONFIG_SENTRY, pkg.yaw = fake_yaw_abs, pkg.yaw = imu.yaw);
             pkg.pitch = imu.pitch;
-            pkg.red = robot_set->referee_info.game_robot_status_data.robot_id < 100;
-            IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(pkg);
+            pkg.red = robot_set->referee_info.game_robot_status_data.robot_id < 100; //红蓝方判断，id<100为红方
+            IO::io<SOCKET>["AUTO_AIM_CONTROL"]->send(pkg);//向自瞄视觉发送数据
 
             UserLib::sleep_ms(config.ControlTime);
         }
     }
 
+    //从IMU和电机获取数据，计算云台当前姿态
     void GimbalT::update_data() {
+        //从电机编码器计算云台相对角度和角速度
         yaw_relative = UserLib::rad_format(
             yaw_motor.data_.rotor_angle - Hardware::DJIMotor::ECD_8192_TO_RAD * config.YawOffSet);
         yaw_gyro = (std::cos(imu.pitch) * imu.yaw_rate - std::sin(imu.pitch) * imu.roll_rate);
         pitch_gyro = imu.pitch_rate;
         // gimbal sentry follow needs
         *yaw_rela = yaw_relative;
+        // 计算云台绝对角度
         fake_yaw_abs = robot_set->gimbal_sentry_yaw - yaw_relative;
     }
 

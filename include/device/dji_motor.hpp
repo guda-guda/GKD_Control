@@ -69,10 +69,10 @@ namespace Hardware {
         constexpr static fp32 ECD_8192_TO_RAD = 2.f * M_PIf / 8192.f;
 
         struct Message {
-            uint16_t ecd = 0;
-            int16_t speed_rpm = 0;
-            int16_t given_current = 0;
-            uint8_t temperate = 0;
+            uint16_t ecd = 0;                      //电机编码器值
+            int16_t speed_rpm = 0;                 //电机速度 (rpm)
+            int16_t given_current = 0;             //给定电流 (mA)
+            uint8_t temperate = 0;                 //电机温度 (°C)
 
             void unpack(const can_frame &frame);
         };

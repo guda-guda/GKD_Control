@@ -92,7 +92,7 @@ namespace Device
             friction_key_pressed_last = false;
         }
 
-
+        //开启/关闭自瞄
         if (pkg.mouse_r || (pkg.s1 == S1_DOWN && pkg.s2 == S2_UP)) {
             robot_set->auto_aim_status = true;
             // LOG_INFO("auto aim status : %d\n", pkg.s1);

@@ -1,6 +1,10 @@
 {
   "name": "Ubuntu Dev",
-  "build": { "dockerfile": "Dockerfile" },
+  "build": { "dockerfile": "Dockerfile",
+  "args": {
+    "HTTP_PROXY": "http://host.docker.internal:7890",
+    "HTTPS_PROXY": "http://host.docker.internal:7890"
+  }},
   "remoteUser": "gkd",
   "postCreateCommand": "xmake project -k compile_commands",
   "customizations": {

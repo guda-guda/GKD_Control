@@ -43,9 +43,9 @@ namespace Gimbal
         Hardware::DJIMotor yaw_motor;
         Hardware::DJIMotor pitch_motor;
 
-        ControllerList yaw_relative_pid;
-        ControllerList yaw_absolute_pid;
-        ControllerList pitch_absolute_pid;
+        ControllerList yaw_relative_pid;        //yaw相对角度pid
+        ControllerList yaw_absolute_pid;        //yaw绝对角度pid
+        ControllerList pitch_absolute_pid;      //pitch绝对角度pid
 
         Shoot::Shoot shoot;
 
