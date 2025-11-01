@@ -17,12 +17,12 @@ namespace Config
 
     const std::vector<std::string> CanInitList = { "CAN_CHASSIS",
                                                    "CAN_BULLET",
-                                                   "CAN_RIGHT_HEAD" };
+                                                   "CAN_GIMBAL" };
 
     const std::vector<std::string> SocketInitList = { "AUTO_AIM_CONTROL" };
 
     const std::vector<std::tuple<std::string, int, int>> SerialInitList = {
-        { "/dev/IMU_RIGHT", 115200, 2000 },
+        { "/dev/IMU_SMALL_YAW", 115200, 2000 },
         { "/dev/IMU_BIG_YAW", 115200, 2000 }
     };
 
@@ -55,9 +55,9 @@ namespace Config
 
 //rm left_head
     const Gimbal::GimbalConfig gimbal_config = {
-            .imu_serial_port = "/dev/IMU_LEFT",
-            .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 2),
-            .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 1),
+            .imu_serial_port = "/dev/IMU_SMALL_YAW",
+            .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_GIMBAL", 2),
+            .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_GIMBAL", 1),
             .yaw_rate_pid_config = {
                 .kp =           5000.f,
                 .ki =           0.0f,
@@ -98,8 +98,8 @@ namespace Config
             .ControlTime = 1,
             .YawOffSet = 716,
             .shoot_config = {
-                .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 1, 0.075},
-                .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 2, 0.075},
+                .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 1, 0.075},
+                .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 2, 0.075},
                 .trigger_motor_config = Hardware::DJIMotorConfig{2006, "CAN_BULLET", 2, 0.075},
                 .friction_speed_pid_config = Pid::PidConfig{
                     2000.f,       // KP
@@ -122,70 +122,7 @@ namespace Config
             .auto_aim_port = 11453,
         };
 
-    const Gimbal::GimbalConfig gimbal_config = {
-            .imu_serial_port = "/dev/IMU_BIG_YAW",
-            .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 2),
-            .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_RIGHT_HEAD", 1), // not used
-            .yaw_rate_pid_config = {
-                .kp =           450.f,
-                .ki =           5.0f,
-                .kd =           50.f,
-                .max_out =      850.0f,
-                .max_iout =     250.0f,
-            },
-            .pitch_rate_pid_config = {
-                .kp =           5500.0f,
-                .ki =           100.0f,
-                .kd =           0.0f,
-                .max_out =      30000.0f,
-                .max_iout =     5000.0f,
-            },
-            .yaw_relative_pid_config ={
-                .kp =           3.6f,
-                .ki =           0.0f,
-                .kd =           8.0f,
-                .max_out =      15.0f,
-                .max_iout =     0.0f,
-            },
-            .yaw_absolute_pid_config = {
-                .kp =           8.0f,
-                .ki =           0.0f,
-                .kd =           10.0f,
-                .max_out =      15.0f,
-                .max_iout =     5.0f,
-            },
-            .pitch_absolute_pid_config = {
-                .kp =           15.0f,
-                .ki =           0.0f,
-                .kd =           10.0f,
-                .max_out =      10.0f,
-                .max_iout =     0.0f,
-            },
-            .gimbal_motor_dir = 1.0,
-            .gimbal_id = 1,
-            .ControlTime = 1,
-            .YawOffSet = 47555,
-            .shoot_config = {
-                .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 1, 0.075},
-                .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_RIGHT_HEAD", 1, 0.075},
-                .trigger_motor_config = Hardware::DJIMotorConfig{2006, "CAN_BULLET", 1, 0.075},
-                .friction_speed_pid_config = Pid::PidConfig{
-                    2000.f,       // KP
-                    0.05f,     // KI
-                    10.0f,     // KD
-                    16000.0f,  // MAX_OUT
-                    2000.0f,   // MAX_IOUT
-                },
-                .trigger_speed_pid_config = Pid::PidConfig{
-                    800.0f,    // KP
-                    0.5f,      // KI
-                    0.0f,      // KD
-                    10000.0f,  // MAX_OUT
-                    9000.0f,   // MAX_IOUT
-                },
-            }
-        };
-
+    
     // NOTE: PID CONFIG
 
     /** CHASSIS **/
