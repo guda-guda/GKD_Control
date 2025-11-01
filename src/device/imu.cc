@@ -16,7 +16,7 @@ namespace Device
         }
         serial_interface->register_callback<Types::ReceivePacket_IMU>(
             [&](const Types::ReceivePacket_IMU &rp) { unpack(rp); });
-    }
+        }
 
     void IMU::unpack(const Types::ReceivePacket_IMU &pkg) {
         yaw = UserLib::rad_format(pkg.yaw * (M_PIf / 180));

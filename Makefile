@@ -21,6 +21,7 @@ CPPFLAGS += -I$(WORK_DIR)/include/chassis
 CPPFLAGS += -I$(WORK_DIR)/include/device
 CPPFLAGS += -I$(WORK_DIR)/include/utils
 CPPFLAGS += -I$(WORK_DIR)/include/device/referee
+CPPFLAGS += -I$(WORK_DIR)/include/logger
 
 # NOTE: turn on debug here
 CPPFLAGS += -D__DEBUG__
