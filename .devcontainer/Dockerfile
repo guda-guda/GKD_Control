@@ -59,3 +59,8 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 
 ENV SHELL=/usr/bin/zsh
 CMD ["zsh"]
+
+# 代理设置
+ENV HTTP_PROXY=http://127.0.0.1:7890
+ENV HTTPS_PROXY=http://127.0.0.1:7890
+

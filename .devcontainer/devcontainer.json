@@ -6,6 +6,7 @@
     "HTTPS_PROXY": "http://host.docker.internal:7890"
   }},
   "remoteUser": "gkd",
+  "runArgs": ["--network=host"],
   "postCreateCommand": "xmake project -k compile_commands",
   "customizations": {
     "vscode": {
