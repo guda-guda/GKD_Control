@@ -13,7 +13,7 @@ namespace Chassis
     Chassis::Chassis(const ChassisConfig &config)
         : config(config),
           motors(config.wheels_config.begin(), config.wheels_config.end()),
-          power_manager(motors, Power::Division::HERO) {
+          power_manager(motors, MUXDEF(CONFIG_SENTRY, Power::Division::SENTRY, MUXDEF(CONFIG_HERO, Power::Division::HERO, Power::Division::INFANTRY))) {
     }
 
     void Chassis::init(const std::shared_ptr<Robot::Robot_set> &robot) {
@@ -48,12 +48,11 @@ namespace Chassis
         std::jthread power_daemon(&Power::Manager::powerDaemon, &power_manager);
         while (true) {
             decomposition_speed();
-            LOG_INFO("chassis.wheel_speed: %f, %f, %f, %f\n", wheel_speed[0], wheel_speed[1], wheel_speed[2], wheel_speed[3]);
+             LOG_INFO("chassis.wheel_speed: %f, %f, %f, %f\n", wheel_speed[0], wheel_speed[1], wheel_speed[2], wheel_speed[3]);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
-                //安全模式，电机不动
                 for (auto &motor : motors) {
                     motor.set(0.f);
-                }P
+                }
             } else {
                 fp32 max_speed = 0.f;
                 for (int i = 0; i < 4; i++) {
@@ -68,7 +67,7 @@ namespace Chassis
                 }
 
                 for (int i = 0; i < 4; i++) {
-                    wheels_pid[i].set(wheel_speed[i]);                          //设置轮子速度闭环目标（期望速度）
+                    wheels_pid[i].set(wheel_speed[i]);
                 }
 
                 robot_set->spin_state = robot_set->wz_set < 0.1 ? false : true; //设置旋转状态,当wz_set大于0.1时认为在旋转
@@ -78,7 +77,7 @@ namespace Chassis
                 for (int i = 0; i < 4; ++i) {
                     objs[i].curAv = motors[i].motor_measure_.speed_rpm * M_PIf / 30;
                     objs[i].pidOutput = wheels_pid[i].out;
-                    objs[i].setAv = wheel_speed[i];                              // 目标速度
+                    objs[i].setAv = wheel_speed[i];
                     objs[i].pidMaxOutput = 14000;
                 }
                 static Power::PowerObj *pObjs[4] = { &objs[0], &objs[1], &objs[2], &objs[3] };
@@ -88,26 +87,33 @@ namespace Chassis
                 // for (int i = 0; i < 4; ++i) {
                 //    logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
                 //    logger.push_console_message("<h1>111</h1>");
-                // }
+                //
+                }
 
-                for (int i = 0; i < 4; ++i) {
-                    if(motors[i].offline()) {
-                        LOG_ERR("chassis_%d offline\n", i + 1);
+                // Check if chassis power is disabled due to virtual buffer depletion
+                if (power_manager.isChassisPowerDisabled()) {
+                    // Chassis power is disabled, set all motor currents to 0
+                    for (int i = 0; i < 4; ++i) {
+                        if(motors[i].offline()) {
+                            LOG_ERR("chassis_%d offline\n", i + 1);
+                        }
+                        motors[i].give_current = 0.0f; // Force motors to stop during power disable
                     }
-                /*
-                TODO功率限制需要修改，现在直接输出pidout
-                */
-                    motors[i].give_current = wheels_pid[i].out;
+                } else { 
+                    for (int i = 0; i < 4; ++i) {
+                        if(motors[i].offline()) {
+                            LOG_ERR("chassis_%d offline\n", i + 1);
+                        }
+                        motors[i].give_current = cmd_power[i];
+                    }
                 }
             }
             UserLib::sleep_ms(config.ControlTime);
         }
     }
 
-    //从机器人期望速度分解到各轮子速度
     void Chassis::decomposition_speed() {
         if (robot_set->mode != Types::ROBOT_MODE::ROBOT_NO_FORCE) {
-            //坐标变换，从机器人坐标系变换到全局坐标系，考虑云台偏移角度
             fp32 sin_yaw, cos_yaw;
             MUXDEF(
                 CONFIG_SENTRY,
@@ -116,7 +122,7 @@ namespace Chassis
             vx_set = cos_yaw * robot_set->vx_set + sin_yaw * robot_set->vy_set;
             vy_set = -sin_yaw * robot_set->vx_set + cos_yaw * robot_set->vy_set;
 
-            if (robot_set->wz_set == 0.f) {  
+            if (robot_set->wz_set == 0.f) {
                 if (last_wz_direction != 0.f) {  
                     fp32 current_angle = MUXDEF(  
                         CONFIG_SENTRY,  
@@ -130,15 +136,13 @@ namespace Chassis
                         last_wz_direction = 0.f;   
                     }  
                 } else {  
-                    chassis_angle_pid.set(0.f);  
-                    wz_set = chassis_angle_pid.out;  
-            }  
-        } else {  
-            wz_set = robot_set->wz_set;  
+                chassis_angle_pid.set(0.f);
+                wz_set = chassis_angle_pid.out;
+            } else {
+                wz_set = robot_set->wz_set;
             last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
         }
-        
-        //轮速分解，从全局坐标系变换到机器人坐标系，采用全向轮运动学模型
+
         wheel_speed[0] = -vx_set + vy_set + wz_set;
         wheel_speed[1] = vx_set + vy_set + wz_set;
         wheel_speed[2] = vx_set - vy_set + wz_set;

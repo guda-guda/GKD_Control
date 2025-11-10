@@ -67,7 +67,13 @@ namespace Power
           k2(k2_),
           k3(k3_),
           lastUpdateTick(0),
-          rls(1e-5f, 0.99999f) {
+          rls(1e-5f, 0.99999f),
+          virtualBufferEnergy(60.0f),        // 初始化虚拟缓冲能量为60J
+          virtualBufferMax(60.0f),           // 虚拟缓冲能量上限为60J
+          powerLimit(0.0f),                  // 功率限制将在powerDaemon中更新
+          chassisPowerDisabled(false),       // 默认不被断电
+          powerDisabledUntil(0)            // 断电截止时间初始化为0
+          {            
         configASSERT(k1_ >= 0);
         configASSERT(k2_ >= 0);
         configASSERT(k3_ >= 0);
@@ -138,19 +144,18 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     //     robot_set->referee_info.game_robot_status_data.robot_id,
     //     robot_set->referee_info.game_robot_status_data.robot_level);
 
-    // {       
-    //     logger.push_value("chassis.pc.sum power",  sumCmdPower);
-    //     logger.push_value("chassis.pc.max power",  maxPower);
-    //     logger.push_value("chassis.pc.measured power",  measuredPower);
-    //     logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.capEnergy);
-    //     logger.push_value("chassis.pc.robot id",  robot_set->referee_info.game_robot_status_data.robot_id);
-    //     logger.push_value("chassis.pc.robot level",  robot_set->referee_info.game_robot_status_data.robot_level);
-    // }
+    //{       
+    //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
+    //    logger.push_value("chassis.pc.max power",  maxPower);
+    //    logger.push_value("chassis.pc.measured power",  measuredPower);
+    //    logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.capEnergy);
+    //   logger.push_value("chassis.pc.robot id",  robot_set->referee_info.game_robot_status_data.robot_id);
+   // }
 
     // LOG_INFO("k1 %f k2 %f k3 %f max %f\n", k1, k2, k3, maxPower);
 
-    // LOG_INFO("referee level %d\n",
-    // robot_set->referee_info.game_robot_status_data.robot_level);
+    // LOG_INFO("robot id %d\n",  // Updated for new rules - no more level dependency
+    // robot_set->referee_info.game_robot_status_data.robot_id);
 
     //      update power status
     powerStatus.maxPowerLimited = maxPower;
@@ -270,17 +275,26 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             baseBuffSet = capBaseBuffSet;  // 30
 
             // Update the referee maximum power limit and user configured power limit
-            // If disconnected, then restore the last robot level and find corresponding
-            // chassis power limit
+            // With new rules, power limit is now fixed for each robot type (no level dependency)
+            // Use the chassis power limit from referee system, but ensure it doesn't drop too low
+            // In new system, super_cap_info.chassisPowerlimit should reflect referee limit
             refereeMaxPower = fmax(
-                robot_set->super_cap_info.chassisPowerlimit,
+                robot_set->super_cap_info.chassisPowerlimit, 
                 CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD);
 
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
-            // FIXME: referee leve to set lower limit
-            powerLowerLimit = 50;
+        
+            if (division == Division::HERO) {
+                powerLowerLimit = 40;  // 英雄机器人最低功率限制
+            } else if (division == Division::INFANTRY) {
+                // 步兵：根据具体底盘类型设置，但实际应用中需通过其他方式确定
+                // 这里使用一个适中的值，实际应用中应根据具体底盘类型调整
+                powerLowerLimit = 35;  // 步兵机器人最低功率限制
+            } else { // SENTRY
+                powerLowerLimit = 50;  // 哨兵机器人最低功率限制
+            }
 
-            MIN_MAXPOWER_CONFIGURED = 50 * 0.8;
+            MIN_MAXPOWER_CONFIGURED = powerLowerLimit * 0.8;
 
             // energy loop
             // if cap and referee both gg, set the max power to latest power limit *
@@ -337,6 +351,13 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // outputFile << refereeMaxPower << ", " << baseMaxPower << "\n" << std::flush;
             //outputFile << baseMaxPower << ", " << fullMaxPower << "\n" << std::flush;
 
+            // NEW: Implement 60J virtual buffer energy system
+            // Update the power limit for the virtual buffer system
+            powerLimit = refereeMaxPower;
+            
+            // Update the virtual buffer energy based on measured power
+            updateVirtualBuffer(measuredPower, powerLimit);
+
             // update power status
             powerStatus.userConfiguredMaxPower = userConfiguredMaxPower;
             powerStatus.effectivePower = effectivePower;
@@ -360,7 +381,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
             lastUpdateTick = now;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Changed from 1ms to 100ms to achieve 10Hz
         }
     }
 
@@ -376,5 +397,55 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         powerUpperLimit = CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD;
         powerPD_base = Pid::PidPosition(powerPD_base_pid_config, powerBuff);
         powerPD_full = Pid::PidPosition(powerPD_full_pid_config, powerBuff);
+        
+        // Initialize virtual buffer energy to maximum
+        virtualBufferEnergy = virtualBufferMax;
+    }
+
+    /**
+     * @brief Update the virtual buffer energy based on power consumption
+     * @param instantaneousPower Measured instantaneous power output (Pr)
+     * @param powerLimit Power limit threshold (Pl)
+     */
+    void Manager::updateVirtualBuffer(float instantaneousPower, float powerLimit) {
+        // Calculate the time interval in seconds (10Hz = 0.1s per cycle)
+        float deltaTime = 0.1f; // 10Hz = 0.1s per update
+        
+        // Calculate energy consumption: Z = Z - (Pr - Pl) * 0.1
+        // Only consume energy if instantaneous power exceeds the limit
+        if (instantaneousPower > powerLimit) {
+            float energyConsumption = (instantaneousPower - powerLimit) * deltaTime;
+            virtualBufferEnergy -= energyConsumption;
+            // Ensure buffer energy does not go below 0  
+            virtualBufferEnergy = std::max(0.0f, virtualBufferEnergy);
+            
+            if (virtualBufferEnergy <= 0.0f && !chassisPowerDisabled) {
+                // Buffer depleted, trigger 5-second power-off
+                chassisPowerDisabled = true;
+                powerDisabledUntil = clock() + 5000; // 5 seconds from now (assuming clock() returns milliseconds)
+                
+                // Log the event
+                LOG_ERR("Virtual buffer depleted. Chassis power disabled for 5 seconds.");
+            }
+        }
+    }
+
+    /**
+     * @brief Check if chassis power is currently disabled
+     * @return true if chassis is disabled, false otherwise
+     */
+    bool Manager::isChassisPowerDisabled() {
+        if (chassisPowerDisabled) {
+            // Check if 5 seconds have passed since power was disabled
+            if (clock() >= powerDisabledUntil) {
+                // Re-enable chassis after 5 seconds
+                chassisPowerDisabled = false;
+                // Reset virtual buffer for safety (may depend on specific rules)
+                virtualBufferEnergy = virtualBufferMax; // Start with 60J after power-on
+                
+                LOG_INFO("Chassis power re-enabled after 5-second timeout.");
+            }
+        }
+        return chassisPowerDisabled;
     }
 }  // namespace Power
