@@ -15,7 +15,7 @@ namespace Chassis
           motors(config.wheels_config.begin(), config.wheels_config.end()),
           power_manager(motors, MUXDEF(CONFIG_SENTRY, Power::Division::SENTRY, MUXDEF(CONFIG_HERO, Power::Division::HERO, Power::Division::INFANTRY))) {
     }
-
+ 
     void Chassis::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
 

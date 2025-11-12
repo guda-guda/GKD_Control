@@ -25,8 +25,7 @@ namespace Device
             Power::HeroChassisPowerLimit * 0.9,      // 英雄固定100W * 0.9 = 90W
             MUXDEF(
                 CONFIG_INFANTRY,
-                // 步兵：在实际比赛中，具体底盘类型需要从裁判系统获取
-                // 通常通过机器人ID或特定配置数据确定，这里暂时使用血量优先模式
+                // 这里暂时使用血量优先模式
                 Power::InfantryChassisPowerLimit_HPFirst * 0.9,  // 血量优先: 75W * 0.9 = 67.5W
                 //Power::InfantryChassisPowerLimit_PowerFirst * 0.9,  // 功率优先: 90W * 0.9 = 81W
                 Power::SentryChassisPowerLimit * 0.9));  // 哨兵固定100W * 0.9 = 90W

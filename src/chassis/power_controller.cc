@@ -129,14 +129,13 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
     }
 
-    // LOG_INFO(
-    //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d %d\n",
-    //     sumCmdPower,
-    //     maxPower,
-    //     measuredPower,
-    //     robot_set->super_cap_info.capEnergy,
-    //     robot_set->referee_info.game_robot_status_data.robot_id,
-    //     robot_set->referee_info.game_robot_status_data.robot_level);
+     LOG_INFO(
+         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d\n",
+         sumCmdPower,
+         maxPower,
+         measuredPower,
+         robot_set->super_cap_info.capEnergy,
+         robot_set->referee_info.game_robot_status_data.robot_id);
 
     //{       
     //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
@@ -265,8 +264,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             powerBuff = sqrtf(robot_set->super_cap_info.capEnergy);
 
             // Set the energy target based on the current error status
-            fullBuffSet = capFullBuffSet;  // 230
-            baseBuffSet = capBaseBuffSet;  // 30
+            fullBuffSet = capFullBuffSet;  // 250
+            baseBuffSet = capBaseBuffSet;  // 100
 
             // Update the referee maximum power limit and user configured power limit
             // With new rules, power limit is now fixed for each robot type (no level dependency)
@@ -339,7 +338,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             //    "%d %f %d\n",
             //    robot_set->super_cap_info.capEnergy,
             //    robot_set->super_cap_info.chassisPower,
-            //    robot_set->super_cap_info.chassisPowerlimit);
+            //   robot_set->super_cap_info.chassisPowerlimit);
 
             // NOTE: for dumping log and draw purpose
             // printf("%f, %f\n", baseMaxPower, fullMaxPower);
