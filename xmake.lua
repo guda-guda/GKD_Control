@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
 add_requires("serial")
-set_toolchains("clang")
+--set_toolchains("clang")
 
 option("type")
     set_default("infantry")

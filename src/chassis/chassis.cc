@@ -87,27 +87,14 @@ namespace Chassis
                 // for (int i = 0; i < 4; ++i) {
                 //    logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
                 //    logger.push_console_message("<h1>111</h1>");
-                //
-                }
-
-                // Check if chassis power is disabled due to virtual buffer depletion
-                if (power_manager.isChassisPowerDisabled()) {
-                    // Chassis power is disabled, set all motor currents to 0
-                    for (int i = 0; i < 4; ++i) {
-                        if(motors[i].offline()) {
-                            LOG_ERR("chassis_%d offline\n", i + 1);
-                        }
-                        motors[i].give_current = 0.0f; // Force motors to stop during power disable
-                    }
-                } else { 
-                    for (int i = 0; i < 4; ++i) {
+                //}
+                for (int i = 0; i < 4; ++i) {
                         if(motors[i].offline()) {
                             LOG_ERR("chassis_%d offline\n", i + 1);
                         }
                         motors[i].give_current = cmd_power[i];
                     }
-                }
-            }
+            }     
             UserLib::sleep_ms(config.ControlTime);
         }
     }
@@ -138,9 +125,9 @@ namespace Chassis
                 } else {  
                 chassis_angle_pid.set(0.f);
                 wz_set = chassis_angle_pid.out;
-            } else {
+            }} else {
                 wz_set = robot_set->wz_set;
-            last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
+                last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
         }
 
         wheel_speed[0] = -vx_set + vy_set + wz_set;

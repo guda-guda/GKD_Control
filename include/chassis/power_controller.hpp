@@ -141,22 +141,12 @@ namespace Power
         std::shared_ptr<Device::Super_Cap> supercap;
         std::shared_ptr<Device::Dji_referee> referee;
 
-        // New members for virtual buffer energy management
-        float virtualBufferEnergy;       // 虚拟缓冲能量 Z (0-60J)
-        float virtualBufferMax;          // 虚拟缓冲能量上限 Q = 60J
-        float powerLimit;                // 底盘功率上限 Pl
-        bool chassisPowerDisabled;       // 底盘是否被断电
-        uint32_t powerDisabledUntil;     // 底盘断电截止时间 (ms)
-
         void init(const std::shared_ptr<Robot::Robot_set> &robot);
         std::array<float, 4> getControlledOutput(PowerObj *objs[4]);
         void setMaxPowerConfigured(float maxPower);
         void setMode(uint8_t mode); //功率最大值设置
         [[noreturn]] void powerDaemon (); //电源守护进程
         
-        // 新增函数用于管理60J虚拟缓冲
-        void updateVirtualBuffer(float instantaneousPower, float powerLimit);
-        bool isChassisPowerDisabled();
     };
 
 #define POWER_PD_KP 50.0f
