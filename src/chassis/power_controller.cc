@@ -130,12 +130,12 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     }
 
      LOG_INFO(
-         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d\n",
+         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, ChassisPowerlimit: %d\n",
          sumCmdPower,
          maxPower,
          measuredPower,
          robot_set->super_cap_info.capEnergy,
-         robot_set->referee_info.game_robot_status_data.robot_id);
+         robot_set->super_cap_info.chassisPowerlimit);
 
     //{       
     //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
@@ -334,11 +334,11 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             //     robot_set->super_cap_info.capEnergy);
 
             //NOTE: log super_cat_info
-             LOG_INFO(
-                "capEnergy:%d,chassisPower:%f,chassisPowerlimit:%d\n",
-                robot_set->super_cap_info.capEnergy,
-                robot_set->super_cap_info.chassisPower,
-               robot_set->super_cap_info.chassisPowerlimit);
+            //LOG_INFO(
+            //    "CapEnergy: %d , ChassisPower: %f , ChassisPowerlimit: %d\n",
+            //    robot_set->super_cap_info.capEnergy,
+            //    robot_set->super_cap_info.chassisPower,
+            //    robot_set->super_cap_info.chassisPowerlimit);
 
             // NOTE: for dumping log and draw purpose
             // printf("%f, %f\n", baseMaxPower, fullMaxPower);
