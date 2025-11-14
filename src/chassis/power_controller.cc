@@ -367,7 +367,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             }
 
             lastUpdateTick = now;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Changed from 1ms to 100ms to achieve 10Hz
+            std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
         }
     }
 
