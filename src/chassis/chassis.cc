@@ -13,9 +13,9 @@ namespace Chassis
     Chassis::Chassis(const ChassisConfig &config)
         : config(config),
           motors(config.wheels_config.begin(), config.wheels_config.end()),
-          power_manager(motors, Power::Division::HERO) {
+          power_manager(motors, MUXDEF(CONFIG_SENTRY, Power::Division::SENTRY, MUXDEF(CONFIG_HERO, Power::Division::HERO, Power::Division::INFANTRY))) {
     }
-
+ 
     void Chassis::init(const std::shared_ptr<Robot::Robot_set> &robot) {
         robot_set = robot;
 
@@ -48,7 +48,7 @@ namespace Chassis
         std::jthread power_daemon(&Power::Manager::powerDaemon, &power_manager);
         while (true) {
             decomposition_speed();
-            LOG_INFO("chassis.wheel_speed: %f, %f, %f, %f\n", wheel_speed[0], wheel_speed[1], wheel_speed[2], wheel_speed[3]);
+             LOG_INFO("chassis.wheel_speed: %f, %f, %f, %f\n", wheel_speed[0], wheel_speed[1], wheel_speed[2], wheel_speed[3]);
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE) {
                 for (auto &motor : motors) {
                     motor.set(0.f);
@@ -62,7 +62,7 @@ namespace Chassis
                 if (max_speed > max_wheel_speed) {
                     fp32 speed_rate = max_wheel_speed / max_speed;
                     for (int i = 0; i < 4; i++) {
-                        wheel_speed[i] *= speed_rate;
+                        wheel_speed[i] *= speed_rate;                           //速度归一化，防止超速
                     }
                 }
 
@@ -70,7 +70,7 @@ namespace Chassis
                     wheels_pid[i].set(wheel_speed[i]);
                 }
 
-                robot_set->spin_state = robot_set->wz_set < 0.1 ? false : true;
+                robot_set->spin_state = robot_set->wz_set < 0.1 ? false : true; //设置旋转状态,当wz_set大于0.1时认为在旋转
                 // LOG_INFO("spin?: %d\n", robot_set->spin_state);
 
                 // Power Limit
@@ -87,18 +87,14 @@ namespace Chassis
                 // for (int i = 0; i < 4; ++i) {
                 //    logger.push_value("chassis." + std::to_string(i), cmd_power[i]);
                 //    logger.push_console_message("<h1>111</h1>");
-                // }
-
+                //}
                 for (int i = 0; i < 4; ++i) {
-                    if(motors[i].offline()) {
-                        LOG_ERR("chassis_%d offline\n", i + 1);
+                        if(motors[i].offline()) {
+                            LOG_ERR("chassis_%d offline\n", i + 1);
+                        }
+                        motors[i].give_current = cmd_power[i];
                     }
-                /*
-                TODO功率限制需要修改，现在直接输出pidout
-                */
-                    motors[i].give_current = wheels_pid[i].out;
-                }
-            }
+            }     
             UserLib::sleep_ms(config.ControlTime);
         }
     }
@@ -113,7 +109,7 @@ namespace Chassis
             vx_set = cos_yaw * robot_set->vx_set + sin_yaw * robot_set->vy_set;
             vy_set = -sin_yaw * robot_set->vx_set + cos_yaw * robot_set->vy_set;
 
-            if (robot_set->wz_set == 0.f) {  
+            if (robot_set->wz_set == 0.f) {
                 if (last_wz_direction != 0.f) {  
                     fp32 current_angle = MUXDEF(  
                         CONFIG_SENTRY,  
@@ -127,18 +123,16 @@ namespace Chassis
                         last_wz_direction = 0.f;   
                     }  
                 } else {  
-                    chassis_angle_pid.set(0.f);  
-                    wz_set = chassis_angle_pid.out;  
-            }  
-        } else {  
-            wz_set = robot_set->wz_set;  
-            last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
+                chassis_angle_pid.set(0.f);
+                wz_set = chassis_angle_pid.out;
+            }} else {
+                wz_set = robot_set->wz_set;
+                last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
         }
-    }
 
         wheel_speed[0] = -vx_set + vy_set + wz_set;
         wheel_speed[1] = vx_set + vy_set + wz_set;
         wheel_speed[2] = vx_set - vy_set + wz_set;
         wheel_speed[3] = -vx_set - vy_set + wz_set;
     }
-}  // namespace Chassis
+}}  // namespace Chassis

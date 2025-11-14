@@ -61,6 +61,7 @@ namespace Pid
         fp32 last_err = 0.f;
     };
 
+
     class Invert final : public PidConfig, public Controller
     {
     public:

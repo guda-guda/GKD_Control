@@ -1,5 +1,4 @@
 #include "device/imu.hpp"
-
 #include "io.hpp"
 #include "serial_interface.hpp"
 #include "user_lib.hpp"

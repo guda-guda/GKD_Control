@@ -43,6 +43,7 @@ namespace Shoot
                 trigger.set(0);
             }
 
+            //摩擦轮渐进加速或停止
             friction_ramp.update(robot_set->friction_open ? Config::FRICTION_MAX_SPEED : 0.f);
 
             // friction really open?
@@ -88,7 +89,7 @@ namespace Shoot
             //     shoot_heat,
             //     robot_set->referee_info.power_heat_data.shooter_id_1_17_mm_cooling_heat,
             //     robot_set->referee_info.game_robot_status_data.shooter_cooling_limit);
-
+            //触发器控制，判定模式、裁判系统允许与否、摩擦轮状态
             if (robot_set->mode == Types::ROBOT_MODE::ROBOT_NO_FORCE ||
                 !(robot_set->shoot_open & gimbal_id) || !referee_fire_allowance ||
                 !robot_set->friction_real_state) {
@@ -99,7 +100,7 @@ namespace Shoot
             UserLib::sleep_ms(Config::SHOOT_CONTROL_TIME);
         }
     }
-
+    // 判断卡弹
     bool Shoot::isJam() {
         return trigger.motor_measure_.given_current > 4000 && trigger.motor_measure_.speed_rpm < 1;
     }

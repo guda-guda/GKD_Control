@@ -41,7 +41,7 @@ namespace Device
        public:
         explicit Rc_Controller(const std::string& serial_name);
 
-        bool inited = 0;
+        bool inited = 0;     // whether the rc controller is initialized
         fp32 yaw = 0;
         fp32 pitch = 0;
         fp32 roll = 0;

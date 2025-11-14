@@ -3,7 +3,8 @@
 #include "user_lib.hpp"
 
 namespace Pid
-{
+{   
+    //位置形式的PID控制器
     void PidPosition::set(const fp32 set_v) {
         error[1] = error[0];
         error[0] = (set_v - ref);
@@ -25,6 +26,7 @@ namespace Pid
         out = 0;
     }
 
+    //弧度形式的PID控制器
     void PidRad::set(const fp32 set) {
         last_err = err;
 

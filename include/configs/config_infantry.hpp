@@ -199,6 +199,8 @@ namespace Config
     constexpr fp32 RPM_TO_RAD_S = 2.f * M_PIf / 60.f;
     constexpr fp32 temp = CHASSIS_MOTOR_RPM_TO_VECTOR_SEN / (RPM_TO_RAD_S / 19.f);
     constexpr fp32 CHASSIS_CONTROL_FREQUENCE = 500.0f;
+
+    // NOTE: HARDWARE CONFIG
 #define STAND
 #ifdef STAND
     constexpr fp32 GIMBAL1_YAW_OFFSET_ECD = 3459;

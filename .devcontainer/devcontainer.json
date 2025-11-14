@@ -1,6 +1,6 @@
 {
   "name": "Ubuntu Dev",
-  "build": { "dockerfile": "Dockerfile" },
+  "build": { "dockerfile": "Dockerfile"},
   "remoteUser": "gkd",
   "postCreateCommand": "xmake project -k compile_commands",
   "customizations": {
