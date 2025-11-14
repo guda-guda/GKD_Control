@@ -335,7 +335,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
             //NOTE: log super_cat_info
              LOG_INFO(
-                "%d %f %d\n",
+                "capEnergy:%d,chassisPower:%f,chassisPowerlimit:%d\n",
                 robot_set->super_cap_info.capEnergy,
                 robot_set->super_cap_info.chassisPower,
                robot_set->super_cap_info.chassisPowerlimit);
