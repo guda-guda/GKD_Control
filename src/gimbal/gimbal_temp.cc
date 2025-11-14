@@ -83,15 +83,16 @@ namespace Gimbal
                     robot_set->shoot_open |= config.gimbal_id;
                 }
 
+                const fp32 clamped_pitch = clamp_pitch_setpoint(vc.pitch_set);
                 if ((robot_set->shoot_open & (3 - config.gimbal_id)) == 0) {
                     *another_yaw_set = vc.yaw_set;
-                    *another_pitch_set = vc.pitch_set;
+                    *another_pitch_set = clamped_pitch;
                 }
 
                 // if (!ISDEF(CONFIG_SENTRY) && !robot_set->auto_aim_status)
                 //     return;
                 *yaw_set = vc.yaw_set;
-                *pitch_set = vc.pitch_set;
+                *pitch_set = clamped_pitch;
             });
 
         std::thread check_auto_aim([this] {
@@ -187,7 +188,7 @@ namespace Gimbal
                     -yaw >> yaw_relative_pid >> yaw_motor;
                 }
                 *pitch_set = std::clamp((double)pitch, -0.18, 0.51);
-                *pitch_set >> pitch_absolute_pid >> pitch_motor;
+                clamp_pitch_setpoint(*pitch_set) >> pitch_absolute_pid >> pitch_motor;
             } else {
                 // NOTE: 抽象双头限位
                 MUXDEF(
@@ -209,7 +210,7 @@ namespace Gimbal
                     yaw_absolute_pid >> yaw_motor;
                     , *yaw_set >> yaw_absolute_pid >> yaw_motor;)
 
-                *pitch_set >> pitch_absolute_pid >> pitch_motor;
+                clamp_pitch_setpoint(*pitch_set) >> pitch_absolute_pid >> pitch_motor;
             }
             // if (config.gimbal_id == 1)
             // LOG_INFO("%dpitch set %f\n", config.gimbal_id, *pitch_set);
@@ -233,6 +234,13 @@ namespace Gimbal
         // gimbal sentry follow needs
         *yaw_rela = yaw_relative;
         fake_yaw_abs = robot_set->gimbal_sentry_yaw - yaw_relative;
+    }
+
+    fp32 GimbalT::clamp_pitch_setpoint(fp32 value) const {
+        if (!config.pitch_limit_enabled) {
+            return value;
+        }
+        return std::clamp(value, config.pitch_min_angle, config.pitch_max_angle);
     }
 
 }  // namespace Gimbal

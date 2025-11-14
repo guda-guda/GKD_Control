@@ -46,13 +46,13 @@ namespace Config
             .max_iout =     2000.0f,
         },
         .ControlTime = 2,
-				.follow_dir = 1,
-};  // namespace Config
+		.follow_dir = 1,
+};  
 
     const Gimbal::GimbalConfig gimbal_config = {
         .imu_serial_port = "/dev/IMU_HERO",
         .yaw_motor_config = Hardware::DJIMotorConfig(6020, "CAN_GIMBAL", 3),
-        .pitch_motor_config = Hardware::DJIMotorConfig(3508, "CAN_GIMBAL", 1, 0.075),
+        .pitch_motor_config = Hardware::DJIMotorConfig(6020, "CAN_GIMBAL", 2),
         .yaw_rate_pid_config = {
             .kp =           8000.f,
             .ki =           0.0f,
@@ -61,11 +61,11 @@ namespace Config
             .max_iout =     5000.0f,
         },
         .pitch_rate_pid_config = {
-            .kp =           5500.0f,
-            .ki =           100.0f,
+            .kp =           9073.0f,
+            .ki =           283.0f,
             .kd =           0.0f,
             .max_out =      30000.0f,
-            .max_iout =     5000.0f,
+            .max_iout =     15000.0f,
         },
         .yaw_relative_pid_config ={
             .kp =           10.0f,
@@ -82,16 +82,19 @@ namespace Config
             .max_iout =     0.0f,
         },
         .pitch_absolute_pid_config = {
-            .kp =           15.0f,
+            .kp =           13.45f,
             .ki =           0.0f,
-            .kd =           10.0f,
+            .kd =           0.0f,
             .max_out =      10.0f,
             .max_iout =     0.0f,
         },
         .gimbal_motor_dir = 1.0,
         .gimbal_id = 1,
         .ControlTime = 1,
-        .YawOffSet = 3866,
+        .YawOffSet = 2958,
+        .pitch_limit_enabled = true,
+        .pitch_min_angle = -16.0f * M_PIf / 180.0f,
+        .pitch_max_angle = 16.0f * M_PIf / 180.0f,
         .shoot_config = {
             .left_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 3, 0.075},
             .right_friction_motor_config = Hardware::DJIMotorConfig{3508, "CAN_GIMBAL", 2, 0.075},
@@ -111,12 +114,8 @@ namespace Config
                 9000.0f,   // MAX_IOUT
             },
             .gimbal_id = 1
-}  // namespace Config
-}
-;
-
-    // NOTE: PID CONFIG
-
+    } 
+};
     /** CHASSIS **/
     const typename Pid::PidConfig M3508_SPEED_PID_CONFIG{
         15000.0f,  // KP
@@ -134,7 +133,6 @@ namespace Config
         0.2f,   // MAX_IOUT
     };
 
-    // TODO Adjust PID parameters
     /** GIMBAL **/
     const typename Pid::PidConfig GIMBAL_YAW_ABSOLUTE_PID_CONFIG{
         12.0f,  // KP
