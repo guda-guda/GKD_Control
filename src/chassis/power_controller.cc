@@ -325,20 +325,20 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
             // NOTE: log PIDs
             // LOG_INFO(
-            //    "%f, %f, %f, %f, %f %d\n",
+            //     "%f, %f, %f, %f, %f %d\n",
             //    sqrtf(baseBuffSet),
-            //    powerBuff,
-            //    refereeMaxPower,
-            //    powerPD_base.out,
-            //    baseMaxPower,
-            //    robot_set->super_cap_info.capEnergy);
+            //     powerBuff,
+            //     refereeMaxPower,
+            //     powerPD_base.out,
+            //     baseMaxPower,
+            //     robot_set->super_cap_info.capEnergy);
 
-            // NOTE: log super_cat_info
-            // LOG_INFO(
-            //    "%d %f %d\n",
-            //    robot_set->super_cap_info.capEnergy,
-            //    robot_set->super_cap_info.chassisPower,
-            //   robot_set->super_cap_info.chassisPowerlimit);
+            //NOTE: log super_cat_info
+             LOG_INFO(
+                "%d %f %d\n",
+                robot_set->super_cap_info.capEnergy,
+                robot_set->super_cap_info.chassisPower,
+               robot_set->super_cap_info.chassisPowerlimit);
 
             // NOTE: for dumping log and draw purpose
             // printf("%f, %f\n", baseMaxPower, fullMaxPower);
