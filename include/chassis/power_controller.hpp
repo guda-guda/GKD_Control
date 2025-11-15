@@ -46,24 +46,18 @@ namespace Power
     constexpr float CAP_REFEREE_BOTH_GG_COE = 0.85f; // 电容和裁判系统都挂了时的功率系数
 
     /**
-     * @brief The Power Limit and max HP enumeration attributed by division, chassis
-     * type and level
-     * @note  Copy from RM2024 Official Rule Manual
-     * @attention The infantry data list only suits for standard infantry, but not
-     * balanced infantry
-     * @attention if the pilot changes the chassis type before the game officially
-     * start, and simultaneously the referee system is disconnected before chassis
-     * type changed, there will be problem of distinguishing the chassis type, so we
-     * choose HP_FIRST chassis type conservatively, except for sentry
+     * @brief The Power Limit enumeration for different robot types
+     * @note  Updated for new rules: fixed power limits (no level dependency)
+     * @attention Power limits are now fixed for each robot type (hero, infantry, sentry)
+     * @attention No more level-based power adjustment during match
      */
-    constexpr static uint8_t maxLevel = 11U; //最高等级
-    constexpr static uint8_t HeroChassisPowerLimit_HP_FIRST[maxLevel] = { 0,   55U,  60U, 65U,
-                                                                          70U, 75U,  80U, 85U,
-                                                                          90U, 100U, 120U }; // 英雄各等级功率限制
-    constexpr static uint8_t InfantryChassisPowerLimit_HP_FIRST[maxLevel] = { 0,   45U, 50U, 55U,
-                                                                              60U, 65U, 70U, 75U,
-                                                                              80U, 90U, 100U };// 步兵各等级功率限制
-    constexpr static uint8_t SentryChassisPowerLimit = 100U;
+    // 英雄固定功率限制
+    constexpr static uint8_t HeroChassisPowerLimit = 100U; // 英雄固定功率限制100W
+    // 步兵固定功率限制
+    constexpr static uint8_t InfantryChassisPowerLimit_PowerFirst = 90U; // 功率优先步兵固定功率限制90W
+    constexpr static uint8_t InfantryChassisPowerLimit_HPFirst = 75U;   // 血量优先步兵固定功率限制75W
+    // 哨兵固定功率限制
+    constexpr static uint8_t SentryChassisPowerLimit = 100U; // 哨兵功率限制保持不变
 
     enum class Division
     {
@@ -152,6 +146,7 @@ namespace Power
         void setMaxPowerConfigured(float maxPower);
         void setMode(uint8_t mode); //功率最大值设置
         [[noreturn]] void powerDaemon (); //电源守护进程
+        
     };
 
 #define POWER_PD_KP 50.0f

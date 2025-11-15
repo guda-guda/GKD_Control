@@ -51,6 +51,7 @@ namespace Gimbal
 
         std::chrono::_V2::steady_clock::time_point receive_auto_aim;
 
+        fp32 clamp_pitch_setpoint(fp32 value) const;
     };
 
 }  // namespace Gimbal

@@ -67,7 +67,7 @@ namespace Power
           k2(k2_),
           k3(k3_),
           lastUpdateTick(0),
-          rls(1e-5f, 0.99999f) {
+          rls(1e-5f, 0.99999f){            
         configASSERT(k1_ >= 0);
         configASSERT(k2_ >= 0);
         configASSERT(k3_ >= 0);
@@ -129,28 +129,26 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
     }
 
-    // LOG_INFO(
-    //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d %d\n",
-    //     sumCmdPower,
-    //     maxPower,
-    //     measuredPower,
-    //     robot_set->super_cap_info.capEnergy,
-    //     robot_set->referee_info.game_robot_status_data.robot_id,
-    //     robot_set->referee_info.game_robot_status_data.robot_level);
+     LOG_INFO(
+         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, ChassisPowerlimit: %d\n",
+         sumCmdPower,
+         maxPower,
+         measuredPower,
+         robot_set->super_cap_info.capEnergy,
+         robot_set->super_cap_info.chassisPowerlimit);
 
-    // {       
-    //     logger.push_value("chassis.pc.sum power",  sumCmdPower);
-    //     logger.push_value("chassis.pc.max power",  maxPower);
-    //     logger.push_value("chassis.pc.measured power",  measuredPower);
-    //     logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.capEnergy);
-    //     logger.push_value("chassis.pc.robot id",  robot_set->referee_info.game_robot_status_data.robot_id);
-    //     logger.push_value("chassis.pc.robot level",  robot_set->referee_info.game_robot_status_data.robot_level);
-    // }
+    //{       
+    //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
+    //    logger.push_value("chassis.pc.max power",  maxPower);
+    //    logger.push_value("chassis.pc.measured power",  measuredPower);
+    //    logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.capEnergy);
+    //   logger.push_value("chassis.pc.robot id",  robot_set->referee_info.game_robot_status_data.robot_id);
+   // }
 
     // LOG_INFO("k1 %f k2 %f k3 %f max %f\n", k1, k2, k3, maxPower);
 
-    // LOG_INFO("referee level %d\n",
-    // robot_set->referee_info.game_robot_status_data.robot_level);
+    // LOG_INFO("robot id %d\n",  // Updated for new rules - no more level dependency
+    // robot_set->referee_info.game_robot_status_data.robot_id);
 
     //      update power status
     powerStatus.maxPowerLimited = maxPower;
@@ -266,21 +264,31 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             powerBuff = sqrtf(robot_set->super_cap_info.capEnergy);
 
             // Set the energy target based on the current error status
-            fullBuffSet = capFullBuffSet;  // 230
-            baseBuffSet = capBaseBuffSet;  // 30
+            fullBuffSet = capFullBuffSet;  // 250
+            baseBuffSet = capBaseBuffSet;  // 100
 
             // Update the referee maximum power limit and user configured power limit
-            // If disconnected, then restore the last robot level and find corresponding
-            // chassis power limit
+            // With new rules, power limit is now fixed for each robot type (no level dependency)
+            // Use the chassis power limit from referee system, but ensure it doesn't drop too low
+            // In new system, super_cap_info.chassisPowerlimit should reflect referee limit
             refereeMaxPower = fmax(
-                robot_set->super_cap_info.chassisPowerlimit,
+                robot_set->super_cap_info.chassisPowerlimit, 
                 CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD);
-
+            
+            
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
-            // FIXME: referee leve to set lower limit
-            powerLowerLimit = 50;
+            //TODO：测试不同机器人最低功率限制，或者统一设置一个最低功率限制    
+            if (division == Division::HERO) {
+                powerLowerLimit = 40;  // 英雄机器人最低功率限制
+            } else if (division == Division::INFANTRY) {
+                // 步兵：根据具体底盘类型设置，但实际应用中需通过其他方式确定
+                // 这里使用一个适中的值，实际应用中应根据具体底盘类型调整
+                powerLowerLimit = 35;  // 步兵机器人最低功率限制
+            } else { // SENTRY
+                powerLowerLimit = 50;  // 哨兵机器人最低功率限制
+            }
 
-            MIN_MAXPOWER_CONFIGURED = 50 * 0.8;
+            MIN_MAXPOWER_CONFIGURED = powerLowerLimit * 0.8;
 
             // energy loop
             // if cap and referee both gg, set the max power to latest power limit *
@@ -317,17 +325,17 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
             // NOTE: log PIDs
             // LOG_INFO(
-            //    "%f, %f, %f, %f, %f %d\n",
+            //     "%f, %f, %f, %f, %f %d\n",
             //    sqrtf(baseBuffSet),
-            //    powerBuff,
-            //    refereeMaxPower,
-            //    powerPD_base.out,
-            //    baseMaxPower,
-            //    robot_set->super_cap_info.capEnergy);
+            //     powerBuff,
+            //     refereeMaxPower,
+            //     powerPD_base.out,
+            //     baseMaxPower,
+            //     robot_set->super_cap_info.capEnergy);
 
-            // NOTE: log super_cat_info
-            // LOG_INFO(
-            //    "%d %f %d\n",
+            //NOTE: log super_cat_info
+            //LOG_INFO(
+            //    "CapEnergy: %d , ChassisPower: %f , ChassisPowerlimit: %d\n",
             //    robot_set->super_cap_info.capEnergy,
             //    robot_set->super_cap_info.chassisPower,
             //    robot_set->super_cap_info.chassisPowerlimit);
@@ -359,8 +367,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             }
 
             lastUpdateTick = now;
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
         }
     }
 

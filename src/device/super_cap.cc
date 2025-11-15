@@ -17,14 +17,18 @@ namespace Device
     void Super_Cap::unpack(const can_frame& frame) {
         static int delta = 0;
         delta++;
-        uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
+        
+        //取消等级机制，使用固定功率限制
+        // 注意：步兵有两种底盘类型(功率优先:90W, 血量优先:75W)
         uint16_t power_limit = MUXDEF(
             CONFIG_HERO,
-            Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+            Power::HeroChassisPowerLimit * 0.9,      // 英雄固定100W * 0.9 = 90W
             MUXDEF(
                 CONFIG_INFANTRY,
-                Power::InfantryChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
-                100U * 0.9));
+                // 这里暂时使用血量优先模式
+                Power::InfantryChassisPowerLimit_HPFirst * 0.9,  // 血量优先: 75W * 0.9 = 67.5W
+                //Power::InfantryChassisPowerLimit_PowerFirst * 0.9,  // 功率优先: 90W * 0.9 = 81W
+                Power::SentryChassisPowerLimit * 0.9));  // 哨兵固定100W * 0.9 = 90W
 
         if (delta >= 500) {
             set(true, power_limit);

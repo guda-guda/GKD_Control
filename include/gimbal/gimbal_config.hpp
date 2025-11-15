@@ -20,6 +20,9 @@ namespace Gimbal
         int gimbal_id;
         const int ControlTime{};
         const fp32 YawOffSet{};
+        bool pitch_limit_enabled = false;
+        fp32 pitch_min_angle = 0.f;
+        fp32 pitch_max_angle = 0.f;
         Shoot::ShootConfig shoot_config;
         uint8_t header;
         std::string auto_aim_ip;
