@@ -130,19 +130,11 @@ namespace Chassis
                 wz_set = robot_set->wz_set;
                 last_wz_direction = wz_set > 0 ? 1.0f : -1.0f; 
         }
-<<<<<<< HEAD
         
         //轮速分解，从全局坐标系变换到机器人坐标系，采用全向轮运动学模型
-=======
-
->>>>>>> c8dedce2d17bac8b7e2a38e564a51e1bc009d4f5
         wheel_speed[0] = -vx_set + vy_set + wz_set;
         wheel_speed[1] = vx_set + vy_set + wz_set;
         wheel_speed[2] = vx_set - vy_set + wz_set;
         wheel_speed[3] = -vx_set - vy_set + wz_set;
     }
-<<<<<<< HEAD
 }  }// namespace Chassis
-=======
-}}  // namespace Chassis
->>>>>>> c8dedce2d17bac8b7e2a38e564a51e1bc009d4f5
