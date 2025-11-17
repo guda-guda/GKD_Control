@@ -130,7 +130,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     }
 
      LOG_INFO(
-         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, buffer_energy %d %d,chassisPowerlimit %d\n",
+         "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, Robot_id&&Robot_level:%d %d,chassisPowerlimit %d\n",
          sumCmdPower,
          maxPower,
          measuredPower,
