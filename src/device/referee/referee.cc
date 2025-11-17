@@ -6,6 +6,10 @@ namespace Device
 {
     // read data from referee
     void Dji_referee::read() {
+        if (!base_.serial_.isOpen()) {
+            return;  // 如果串口未打开，则直接返回
+        }
+
         if (base_.serial_.available()) {
             rx_len_ = static_cast<int>(base_.serial_.available());
             base_.serial_.read(rx_buffer_, rx_len_);
@@ -130,17 +134,22 @@ namespace Device
                 robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_42_mm > 0,
                 robot_set->referee_info.bullet_allowance_data.bullet_allowance_num_17_mm > 0);
             // LOG_INFO("ui update\n");
-            update_ui_data(
-                &base_,
-                robot_set->friction_real_state && referee_fire_allowance,
-                robot_set->cv_fire,
-                robot_set->spin_state,
-                ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
+            // 只有在串口打开时才更新UI数据，避免在串口未打开时尝试发送UI
+            if (base_.serial_.isOpen()) {
+                update_ui_data(
+                    &base_,
+                    robot_set->friction_real_state && referee_fire_allowance,
+                    robot_set->cv_fire,
+                    robot_set->spin_state,
+                    ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
     void Dji_referee::task_ui() {
-        custom_ui_task(&base_, robot_set->referee_info.game_robot_status_data.robot_id);
+        if (base_.serial_.isOpen()) {
+            custom_ui_task(&base_, robot_set->referee_info.game_robot_status_data.robot_id);
+        }
     }
 }  // namespace Device
