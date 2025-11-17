@@ -38,7 +38,7 @@ namespace Robot
         // start DJIMotorManager thread
         Hardware::DJIMotorManager::start();
 
-        //threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
+        threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
         IFDEF(CONFIG_SENTRY, threads.emplace_back(&Gimbal::GimbalT::init_task, &gimbal_sentry));
     }
 
