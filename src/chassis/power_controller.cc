@@ -129,13 +129,13 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
     }
 
-    // LOG_INFO(
-    //     "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, ChassisPowerlimit: %d\n",
-    //    sumCmdPower,
-    //     maxPower,
-    //     measuredPower,
-    //     robot_set->super_cap_info.capEnergy,
-    //    robot_set->super_cap_info.chassisPowerlimit);
+    LOG_INFO(
+        "sum power: %f, Max power: %f, Measured: %f, CapEnergy: %d, ChassisPowerlimit: %d\n",
+        sumCmdPower,
+        maxPower,
+        measuredPower,
+        robot_set->super_cap_info.capEnergy,
+        robot_set->super_cap_info.chassisPowerlimit);
 
     //{       
     //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
@@ -211,13 +211,16 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         newCmdPower += newTorqueCurrent[i] * k0 * p->curAv + fabs(p->curAv) * k1 +
                        newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
     }
-    LOG_INFO(
-        "sumPower: %f, NewCMDPower power: %f, measuredPower: %f, capEnergy: %d ,refereeMaxPower: %f\n",
-         sumPowerRequired,
-         newCmdPower,
-         robot_set->super_cap_info.chassisPower,
-         robot_set->super_cap_info.capEnergy,
-         refereeMaxPower);
+    
+    //LOG_INFO(
+    //    "sumPower: %f, NewCMDPower power: %f,AllocatableMaxPower: %f,measuredPower: %f, capEnergy: %d ,chassisPowerlimit: %f\n",
+    //     sumPowerRequired,
+    //     newCmdPower,
+    //     maxPower,
+    //     robot_set->super_cap_info.chassisPower,
+    //    robot_set->super_cap_info.capEnergy,
+    //     robot_set->super_cap_info.chassisPowerlimit);
+    
     //      #endif
 
     return newTorqueCurrent; // 直接返回 std::array
