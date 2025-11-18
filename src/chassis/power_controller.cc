@@ -211,6 +211,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         newCmdPower += newTorqueCurrent[i] * k0 * p->curAv + fabs(p->curAv) * k1 +
                        newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
     }
+<<<<<<< HEAD
     
     //LOG_INFO(
     //    "sumPower: %f, NewCMDPower power: %f,AllocatableMaxPower: %f,measuredPower: %f, capEnergy: %d ,chassisPowerlimit: %f\n",
@@ -221,6 +222,17 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     //    robot_set->super_cap_info.capEnergy,
     //     robot_set->super_cap_info.chassisPowerlimit);
     
+=======
+     LOG_INFO(
+         "sumPower: %f, NewCMDPower power: %f,Max Power: %f,measuredPower: %f, capEnergy: %d,chassisPowerlimit: %f\n",
+         sumPowerRequired,
+         newCmdPower,
+         maxPower,
+         robot_set->super_cap_info.chassisPower,
+         robot_set->super_cap_info.capEnergy,
+         refereeMaxPower);
+
+>>>>>>> dev
     //      #endif
 
     return newTorqueCurrent; // 直接返回 std::array
