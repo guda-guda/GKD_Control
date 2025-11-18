@@ -21,16 +21,15 @@ namespace Robot
 
     Robot_ctrl::~Robot_ctrl() = default;
 
-    //初始化各硬件设备，各模块注册回调函数
     void Robot_ctrl::start_init() {
         // NOTE: register motors here
 
         rc_controller.init(robot_set);
         referee.init(robot_set);
-        IFNDEF(CONFIG_SENTRY,
+        //IFNDEF(CONFIG_SENTRY,
         super_cap.init(Config::super_cap_can_interface, robot_set);
         super_cap.set(true, 30);
-        );
+        //);
         
         chassis.init(robot_set);
         gimbal.init(robot_set);
@@ -39,7 +38,7 @@ namespace Robot
         // start DJIMotorManager thread
         Hardware::DJIMotorManager::start();
 
-        //threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
+        threads.emplace_back(&Config::GimbalType::init_task, &gimbal);
         IFDEF(CONFIG_SENTRY, threads.emplace_back(&Gimbal::GimbalT::init_task, &gimbal_sentry));
     }
 
@@ -60,8 +59,7 @@ namespace Robot
         threads.clear();
         std::this_thread::sleep_for(std::chrono::seconds(1000));
     }
-   
-    //仅初始化通讯接口，不注册回调函数
+
     void Robot_ctrl::load_hardware() {
         for (auto& name : Config::CanInitList) {
             IO::io<CAN>.insert(name);

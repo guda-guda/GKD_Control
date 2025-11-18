@@ -42,7 +42,9 @@ void UI_SendByte(unsigned char ch) {
 }
 
 void UI_Send(Device::Base *base_) {
-    base_->serial_.write(UI_com, UI_tot);
+    if (base_->serial_.isOpen()) {
+        base_->serial_.write(UI_com, UI_tot);
+    }
     UI_tot = 0;
 }
 
