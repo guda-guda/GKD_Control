@@ -36,7 +36,7 @@ namespace Device
 
         std::memcpy(&robot_set->super_cap_info, frame.data, 8);
         
-        LOG_INFO(
+        /*LOG_INFO(
             "\n----------------Original-8-bytes-------------\n",
             "SC RX raw: id=0x%03X [%d]\nframe.data:[0-3]:%02X %02X %02X %02X\nframe.data:[4-7]:%02X %02X %02X %02X",
             "--------------------\n",
@@ -63,7 +63,7 @@ namespace Device
             "\n------------------Manual-Decode-------------------\n",
             "SC limit decode: LE=%u  BE=%u",
             "---------------------\n", 
-            (unsigned)limit_le, (unsigned)limit_be);
+            (unsigned)limit_le, (unsigned)limit_be);*/
 
         // LOG_INFO(
         //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\tcapEnergy %d power limit %d\n",

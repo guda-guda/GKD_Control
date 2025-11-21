@@ -217,7 +217,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     }
      LOG_INFO(
          "\n---------------------Power_Controller_Info----------------------\n",
-         "sumPower: %f,\nNewCMDPower power: %f,\nMax Power: %f,\nmeasuredPower: %f,\ncapEnergy: %d,\nchassisPowerlimit: %f\n",
+         "sumPower: %f,\nNewCMDPower: %f,\nMax Power: %f,\nmeasuredPower: %f,\ncapEnergy: %d,\nchassisPowerlimit: %f\n",
          "-------------------------------\n",
          sumPowerRequired,
          newCmdPower,
@@ -277,9 +277,21 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // Update the referee maximum power limit and user configured power limit
             // If disconnected, then restore the last robot level and find corresponding
             // chassis power limit
-            refereeMaxPower = fmax(
+            if(measuredPower < 5.0f){
+                uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
+                uint16_t power_limit = MUXDEF(
+                    CONFIG_HERO,
+                    Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+                    MUXDEF(
+                    CONFIG_INFANTRY,
+                    Power::InfantryChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+                    100U * 0.9));
+                refereeMaxPower = power_limit;
+            }else{ 
+                refereeMaxPower = fmax(
                 robot_set->super_cap_info.chassisPowerlimit,
                 CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD);
+            }
 
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
             // FIXME: referee leve to set lower limit
@@ -291,11 +303,15 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // if cap and referee both gg, set the max power to latest power limit *
             // 0.85 and disable energy loop if referee gg, set the max power to latest
             // power limit * 0.95, enable energy loop when cap energy out
-            powerPD_base.set(sqrtf(baseBuffSet));
-            powerPD_full.set(sqrtf(fullBuffSet));
-            baseMaxPower = std::fclamp(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
-            fullMaxPower = std::fclamp(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
-
+            if(measuredPower < 5.0f){
+                baseMaxPower = refereeMaxPower;
+                fullMaxPower = refereeMaxPower;
+            }else{
+                powerPD_base.set(sqrtf(baseBuffSet));
+                powerPD_full.set(sqrtf(fullBuffSet));
+                baseMaxPower = std::fclamp(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+                fullMaxPower = std::fclamp(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+            }
             // Estimate the power based on the current model
             effectivePower = 0;
             samples[0][0] = 0;
@@ -361,9 +377,6 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                           1e-5f);  // In case the k1 diverge to negative number
                 k2 = fmax(params[1][0],
                           1e-5f);  // In case the k2 diverge to negative number
-            }else{
-                baseMaxPower = refereeMaxPower;
-                fullMaxPower = refereeMaxPower;
             }
 
             lastUpdateTick = now;
