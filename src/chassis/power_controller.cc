@@ -107,6 +107,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     float sumError = 0.0f;
     std::array<float, 4> error;
 
+    //按照现有逻辑，userConfiguredMaxPower永远大于baseMaxPower，所以maxPower恒等于baseMaxPower
     float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);
 
     float allocatablePower = maxPower;
@@ -240,7 +241,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         lastUpdateTick = clock();
 
         while (true) {
-            setMode(1);
+            setMode(1);//似乎没有任何作用，TODO
             float torqueConst = 0.3 * ((float)187 / 3591);
             float k0 =
                 torqueConst * 20 / 16384;  // torque current rate of the motor, defined as Nm/Output
@@ -267,8 +268,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             powerBuff = sqrtf(robot_set->super_cap_info.capEnergy);
 
             // Set the energy target based on the current error status
-            fullBuffSet = capFullBuffSet;  // 230
-            baseBuffSet = capBaseBuffSet;  // 30
+            fullBuffSet = capFullBuffSet;  // 204
+            baseBuffSet = capBaseBuffSet;  // 51
 
             // Update the referee maximum power limit and user configured power limit
             // If disconnected, then restore the last robot level and find corresponding
@@ -289,8 +290,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // power limit * 0.95, enable energy loop when cap energy out
             powerPD_base.set(sqrtf(baseBuffSet));
             powerPD_full.set(sqrtf(fullBuffSet));
-            baseMaxPower = fmax(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED);
-            fullMaxPower = fmax(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED);
+            baseMaxPower = std::fclamp(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+            fullMaxPower = std::fclamp(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
 
             // Estimate the power based on the current model
             effectivePower = 0;
@@ -357,6 +358,9 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                           1e-5f);  // In case the k1 diverge to negative number
                 k2 = fmax(params[1][0],
                           1e-5f);  // In case the k2 diverge to negative number
+            }else{
+                baseMaxPower = refereeMaxPower;
+                fullMaxPower = refereeMaxPower;
             }
 
             lastUpdateTick = now;
