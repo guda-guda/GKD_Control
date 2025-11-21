@@ -309,8 +309,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             }else{
                 powerPD_base.set(sqrtf(baseBuffSet));
                 powerPD_full.set(sqrtf(fullBuffSet));
-                baseMaxPower = std::fclamp(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
-                fullMaxPower = std::fclamp(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+                baseMaxPower = std::clamp(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+                fullMaxPower = std::clamp(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
             }
             // Estimate the power based on the current model
             effectivePower = 0;
