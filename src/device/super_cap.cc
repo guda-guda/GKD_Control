@@ -38,7 +38,7 @@ namespace Device
         std::memcpy(&robot_set->super_cap_info, frame.data, 8);
 
         // LOG_INFO(
-        //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\t· %d power limit %d\n",
+        //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\t %d power limit %d\n",
         //     robot_set->super_cap_info.errorCode,
         //     robot_set->super_cap_info.chassisPower,
         //     (int)robot_set->super_cap_info.chassisPowerlimit,
