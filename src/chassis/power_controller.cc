@@ -216,7 +216,9 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                        newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
     }
      LOG_INFO(
-         "sumPower: %f, NewCMDPower power: %f,Max Power: %f,measuredPower: %f, capEnergy: %d,chassisPowerlimit: %f\n",
+         "\n---------------------Power_Controller_Info----------------------\n",
+         "sumPower: %f,\nNewCMDPower power: %f,\nMax Power: %f,\nmeasuredPower: %f,\ncapEnergy: %d,\nchassisPowerlimit: %f\n",
+         "-------------------------------\n",
          sumPowerRequired,
          newCmdPower,
          maxPower,

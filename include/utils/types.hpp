@@ -65,6 +65,10 @@ namespace Types
         uint8_t capEnergy;
     } __attribute__((packed));
 
+    //Debug add
+    static_assert(sizeof(ReceivePacket_Super_Cap) == 8,
+              "SuperCap packet size mismatch");
+
     struct Referee_info
     {
         Referee::GameStatus game_status_data;
