@@ -20,7 +20,8 @@ namespace Device
         }
         static int delta = 0;
         delta++;
-        uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
+        //uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
+        uint16_t robot_level = 9; // default to level 10 when disconnected,Debug added
         uint16_t power_limit = MUXDEF(
             CONFIG_HERO,
             Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
@@ -30,15 +31,15 @@ namespace Device
                 100U * 0.9));
 
         if (delta >= 500) {
-            set(true, power_limit);
+            //set(true, power_limit);
             delta = 0;
         }
 
         std::memcpy(&robot_set->super_cap_info, frame.data, 8);
         
         /*LOG_INFO(
-            "\n----------------Original-8-bytes-------------\n",
-            "SC RX raw: id=0x%03X [%d]\nframe.data:[0-3]:%02X %02X %02X %02X\nframe.data:[4-7]:%02X %02X %02X %02X",
+            "\n----------------Original-8-bytes-------------\n"
+            "SC RX raw: id=0x%03X [%d]\nframe.data:[0-3]:%02X %02X %02X %02X\nframe.data:[4-7]:%02X %02X %02X %02X\n"
             "--------------------\n",
              frame.can_id,
              frame.can_dlc,
@@ -47,8 +48,8 @@ namespace Device
 
         // 2) 你现在的解读结果
         LOG_INFO(
-            "\n-----------------Parsed-Data------------------\n",
-            "SC parsed: errCode=%u  chassisPower=%f \n chassisPowerlimit(raw)=%u  capEnergy=%u",
+            "\n-----------------Parsed-Data------------------\n"
+            "SC parsed: errCode=%u  chassisPower=%f \n chassisPowerlimit(raw)=%u  capEnergy=%u\n"
             "---------------------\n",
              robot_set->super_cap_info.errorCode,
              robot_set->super_cap_info.chassisPower,
@@ -60,9 +61,9 @@ namespace Device
         uint16_t limit_be = (uint16_t)frame.data[6] | (uint16_t(frame.data[5]) << 8);
 
         LOG_INFO(
-            "\n------------------Manual-Decode-------------------\n",
-            "SC limit decode: LE=%u  BE=%u",
-            "---------------------\n", 
+            "\n------------------Manual-Decode-------------------\n"
+            "SC limit decode: LE=%u  BE=%u\n"
+            "----------------------\n", 
             (unsigned)limit_le, (unsigned)limit_be);*/
 
         // LOG_INFO(
