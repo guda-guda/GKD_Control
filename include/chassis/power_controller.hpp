@@ -33,7 +33,7 @@ namespace Power
     constexpr static float refereeFullBuffSet = 60.0f; // 裁判系统满功率能量缓冲目标值
     constexpr static float refereeBaseBuffSet = 50.0f; // 裁判系统基础功率能量缓冲目标值
     constexpr static float capFullBuffSet = 204.0f; // 超级电容满功率能量缓冲目标值
-    constexpr static float capBaseBuffSet = 51.0f; // 超级电容基础功率能量缓冲目标值
+    constexpr static float capBaseBuffSet = 151.0f; // 超级电容基础功率能量缓冲目标值
     constexpr static float error_powerDistribution_set = 20.0f; //功率分配算法的误差阈值
     constexpr static float prop_powerDistribution_set = 15.0f; // 功率分配算法的比例阈值
 

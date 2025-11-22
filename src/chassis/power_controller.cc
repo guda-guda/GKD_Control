@@ -280,18 +280,19 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             smoothFullBuffSet = static_cast<float>(cap);
             }
 
-            constexpr float alpha = 0.01f;
-            smoothBaseBuffSet = (1.0f - alpha) * smoothBaseBuffSet + alpha * capBaseBuffSet;
-            smoothFullBuffSet = (1.0f - alpha) * smoothFullBuffSet + alpha * capFullBuffSet;
-
-
-            fullBuffSet = smoothFullBuffSet;  
-            baseBuffSet = smoothBaseBuffSet; 
-
             // Update the referee maximum power limit and user configured power limit
             // If disconnected, then restore the last robot level and find corresponding
             // chassis power limit
             measuredPower = robot_set->super_cap_info.chassisPower;
+
+            constexpr float alpha = 0.01f;
+            if(measuredPower > 5.0f){
+            smoothBaseBuffSet = (1.0f - alpha) * smoothBaseBuffSet + alpha * capBaseBuffSet;
+            smoothFullBuffSet = (1.0f - alpha) * smoothFullBuffSet + alpha * capFullBuffSet;
+            }
+
+            fullBuffSet = smoothFullBuffSet;  
+            baseBuffSet = smoothBaseBuffSet;
             
             uint16_t power_limit = MUXDEF(
             CONFIG_HERO,
@@ -323,8 +324,12 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                 baseMaxPower = refereeMaxPower;
                 fullMaxPower = refereeMaxPower;
 
-                pdEffectLimit = std::min(pdEffectLimit + pdEffectLimitRamp, pdEffectLimitMax);
+                // 让 pdEffectLimit 慢慢“冷却”，保证停很久再跑时不至于太猛
+                pdEffectLimit = std::max(pdEffectLimit - pdEffectLimitRamp, 0.0f);
             }else{
+                // 一旦开始有功率输出：启用能量环，并逐步开放 PID 影响力
+                pdEffectLimit = std::min(pdEffectLimit + pdEffectLimitRamp, pdEffectLimitMax);
+
                 powerPD_base.set(sqrtf(baseBuffSet));
                 powerPD_full.set(sqrtf(fullBuffSet));
 
