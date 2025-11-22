@@ -292,30 +292,23 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // If disconnected, then restore the last robot level and find corresponding
             // chassis power limit
             measuredPower = robot_set->super_cap_info.chassisPower;
-            //uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
-            uint16_t robot_level = 9; // default to level 9 when disconnected
+            
             uint16_t power_limit = MUXDEF(
-                    CONFIG_HERO,
-                    Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
-                    MUXDEF(
-                    CONFIG_INFANTRY,
-                    Power::InfantryChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
-                    100U * 0.9));
+            CONFIG_HERO,
+            Power::HeroChassisPowerLimit * 0.9,      // 英雄固定100W * 0.9 = 90W
+            MUXDEF(
+                CONFIG_INFANTRY,
+                // 这里暂时使用血量优先模式
+                Power::InfantryChassisPowerLimit_HPFirst * 0.9,  // 血量优先: 75W * 0.9 = 67.5W
+                //Power::InfantryChassisPowerLimit_PowerFirst * 0.9,  // 功率优先: 90W * 0.9 = 81W
+                Power::SentryChassisPowerLimit * 0.9));  // 哨兵固定100W * 0.9 = 90W
             
             refereeMaxPower = power_limit;
             
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
-            //TODO：测试不同机器人最低功率限制，或者统一设置一个最低功率限制    
-            if (division == Division::HERO) {
-                powerLowerLimit = 40;  // 英雄机器人最低功率限制
-            } else if (division == Division::INFANTRY) {
-                // 步兵：根据具体底盘类型设置，但实际应用中需通过其他方式确定
-                // 这里使用一个适中的值，实际应用中应根据具体底盘类型调整
-                powerLowerLimit = 35;  // 步兵机器人最低功率限制
-            } else { // SENTRY
-                powerLowerLimit = 50;  // 哨兵机器人最低功率限制
-            }
 
+            powerLowerLimit = 50;
+        
             MIN_MAXPOWER_CONFIGURED = powerLowerLimit * 0.8;
 
             // energy loop

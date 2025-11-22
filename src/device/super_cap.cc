@@ -34,7 +34,7 @@ namespace Device
                 Power::SentryChassisPowerLimit * 0.9));  // 哨兵固定100W * 0.9 = 90W
 
         if (delta >= 500) {
-            //set(true, power_limit);
+            set(true, power_limit);
             delta = 0;
         }
 
