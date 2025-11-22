@@ -32,13 +32,13 @@ namespace Power
 
     constexpr static float refereeFullBuffSet = 60.0f; // 裁判系统满功率能量缓冲目标值
     constexpr static float refereeBaseBuffSet = 50.0f; // 裁判系统基础功率能量缓冲目标值
-    constexpr static float capFullBuffSet = 250.0f; // 超级电容满功率能量缓冲目标值
-    constexpr static float capBaseBuffSet = 100.0f; // 超级电容基础功率能量缓冲目标值
+    constexpr static float capFullBuffSet = 204.0f; // 超级电容满功率能量缓冲目标值
+    constexpr static float capBaseBuffSet = 51.0f; // 超级电容基础功率能量缓冲目标值
     constexpr static float error_powerDistribution_set = 20.0f; //功率分配算法的误差阈值
     constexpr static float prop_powerDistribution_set = 15.0f; // 功率分配算法的比例阈值
 
     // constexpr float MIN_MAXPOWER_CONFIGURED                   = 15.0f;
-    constexpr float MAX_CAP_POWER_OUT = 300.0f; // 超级电容最大输出功率
+    constexpr float MAX_CAP_POWER_OUT = 255.0f; // 超级电容最大输出功率
     constexpr float CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD = 43.0f; // 电容离线时能量耗尽的功率阈值
     constexpr float CAP_OFFLINE_ENERGY_TARGET_POWER = 37.0f; // 电容离线时的目标功率
     constexpr float MAX_POEWR_REFEREE_BUFF = 60.0f; // 裁判系统最大功率缓冲

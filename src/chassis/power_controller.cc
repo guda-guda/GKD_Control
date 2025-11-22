@@ -107,6 +107,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     float sumError = 0.0f;
     std::array<float, 4> error;
 
+    //按照现有逻辑，userConfiguredMaxPower永远大于baseMaxPower，所以maxPower恒等于baseMaxPower
     float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);
 
     float allocatablePower = maxPower;
@@ -212,16 +213,15 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                        newTorqueCurrent[i] * k0 * newTorqueCurrent[i] * k0 * k2 + k3 / 4.0f;
     }
     LOG_INFO(
-         "\n------------PowerLimit LOG_INFO-------------\n"
-         "sumPower: %f\nNewCMDPower power: %f\nMax Power: %f\nmeasuredPower: %f\ncapEnergy: %d\nchassisPowerlimit: %f\n"
-         "--------------------------------------------\n",
+         "\n---------------------PowerLimit LOG_INFO----------------------\n"
+         "sumPower: %f,\nNewCMDPower: %f,\nMax Power: %f,\nmeasuredPower: %f,\ncapEnergy: %d,\nchassisPowerlimit: %f\n"
+         "-------------------------------\n",
          sumPowerRequired,
          newCmdPower,
          maxPower,
          robot_set->super_cap_info.chassisPower,
          robot_set->super_cap_info.capEnergy,
          refereeMaxPower);
-
     //      #endif
 
     return newTorqueCurrent; // 直接返回 std::array
@@ -233,6 +233,12 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         static float effectivePower = 0;
         //std::ofstream outputFile("log/log.txt");
 
+        //能量环软启动相关的状态,防止maxPower剧烈跳变
+        static bool  energyLoopInitialized = false;         
+        static float smoothBaseBuffSet     = capBaseBuffSet; // 平滑后的目标能量
+        static float smoothFullBuffSet     = capFullBuffSet; 
+        static float pdEffectLimit         = 0.0f;           // PID 输出作用的软上限
+
         isInitialized = true;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -240,7 +246,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         lastUpdateTick = clock();
 
         while (true) {
-            setMode(1);
+            setMode(1);//似乎没有任何作用，TODO
             float torqueConst = 0.3 * ((float)187 / 3591);
             float k0 =
                 torqueConst * 20 / 16384;  // torque current rate of the motor, defined as Nm/Output
@@ -264,20 +270,39 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // therefore no need to update the powerBuff and buffSet
             //
             // Set the energy feedback based on the current error status
-            powerBuff = sqrtf(robot_set->super_cap_info.capEnergy);
+            uint8_t cap = robot_set->super_cap_info.capEnergy;
+            powerBuff = sqrtf(static_cast<float>(cap));
 
             // Set the energy target based on the current error status
-            fullBuffSet = capFullBuffSet;  // 250
-            baseBuffSet = capBaseBuffSet;  // 100
+            if (!energyLoopInitialized) {
+            energyLoopInitialized = true;
+            smoothBaseBuffSet = static_cast<float>(cap);
+            smoothFullBuffSet = static_cast<float>(cap);
+            }
+
+            constexpr float alpha = 0.01f;
+            smoothBaseBuffSet = (1.0f - alpha) * smoothBaseBuffSet + alpha * capBaseBuffSet;
+            smoothFullBuffSet = (1.0f - alpha) * smoothFullBuffSet + alpha * capFullBuffSet;
+
+
+            fullBuffSet = smoothFullBuffSet;  
+            baseBuffSet = smoothBaseBuffSet; 
 
             // Update the referee maximum power limit and user configured power limit
-            // With new rules, power limit is now fixed for each robot type (no level dependency)
-            // Use the chassis power limit from referee system, but ensure it doesn't drop too low
-            // In new system, super_cap_info.chassisPowerlimit should reflect referee limit
-            refereeMaxPower = fmax(
-                robot_set->super_cap_info.chassisPowerlimit, 
-                CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD);
+            // If disconnected, then restore the last robot level and find corresponding
+            // chassis power limit
+            measuredPower = robot_set->super_cap_info.chassisPower;
+            //uint16_t robot_level = robot_set->referee_info.game_robot_status_data.robot_level;
+            uint16_t robot_level = 9; // default to level 9 when disconnected
+            uint16_t power_limit = MUXDEF(
+                    CONFIG_HERO,
+                    Power::HeroChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+                    MUXDEF(
+                    CONFIG_INFANTRY,
+                    Power::InfantryChassisPowerLimit_HP_FIRST[robot_level] * 0.9,
+                    100U * 0.9));
             
+            refereeMaxPower = power_limit;
             
             powerUpperLimit = refereeMaxPower + MAX_CAP_POWER_OUT;
             //TODO：测试不同机器人最低功率限制，或者统一设置一个最低功率限制    
@@ -297,11 +322,30 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // if cap and referee both gg, set the max power to latest power limit *
             // 0.85 and disable energy loop if referee gg, set the max power to latest
             // power limit * 0.95, enable energy loop when cap energy out
-            powerPD_base.set(sqrtf(baseBuffSet));
-            powerPD_full.set(sqrtf(fullBuffSet));
-            baseMaxPower = fmax(refereeMaxPower - powerPD_base.out, MIN_MAXPOWER_CONFIGURED);
-            fullMaxPower = fmax(refereeMaxPower - powerPD_full.out, MIN_MAXPOWER_CONFIGURED);
+            
+            //对PID输出增加软上限，避免剧烈跳变
+            constexpr float pdEffectLimitMax  = 30.0f;  // PID 最多能上下调整 ±30W
+            constexpr float pdEffectLimitRamp = 0.1f;   // 每次循环增加 0.1W
+            if(measuredPower < 5.0f){
+                baseMaxPower = refereeMaxPower;
+                fullMaxPower = refereeMaxPower;
 
+                pdEffectLimit = std::min(pdEffectLimit + pdEffectLimitRamp, pdEffectLimitMax);
+            }else{
+                powerPD_base.set(sqrtf(baseBuffSet));
+                powerPD_full.set(sqrtf(fullBuffSet));
+
+                // 原始 PID 输出
+                float baseOut = powerPD_base.out;
+                float fullOut = powerPD_full.out;
+
+                // 对 PID 输出加软上限：限制在 [-pdEffectLimit, +pdEffectLimit] 之间
+                baseOut = std::clamp(baseOut, -pdEffectLimit, pdEffectLimit);
+                fullOut = std::clamp(fullOut, -pdEffectLimit, pdEffectLimit);
+                
+                baseMaxPower = std::clamp(refereeMaxPower - baseOut, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+                fullMaxPower = std::clamp(refereeMaxPower - fullOut, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
+            }
             // Estimate the power based on the current model
             effectivePower = 0;
             samples[0][0] = 0;
@@ -320,7 +364,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // Get the measured power from cap
             // If cap is disconnected, get measured power from referee feedback if cap
             // energy is out Otherwise, set it to estimated power
-            measuredPower = robot_set->super_cap_info.chassisPower;
+           
             // NOTE: log k1 k2 k3
             // LOG_INFO(
             //     "%f %f %f %f %f %f\n", measuredPower, effectivePower, estimatedPower, k1, k2,
@@ -386,5 +430,5 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         powerUpperLimit = CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD;
         powerPD_base = Pid::PidPosition(powerPD_base_pid_config, powerBuff);
         powerPD_full = Pid::PidPosition(powerPD_full_pid_config, powerBuff);
-    }
+}
 }  // namespace Power

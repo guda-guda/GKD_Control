@@ -15,6 +15,9 @@ namespace Device
     }
 
     void Super_Cap::unpack(const can_frame& frame) {
+        if (frame.can_id != 0x051) {
+        return;
+        }
         static int delta = 0;
         delta++;
         
@@ -31,11 +34,40 @@ namespace Device
                 Power::SentryChassisPowerLimit * 0.9));  // 哨兵固定100W * 0.9 = 90W
 
         if (delta >= 500) {
-            set(true, power_limit);
+            //set(true, power_limit);
             delta = 0;
         }
 
         std::memcpy(&robot_set->super_cap_info, frame.data, 8);
+        
+        /*LOG_INFO(
+            "\n----------------Original-8-bytes-------------\n"
+            "SC RX raw: id=0x%03X [%d]\nframe.data:[0-3]:%02X %02X %02X %02X\nframe.data:[4-7]:%02X %02X %02X %02X\n"
+            "--------------------\n",
+             frame.can_id,
+             frame.can_dlc,
+             frame.data[0], frame.data[1], frame.data[2], frame.data[3],
+             frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
+
+        // 2) 你现在的解读结果
+        LOG_INFO(
+            "\n-----------------Parsed-Data------------------\n"
+            "SC parsed: errCode=%u  chassisPower=%f \n chassisPowerlimit(raw)=%u  capEnergy=%u\n"
+            "---------------------\n",
+             robot_set->super_cap_info.errorCode,
+             robot_set->super_cap_info.chassisPower,
+             (unsigned)robot_set->super_cap_info.chassisPowerlimit,
+             (unsigned)robot_set->super_cap_info.capEnergy);
+
+        // 3) 手动再解一次 limit（小端/大端两种），方便对照
+        uint16_t limit_le = (uint16_t)frame.data[5] | (uint16_t(frame.data[6]) << 8);
+        uint16_t limit_be = (uint16_t)frame.data[6] | (uint16_t(frame.data[5]) << 8);
+
+        LOG_INFO(
+            "\n------------------Manual-Decode-------------------\n"
+            "SC limit decode: LE=%u  BE=%u\n"
+            "----------------------\n", 
+            (unsigned)limit_le, (unsigned)limit_be);*/
 
         // LOG_INFO(
         //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\t %d power limit %d\n",
