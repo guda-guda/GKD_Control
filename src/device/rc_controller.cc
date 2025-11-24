@@ -148,7 +148,7 @@ namespace Device
             }
 
             if (pkg.s1 == S1_UP)
-                robot_set->wz_set = 1.0;
+                robot_set->wz_set = 1.5;
             else
                 robot_set->wz_set = 0;
 

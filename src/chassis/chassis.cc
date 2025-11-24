@@ -94,6 +94,7 @@ namespace Chassis
                             LOG_ERR("chassis_%d offline\n", i + 1);
                         }
                         motors[i].give_current = cmd_power[i];
+                        //motors[i].give_current = wheels_pid[i].out;
                     }
             }     
             UserLib::sleep_ms(config.ControlTime);

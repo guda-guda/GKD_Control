@@ -318,7 +318,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // power limit * 0.95, enable energy loop when cap energy out
             
             //对PID输出增加软上限，避免剧烈跳变
-            constexpr float pdEffectLimitMax  = 30.0f;  // PID 最多能上下调整 ±30W
+            constexpr float pdEffectLimitMax  = 60.0f;  // PID 最多能上下调整 ±60W
             constexpr float pdEffectLimitRamp = 0.1f;   // 每次循环增加 0.1W
             if(measuredPower < 5.0f){
                 baseMaxPower = refereeMaxPower;
