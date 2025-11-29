@@ -44,7 +44,10 @@ namespace Power
     constexpr float MAX_POEWR_REFEREE_BUFF = 60.0f; // 裁判系统最大功率缓冲
     constexpr float REFEREE_GG_COE = 0.95f; // 裁判系统挂了的功率系数
     constexpr float CAP_REFEREE_BOTH_GG_COE = 0.85f; // 电容和裁判系统都挂了时的功率系数
-
+    //fallback add
+    constexpr uint32_t CAP_OFFLINE_TIME_MS = 500; // 电容离线时间阈值
+    constexpr uint32_t MOTOR_OFFLINE_THRESHOLD = 50; // 电机离线计数阈值
+    constexpr int MOTOR_CURRENT_ACTIVE_THRESHOLD = 50; // 电机电流激活阈值(TODO 根据实际情况调整)
     /**
      * @brief The Power Limit enumeration for different robot types
      * @note  Updated for new rules: fixed power limits (no level dependency)
@@ -86,7 +89,7 @@ namespace Power
         enum ErrorFlags
         {
             MotorDisconnect = 1U,
-            RefereeDisConnect = 2U,
+            //RefereeDisConnect = 2U,
             CAPDisConnect = 4U
         };
 
@@ -146,7 +149,10 @@ namespace Power
         void setMaxPowerConfigured(float maxPower);
         void setMode(uint8_t mode); //功率最大值设置
         [[noreturn]] void powerDaemon (); //电源守护进程
-        
+        // fallback机制新增
+        void updateErrorFlags();
+        bool isCapOnline() const;
+        bool isMotorOnline(int idx) const;
     };
 
 #define POWER_PD_KP 50.0f

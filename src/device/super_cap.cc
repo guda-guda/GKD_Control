@@ -37,9 +37,12 @@ namespace Device
             set(true, power_limit);
             delta = 0;
         }
-
-        std::memcpy(&robot_set->super_cap_info, frame.data, 8);
         
+        std::memcpy(&robot_set->super_cap_info.rx, frame.data, sizeof(Types::ReceivePacket_Super_Cap));
+        //fallback add
+        using Clock = std::chrono::steady_clock;
+        robot_set->super_cap_info.last_update_ms =  std::chrono::duration_cast<std::chrono::milliseconds>(
+                    Clock::now().time_since_epoch()).count();
         /*LOG_INFO(
             "\n----------------Original-8-bytes-------------\n"
             "SC RX raw: id=0x%03X [%d]\nframe.data:[0-3]:%02X %02X %02X %02X\nframe.data:[4-7]:%02X %02X %02X %02X\n"
@@ -54,10 +57,10 @@ namespace Device
             "\n-----------------Parsed-Data------------------\n"
             "SC parsed: errCode=%u  chassisPower=%f \n chassisPowerlimit(raw)=%u  capEnergy=%u\n"
             "---------------------\n",
-             robot_set->super_cap_info.errorCode,
-             robot_set->super_cap_info.chassisPower,
-             (unsigned)robot_set->super_cap_info.chassisPowerlimit,
-             (unsigned)robot_set->super_cap_info.capEnergy);
+             robot_set->super_cap_info.rx.errorCode,
+             robot_set->super_cap_info.rx.chassisPower,
+             (unsigned)robot_set->super_cap_info.rx.chassisPowerlimit,
+             (unsigned)robot_set->super_cap_info.rx.capEnergy);
 
         // 3) 手动再解一次 limit（小端/大端两种），方便对照
         uint16_t limit_le = (uint16_t)frame.data[5] | (uint16_t(frame.data[6]) << 8);
@@ -71,10 +74,10 @@ namespace Device
 
         // LOG_INFO(
         //     "errorCode %d\tchassisPower %f\tchassisPowerlimit %d\t %d power limit %d\n",
-        //     robot_set->super_cap_info.errorCode,
-        //     robot_set->super_cap_info.chassisPower,
-        //     (int)robot_set->super_cap_info.chassisPowerlimit,
-        //     (int)robot_set->super_cap_info.capEnergy,
+        //     robot_set->super_cap_info.rx.errorCode,
+        //     robot_set->super_cap_info.rx.chassisPower,
+        //     (int)robot_set->super_cap_info.rx.chassisPowerlimit,
+        //     (int)robot_set->super_cap_info.rx.capEnergy,
         //     power_limit);
     }
 

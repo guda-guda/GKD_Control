@@ -65,6 +65,13 @@ namespace Types
         uint8_t capEnergy;
     } __attribute__((packed));
 
+    //fallback add
+    struct SuperCapInfo
+    {
+        ReceivePacket_Super_Cap rx; //超级电容接收数据
+        uint64_t last_update_ms = 0;//上次接收数据时间戳
+    };
+
     //Debug add
     static_assert(sizeof(ReceivePacket_Super_Cap) == 8,
               "SuperCap packet size mismatch");

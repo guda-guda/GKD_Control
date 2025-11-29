@@ -97,6 +97,10 @@ namespace Power
 
 std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     std::array<float, 4> newTorqueCurrent; 
+    std::array<bool,4> motorOnline;
+    for(int i=0;i<4;i++){
+        motorOnline[i] = isMotorOnline(i);
+    }
     float torqueConst = 0.3 * ((float)187 / 3591);
     float k0 =
         torqueConst * 20 / 16384;  // torque current rate of the motor, defined as Nm/Output
@@ -118,6 +122,11 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
     for (int i = 0; i < 4; i++) {
         PowerObj *p = objs[i];
+        if(!motorOnline[i]){
+            cmdPower[i] = 0.0f;
+            error[i] = 0.0f;
+            continue;
+        }
         cmdPower[i] = p->pidOutput * k0 * p->curAv + fabs(p->curAv) * k1 +
                       p->pidOutput * k0 * p->pidOutput * k0 * k2 + k3 / static_cast<float>(4);
         sumCmdPower += cmdPower[i];
@@ -135,14 +144,14 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     //    sumCmdPower,
     //    maxPower,
     //    measuredPower,
-    //    robot_set->super_cap_info.capEnergy,
-    //    robot_set->super_cap_info.chassisPowerlimit);
+    //    robot_set->super_cap_info.rx.capEnergy,
+    //    robot_set->super_cap_info.rx.chassisPowerlimit);
 
     //{       
     //    logger.push_value("chassis.pc.sum power",  sumCmdPower);
     //    logger.push_value("chassis.pc.max power",  maxPower);
     //    logger.push_value("chassis.pc.measured power",  measuredPower);
-    //    logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.capEnergy);
+    //    logger.push_value("chassis.pc.cap energy",  robot_set->super_cap_info.rx.capEnergy);
     //   logger.push_value("chassis.pc.robot id",  robot_set->referee_info.game_robot_status_data.robot_id);
    // }
 
@@ -170,6 +179,10 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
         for (int i = 0; i < 4; i++) {
             PowerObj *p = objs[i];
+            if(!motorOnline[i]){
+                newTorqueCurrent[i] = 0.0f;
+                continue;
+            }
             if (floatEqual(cmdPower[i], 0.0f) || cmdPower[i] < 0.0f) {
                 newTorqueCurrent[i] = p->pidOutput;
                 continue;
@@ -201,6 +214,10 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
     } else {
         for (int i = 0; i < 4; i++) {
+            if(!motorOnline[i]){
+                newTorqueCurrent[i] = 0.0f;
+                continue;
+            }
             newTorqueCurrent[i] = objs[i]->pidOutput;
         }
     }
@@ -219,8 +236,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
          sumPowerRequired,
          newCmdPower,
          maxPower,
-         robot_set->super_cap_info.chassisPower,
-         robot_set->super_cap_info.capEnergy,
+         robot_set->super_cap_info.rx.chassisPower,
+         robot_set->super_cap_info.rx.capEnergy,
          refereeMaxPower);
     //      #endif
 
@@ -247,6 +264,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
 
         while (true) {
             setMode(1);//似乎没有任何作用，TODO
+            updateErrorFlags();//fallback add
+            bool capOnline = isCapOnline();//fallback add
             float torqueConst = 0.3 * ((float)187 / 3591);
             float k0 =
                 torqueConst * 20 / 16384;  // torque current rate of the motor, defined as Nm/Output
@@ -259,7 +278,22 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // estimate the cap energy if cap disconnect
             // estimated cap energy = cap energy feedback when cap is connected
             isCapEnergyOut = false;
-            estimatedCapEnergy = robot_set->super_cap_info.capEnergy / 255.0f * 2100.0f;
+            estimatedCapEnergy = robot_set->super_cap_info.rx.capEnergy / 255.0f * 2100.0f;
+
+            // Estimate the power based on the current model
+            effectivePower = 0;
+            samples[0][0] = 0;
+            samples[1][0] = 0;
+            for (int i = 0; i < 4; i++) {
+                //LOG_INFO("%d", motors[i].motor_measure_.given_current);
+
+                effectivePower += motors[i].motor_measure_.given_current * k0 *
+                                  rpm2av(motors[i].motor_measure_.speed_rpm);
+                samples[0][0] += fabsf(rpm2av(motors[i].motor_measure_.speed_rpm));
+                samples[1][0] += motors[i].motor_measure_.given_current * k0 *
+                                 motors[i].motor_measure_.given_current * k0;
+            }
+            estimatedPower = k1 * samples[0][0] + k2 * samples[1][0] + effectivePower + k3;
 
             // Set the power buff and buff set based on the current state
             // Take cap message as priority
@@ -270,7 +304,10 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // therefore no need to update the powerBuff and buffSet
             //
             // Set the energy feedback based on the current error status
-            uint8_t cap = robot_set->super_cap_info.capEnergy;
+            
+            //fallback add:根据电容在线状态选择能量反馈来源
+            if(capOnline){
+            uint8_t cap = robot_set->super_cap_info.rx.capEnergy;
             powerBuff = sqrtf(static_cast<float>(cap));
 
             // Set the energy target based on the current error status
@@ -283,7 +320,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // Update the referee maximum power limit and user configured power limit
             // If disconnected, then restore the last robot level and find corresponding
             // chassis power limit
-            measuredPower = robot_set->super_cap_info.chassisPower;
+            measuredPower = robot_set->super_cap_info.rx.chassisPower;
 
             constexpr float alpha = 0.01f;
             if(measuredPower > 5.0f){
@@ -343,22 +380,22 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
                 
                 baseMaxPower = std::clamp(refereeMaxPower - baseOut, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
                 fullMaxPower = std::clamp(refereeMaxPower - fullOut, MIN_MAXPOWER_CONFIGURED, powerUpperLimit);
-            }
-            // Estimate the power based on the current model
-            effectivePower = 0;
-            samples[0][0] = 0;
-            samples[1][0] = 0;
-            for (int i = 0; i < 4; i++) {
-                //LOG_INFO("%d", motors[i].motor_measure_.given_current);
+            }}else{
+                //停止使用energy loop
+                powerBuff = 0.0f;
+                baseBuffSet = 0.0f;
+                fullBuffSet = 0.0f;
+                //使用模型估计的功率暂时替代测量功率
+                measuredPower = estimatedPower;
 
-                effectivePower += motors[i].motor_measure_.given_current * k0 *
-                                  rpm2av(motors[i].motor_measure_.speed_rpm);
-                samples[0][0] += fabsf(rpm2av(motors[i].motor_measure_.speed_rpm));
-                samples[1][0] += motors[i].motor_measure_.given_current * k0 *
-                                 motors[i].motor_measure_.given_current * k0;
-            }
-            estimatedPower = k1 * samples[0][0] + k2 * samples[1][0] + effectivePower + k3;
+                baseMaxPower = CAP_OFFLINE_ENERGY_RUNOUT_POWER_THRESHOLD;
+                fullMaxPower = CAP_OFFLINE_ENERGY_TARGET_POWER;
 
+                energyLoopInitialized = false;
+                pdEffectLimit = 0.0f;
+            }
+
+            
             // Get the measured power from cap
             // If cap is disconnected, get measured power from referee feedback if cap
             // energy is out Otherwise, set it to estimated power
@@ -376,14 +413,14 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             //     refereeMaxPower,
             //     powerPD_base.out,
             //     baseMaxPower,
-            //     robot_set->super_cap_info.capEnergy);
+            //     robot_set->super_cap_info.rx.capEnergy);
 
             //NOTE: log super_cat_info
             //LOG_INFO(
             //    "CapEnergy: %d , ChassisPower: %f , ChassisPowerlimit: %d\n",
-            //    robot_set->super_cap_info.capEnergy,
-            //    robot_set->super_cap_info.chassisPower,
-            //    robot_set->super_cap_info.chassisPowerlimit);
+            //    robot_set->super_cap_info.rx.capEnergy,
+            //    robot_set->super_cap_info.rx.chassisPower,
+            //    robot_set->super_cap_info.rx.chassisPowerlimit);
 
             // NOTE: for dumping log and draw purpose
             // printf("%f, %f\n", baseMaxPower, fullMaxPower);
@@ -403,7 +440,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             // Add dead zone AND
             // The Referee System could not detect negative power, leading to failure of
             // real measurement. So use estimated power to evaluate this situtation
-            if (fabs(measuredPower) > 5.0f) {
+            if (fabs(measuredPower) > 5.0f && capOnline && rlsEnabled == Manager::RLSEnabled::Enable) {
                 params = rls.update(samples, measuredPower - effectivePower - k3);
                 k1 = fmax(params[0][0],
                           1e-5f);  // In case the k1 diverge to negative number
@@ -429,4 +466,63 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         powerPD_base = Pid::PidPosition(powerPD_base_pid_config, powerBuff);
         powerPD_full = Pid::PidPosition(powerPD_full_pid_config, powerBuff);
 }
-}  // namespace Power
+    /**
+     * @implements fallback add
+     */
+    bool Manager::isCapOnline() const{
+        using Clock = std::chrono::steady_clock;
+        auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    Clock::now().time_since_epoch()).count();
+        auto duration = now_ms - robot_set->super_cap_info.last_update_ms;
+        if(duration > CAP_OFFLINE_TIME_MS || robot_set->super_cap_info.rx.errorCode != 0){
+            return false;
+        } 
+        return true;
+    }
+
+    bool Manager::isMotorOnline(int idx) const{
+        if(idx < 0 || idx >= static_cast<int>(motors.size())){
+            return false;
+        }
+        static uint16_t lastEcd[4] = {0};
+        static int16_t lastSpeed[4] = {0};
+        static int offlineCounter[4] = {0};
+
+        bool cmdActive = abs(motors[idx].motor_measure_.given_current) > MOTOR_CURRENT_ACTIVE_THRESHOLD;
+        bool unchanged = (motors[idx].motor_measure_.ecd == lastEcd[idx]) &&
+                         (motors[idx].motor_measure_.speed_rpm == lastSpeed[idx]);
+        lastEcd[idx] = motors[idx].motor_measure_.ecd;
+        lastSpeed[idx] = motors[idx].motor_measure_.speed_rpm;
+        if(cmdActive && unchanged){
+            offlineCounter[idx]++;
+            if(offlineCounter[idx] >= MOTOR_OFFLINE_THRESHOLD){
+                return false;
+            }
+        }else if(!cmdActive){
+            offlineCounter[idx] = std::max(offlineCounter[idx] - 1, 0);
+        }else{
+            offlineCounter[idx] = 0;
+        }
+        return true;
+    }
+    void Manager::updateErrorFlags(){
+        if(!isCapOnline()){
+            setErrorFlag(error, Manager::ErrorFlags::CAPDisConnect);
+        }else{
+            clearErrorFlag(error, Manager::ErrorFlags::CAPDisConnect);
+        }
+
+        bool anyMotorOff = false;
+        for(int i=0;i<4;i++){
+            if(!isMotorOnline(i)){
+                anyMotorOff = true;
+                break;
+            }
+        }
+        if(anyMotorOff){
+            setErrorFlag(error, Manager::ErrorFlags::MotorDisconnect);
+        } else {
+            clearErrorFlag(error, Manager::ErrorFlags::MotorDisconnect);
+        }
+    }
+} // namespace Power

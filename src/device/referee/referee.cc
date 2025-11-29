@@ -141,7 +141,7 @@ namespace Device
                     robot_set->friction_real_state && referee_fire_allowance,
                     robot_set->cv_fire,
                     robot_set->spin_state,
-                    ((float)robot_set->super_cap_info.capEnergy / 250) * 100);
+                    ((float)robot_set->super_cap_info.rx.capEnergy / 250) * 100);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }

@@ -62,7 +62,7 @@ namespace Robot
         Types::ROBOT_MODE mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;         // 机器人当前工作模式
         Types::ROBOT_MODE last_mode = Types::ROBOT_MODE::ROBOT_NO_FORCE;    // 上一个机器人工作模式
 
-        Types::ReceivePacket_Super_Cap super_cap_info;                      // 超级电容信息
+        Types::SuperCapInfo super_cap_info;                                        // 超级电容信息
         Types::Referee_info referee_info;                                   // 裁判系统信息
 
         void set_mode(Types::ROBOT_MODE set_mode) {                         // 设置机器人工作模式
