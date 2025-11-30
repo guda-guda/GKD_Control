@@ -194,7 +194,7 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         }
     }
 
-    float newCmdPower = 0.0f;
+    newCmdPower = 0.0f;
     for (int i = 0; i < 4; i++) {
         PowerObj *p = objs[i];
         newCmdPower += newTorqueCurrent[i] * k0 * p->curAv +
@@ -399,6 +399,10 @@ void Manager::init(const std::shared_ptr<Robot::Robot_set> &robot) {
 
 //fallback add begin
 bool Manager::isCapOnline() const {
+#if !USE_SUPER_CAPACITOR
+    return false;
+#endif
+
     using Clock = std::chrono::steady_clock;
 
     auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -444,7 +448,7 @@ bool Manager::isMotorOnline(int idx) const {
     return true;
 }
 
-// TODO: 当前未在其它模块使用 error flags，预留备用
+// TODO: 当前未在其它模块使用 error flags，可以之后看看哪里可以用到，预留备用
 void Manager::updateErrorFlags() {
     if (!isCapOnline()) {
         setErrorFlag(error, Manager::ErrorFlags::CAPDisConnect);

@@ -19,7 +19,9 @@
 // If the capacitor is plugged into the circuit, make sure you enable the super
 // cap module successfully Otherwise, it will cause unexpected behavior of the
 // RLS model
-#define USE_SUPER_CAPACITOR TRUE
+#ifndef USE_SUPER_CAPACITOR
+#define USE_SUPER_CAPACITOR 0
+#endif
 
 #define USE_REFEREE_SYSTEM_COMM TRUE
 
