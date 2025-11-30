@@ -100,9 +100,8 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     float sumError = 0.0f;
     std::array<float, 4> error{};
 
-    //按照现有逻辑，userConfiguredMaxPower永远大于baseMaxPower，所以maxPower恒等于baseMaxPower
-    float maxPower = std::clamp(userConfiguredMaxPower, fullMaxPower, baseMaxPower);
-
+    // maxPower：能量环计算出的功率上限，限制在 [fullMaxPower, powerUpperLimit] 之间
+    float maxPower = std::clamp(baseMaxPower,fullMaxPower,powerUpperLimit);
     float allocatablePower  = maxPower;
     float sumPowerRequired  = 0.0f;
     static float newCmdPower;
@@ -235,8 +234,6 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
     lastUpdateTick = clock();
 
     while (true) {
-        setMode(1);//似乎没有任何作用，TODO
-
         bool  capOnline    = isCapOnline();//fallback add
         float torqueConst  = 0.3f * (187.0f / 3591.0f);
         float k0           = torqueConst * 20.0f / 16384.0f;// torque current rate of the motor, defined as Nm/Output
@@ -344,7 +341,6 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             energyLoopInitialized = false;
             pdEffectLimit         = 0.0f;
         }
-
     // NOTE: log k1 k2 k3
         // LOG_INFO(
         //     "%f %f %f %f %f %f\n", measuredPower, effectivePower, estimatedPower, k1, k2,
