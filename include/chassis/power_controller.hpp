@@ -163,22 +163,6 @@ namespace Power
         POWER_PD_KP, 0.0f, 0.2f, MAX_CAP_POWER_OUT, 0.0f,
     };
 
-    /**
-     * @brief Storing the power status of the chassis
-     */
-    struct PowerStatus
-    {
-       public:
-        float userConfiguredMaxPower;
-        float maxPowerLimited;
-        float sumPowerCmd_before_clamp;
-        float effectivePower;
-        float powerLoss;
-        float efficiency;
-        uint8_t estimatedCapEnergy;
-        Manager::ErrorFlags error;
-    };
-
     // return the latest feedback referee power limit(before referee disconnected),
     // according to the robot level
     //TODO 完成定义
@@ -191,12 +175,6 @@ namespace Power
      * @retval The controlled output torque current
      */
     std::array<float, 4> getControlledOutput(PowerObj *objs[4]);
-
-    /**
-     * @brief return the power status of the chassis
-     * @retval The power status object
-     */
-    const volatile PowerStatus &getPowerStatus();
 
     /**
      * @brief set the user configured max power

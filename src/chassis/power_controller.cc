@@ -12,7 +12,6 @@
 
 namespace Power {
 
-PowerStatus powerStatus;
 static bool  isCapEnergyOut             = false;
 static float MIN_MAXPOWER_CONFIGURED    = 30.0f;
 
@@ -132,9 +131,6 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
             sumPowerRequired += cmdPower[i];
         }
     }
-
-    powerStatus.maxPowerLimited          = maxPower;
-    powerStatus.sumPowerCmd_before_clamp = sumCmdPower;
 
     if (sumCmdPower > maxPower) {
         float errorConfidence = 0.0f;
@@ -375,15 +371,6 @@ std::array<float, 4> Manager::getControlledOutput(PowerObj *objs[4]) {
         // printf("%f, %f\n", baseMaxPower, fullMaxPower);
         // outputFile << refereeMaxPower << ", " << baseMaxPower << "\n" << std::flush;
         //outputFile << baseMaxPower << ", " << fullMaxPower << "\n" << std::flush;
-
-        powerStatus.userConfiguredMaxPower = userConfiguredMaxPower;
-        powerStatus.effectivePower         = effectivePower;
-        powerStatus.powerLoss              = measuredPower - effectivePower;
-        powerStatus.efficiency             = std::clamp(
-            effectivePower / measuredPower, 0.0f, 1.0f);
-        powerStatus.estimatedCapEnergy =
-            static_cast<uint8_t>(estimatedCapEnergy / 2100.0f * 255.0f);
-        powerStatus.error = static_cast<Manager::ErrorFlags>(error);
 
         // RLS 参数更新：只在 CAP 在线且功率足够大时更新
         if (fabs(measuredPower) > 5.0f &&
